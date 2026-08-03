@@ -185,6 +185,19 @@ func distance_to_cargo() -> float:
 	return global_position.distance_to(cargo.global_position)
 
 
+## Speed multiplier for a defender walking back to its slot.
+##
+## One where the defender is already fast enough. See
+## [member DefenderTuning.catch_up_margin] for why the rest is needed.
+func catch_up_scale() -> float:
+	if cargo == null:
+		return 1.0
+	var own := base_speed * terrain_factor
+	if own <= 0.0:
+		return 1.0
+	return maxf(1.0, (cargo.get_current_speed() + tuning.catch_up_margin) / own)
+
+
 # --- Combat -------------------------------------------------------------------
 
 

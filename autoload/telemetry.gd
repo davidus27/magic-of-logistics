@@ -203,6 +203,9 @@ func _blank_record() -> Dictionary:
 		"barrier_work_amount": 0.0,
 		"defender_idle_time": 0.0,
 		"defender_time_outside_defense_radius": 0.0,
+		# Section 34. How often a unit was blocked long enough to need a fallback
+		# position, which is the acceptance criterion of section 40.
+		"unit_fallbacks": 0,
 		# Session behaviour.
 		"pause_count": 0,
 		"total_pause_time": 0.0,

@@ -78,8 +78,12 @@ func _run_shots() -> void:
 	await _capture("03_formation")
 
 	# 4. The first enemy group on the approach. Sections 25.1 and 26.
-	_jump(620.0)
-	await _wait(150)
+	#
+	# Driven rather than jumped. A jump leaves the defenders where they were, and
+	# the catch-up of DefenderTuning.catch_up_margin only closes the gap at 25
+	# pixels a second, so the shot would show a strung-out squad that no real run
+	# produces.
+	await _drive_to(820.0)
 	await _capture("04_first_contact")
 
 	# 5. Selection rings and order marks. Sections 10.5 and 17.
@@ -137,6 +141,17 @@ func _run_shots() -> void:
 	await _capture("13_result")
 
 
+## Drive to a route offset the way the game does, so the escort keeps up.
+func _drive_to(route_offset: float, limit_frames: int = 1200) -> void:
+	var frames := 0
+	while _cargo.get_route_offset() < route_offset and frames < limit_frames:
+		frames += 1
+		await get_tree().process_frame
+
+
+## Move the cargo to a route offset at once. Fast, but it leaves everything that
+## was following the cargo behind, so use [method _drive_to] for any shot the
+## defenders appear in.
 func _jump(route_offset: float) -> void:
 	_cargo.motor.jump_to(route_offset)
 	_cargo.route_hint = -1

@@ -114,9 +114,13 @@ func _physics_process(delta: float) -> void:
 
 	_track_blocked(delta, speed)
 
-	# The agent needs a speed cap even on a frame the unit holds still, or the
-	# avoidance solver keeps last frame's cap.
-	_agent.max_speed = maxf(base_speed * terrain_factor, 1.0)
+	# The avoidance solver clamps the velocity it returns to this cap, so the cap
+	# has to include the speed scale of the current request. Leaving the scale out
+	# looks harmless and quietly throws away every request to move faster than the
+	# unit's own speed, which is how a defender catching up ends up not catching up.
+	# The cap is also set on a frame the unit holds still, or the solver keeps the
+	# cap from the last frame that did move.
+	_agent.max_speed = maxf(base_speed * terrain_factor * maxf(1.0, _move_scale), 1.0)
 	_agent.velocity = desired
 
 	# Asked for again every step. See the note at the top of the file.
@@ -291,6 +295,10 @@ func _track_blocked(delta: float, speed: float) -> void:
 
 ## Step aside to a position that is inside the navigation area. Section 34.
 func _choose_fallback() -> void:
+	# Counted so a run can show whether section 34 is being met. The rule is that
+	# no unit stays blocked for more than two seconds, and a count that climbs is
+	# the only cheap signal that units are getting stuck often enough to matter.
+	Telemetry.count("unit_fallbacks")
 	_fallback_angle += FALLBACK_TURN
 	var probe := global_position + Vector2.RIGHT.rotated(_fallback_angle) * FALLBACK_RADIUS
 	var navigation_map := get_world_2d().navigation_map

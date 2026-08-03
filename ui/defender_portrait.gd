@@ -15,9 +15,13 @@ extends Control
 
 signal portrait_pressed(index: int)
 
-const SIZE := Vector2(126.0, 78.0)
+## Four of these plus the order controls and the spell controls have to share
+## one 1280 pixel row without touching. See the layout note in [Hud].
+const SIZE := Vector2(108.0, 74.0)
 const BAR_HEIGHT := 5.0
-const PADDING := 8.0
+const PADDING := 7.0
+const NAME_FONT := 14
+const STATE_FONT := 12
 
 var index: int = 0
 var defender: Defender = null
@@ -37,13 +41,13 @@ func _init(slot_index: int) -> void:
 
 
 func _ready() -> void:
-	_name = InkUi.label("-", InkUi.FONT_SIZE_BODY)
+	_name = InkUi.label("-", NAME_FONT)
 	_name.position = Vector2(PADDING, 5.0)
-	_name.size = Vector2(SIZE.x - PADDING * 2.0, 22.0)
+	_name.size = Vector2(SIZE.x - PADDING * 2.0, 20.0)
 	add_child(_name)
 
-	_state = InkUi.label("", InkUi.FONT_SIZE_SMALL, InkPalette.GRAY_MEDIUM)
-	_state.position = Vector2(PADDING, 27.0)
+	_state = InkUi.label("", STATE_FONT, InkPalette.GRAY_MEDIUM)
+	_state.position = Vector2(PADDING, 26.0)
 	_state.size = Vector2(SIZE.x - PADDING * 2.0, 18.0)
 	add_child(_state)
 

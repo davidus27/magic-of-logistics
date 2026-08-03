@@ -51,6 +51,10 @@ var _elapsed: float = 0.0
 var _cast_timer: float = 0.0
 var _spawned_total: int = 0
 var _peak_enemies: int = 0
+var _groups_fired: int = 0
+var _furthest: float = 0.0
+var _formation_time: float = 0.0
+var _in_leash_time: float = 0.0
 var _finished: bool = false
 
 
@@ -106,6 +110,7 @@ func _process(delta: float) -> void:
 	_elapsed += delta
 	_peak_enemies = maxi(_peak_enemies, _spawner.living_count())
 	_fire_arc_bolt(delta)
+	_sample_formation(delta)
 
 	if _controller.state == GameController.State.RESULT:
 		_check_outcome()
@@ -119,6 +124,23 @@ func _process(delta: float) -> void:
 			GIVE_UP_SECONDS, _controller.state_name(), _cargo.get_route_offset(), _map.route_length,
 		])
 		_report()
+
+
+## Watch how far the defenders drift from the cargo unit.
+##
+## Section 15.2 gives three of the four defenders a speed below the Normal cargo
+## speed of section 13.1, so without the catch-up of
+## [member DefenderTuning.catch_up_margin] the squad falls behind for the whole
+## run and never defends anything. This measures whether that is still true.
+func _sample_formation(delta: float) -> void:
+	if _controller.state != GameController.State.RUN:
+		return
+	for defender in _squad.get_living():
+		var distance := defender.distance_to_cargo()
+		_furthest = maxf(_furthest, distance)
+		_formation_time += delta
+		if distance <= _squad.tuning.attack_leash:
+			_in_leash_time += delta
 
 
 ## Cast Arc Bolt at the nearest enemy. Section 14.5.
@@ -276,6 +298,24 @@ func _check_combat() -> void:
 	if int(record.get("defender_orders", 0)) <= 0:
 		_fail("the defender order count was not recorded")
 
+	# The escort has to stay an escort. A defender that spends the run outside
+	# the attack leash of section 15.7 can never intercept anything.
+	var in_leash := 0.0
+	if _formation_time > 0.0:
+		in_leash = _in_leash_time / _formation_time
+	_notes.append("defenders within the %.0fpx leash %.0f%% of the time, furthest %.0fpx" % [
+		_squad.tuning.attack_leash, in_leash * 100.0, _furthest,
+	])
+	if in_leash < 0.9:
+		_fail("defenders were outside the attack leash %.0f%% of the run" % [
+			(1.0 - in_leash) * 100.0,
+		])
+
+	# A unit must not stay blocked for more than two seconds. Sections 34 and 40.
+	# Every enemy walking to the cargo and dying there is the positive evidence;
+	# this is the count of how often one had to be helped past something.
+	_notes.append("blocked-unit fallbacks %d" % int(record.get("unit_fallbacks", 0)))
+
 
 ## Every value section 36 requires in the telemetry file, by record key.
 const REQUIRED_TELEMETRY_KEYS: PackedStringArray = [
@@ -326,8 +366,6 @@ func _check_telemetry_file() -> void:
 
 
 # --- Plumbing -----------------------------------------------------------------
-
-var _groups_fired: int = 0
 
 
 func _on_group_spawned(_index: int, count: int) -> void:

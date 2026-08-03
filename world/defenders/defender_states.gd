@@ -34,12 +34,15 @@ class Base:
 		return machine.get_parent() as Defender
 
 	## Walk to the assigned cargo slot and stand on it. Sections 15.5 and 15.6.
+	##
+	## Walking to a slot is the one thing a defender does at more than its own
+	## speed. See [member DefenderTuning.catch_up_margin].
 	func hold_slot(unit: Defender) -> void:
 		var slot := unit.slot_position()
 		if unit.has_arrived(slot, 12.0):
 			unit.hold_still()
 		else:
-			unit.move_toward(slot)
+			unit.move_toward(slot, unit.catch_up_scale())
 
 	## Close on the current target and strike it when it is in reach. Returns
 	## false when there is no target worth chasing.
@@ -198,7 +201,7 @@ class Return:
 		if unit.distance_to_cargo() <= unit.tuning.defend_radius:
 			unit.machine.change_to(unit.ordered_state)
 			return
-		unit.move_toward(unit.slot_position())
+		unit.move_toward(unit.slot_position(), unit.catch_up_scale())
 
 
 ## Zero health. Fifteen seconds to be revived with Mend. Section 15.10.

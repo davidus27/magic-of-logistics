@@ -18,6 +18,7 @@ downed_seconds = 15.0
 barrier_search_distance = 180.0
 repair_work_distance = 96.0
 repair_work_spacing = 30.0
+catch_up_margin = 25.0
 separation_radius = 26.0
 separation_strength = 40.0
 blocked_timeout = 2.0

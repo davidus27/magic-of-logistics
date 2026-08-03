@@ -116,11 +116,17 @@ func _build_run_state() -> void:
 
 
 ## Bottom left: four defender portraits. Section 30.3.
+##
+## The three bottom regions share one row and must not touch, so their widths
+## are fixed rather than fitted: four portraits and three gaps reach x 462, the
+## order controls are centred from 482 to 798, and the spell controls end at the
+## right margin from 946. The window scales the whole 1280 pixel canvas, so those
+## numbers hold at every window size.
 func _build_portraits() -> void:
 	var row := HBoxContainer.new()
-	row.add_theme_constant_override("separation", 8)
+	row.add_theme_constant_override("separation", 6)
 	row.mouse_filter = Control.MOUSE_FILTER_PASS
-	_place(row, Vector2(0.0, 1.0), Rect2(18.0, -96.0, 552.0, 78.0))
+	_place(row, Vector2(0.0, 1.0), Rect2(12.0, -92.0, 450.0, 74.0))
 
 	for index in Squad.ROSTER.size():
 		var portrait := DefenderPortrait.new(index)
@@ -134,12 +140,12 @@ func _build_orders() -> void:
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 8)
 	row.mouse_filter = Control.MOUSE_FILTER_PASS
-	_place(row, Vector2(0.5, 1.0), Rect2(-210.0, -78.0, 420.0, 60.0))
+	_place(row, Vector2(0.5, 1.0), Rect2(-158.0, -76.0, 316.0, 58.0))
 
 	# The control labels change for the active defender method. Section 30.4.
 	for entry in _order_entries():
 		var button := InkUi.button(entry[0], InkUi.FONT_SIZE_SMALL)
-		button.custom_minimum_size = Vector2(134.0, 52.0)
+		button.custom_minimum_size = Vector2(100.0, 50.0)
 		button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		button.pressed.connect(_on_order_pressed.bind(entry[1]))
 		row.add_child(button)
@@ -169,12 +175,12 @@ func _order_entries() -> Array:
 ## Bottom right: three spell controls with a mana bar above them. Section 30.5.
 func _build_spells() -> void:
 	_mana_bar = ManaBar.new()
-	_place(_mana_bar, Vector2(1.0, 1.0), Rect2(-334.0, -96.0, 316.0, 12.0))
+	_place(_mana_bar, Vector2(1.0, 1.0), Rect2(-334.0, -94.0, 316.0, 12.0))
 
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 8)
 	row.mouse_filter = Control.MOUSE_FILTER_PASS
-	_place(row, Vector2(1.0, 1.0), Rect2(-334.0, -78.0, 316.0, 66.0))
+	_place(row, Vector2(1.0, 1.0), Rect2(-334.0, -76.0, 316.0, 62.0))
 
 	if wizard == null:
 		return

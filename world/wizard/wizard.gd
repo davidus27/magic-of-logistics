@@ -255,7 +255,7 @@ func _draw() -> void:
 		return
 
 	# The game shows the spell range around the cargo unit. Section 14.3.
-	_draw_dashed_circle(spell.cast_range, InkPalette.LINE_LIGHT)
+	_draw_dashed_circle(spell.cast_range, InkPalette.GRAY_MEDIUM)
 
 	# A short line shows the maximum permitted target point. Section 14.4.
 	var offset := _pointer - global_position
@@ -269,13 +269,18 @@ func _draw() -> void:
 
 ## An ink circle drawn as dashes, which reads as a guide rather than as a world
 ## object in the paper-and-ink style of section 10.
+##
+## The Arc Bolt range of 500 pixels is taller than the 720 pixel viewport, so
+## only the left and right arcs are ever on screen. Long dashes in the medium
+## grey are what makes those two arcs read as one boundary; the light line colour
+## of the road edges disappears against the paper at this width.
 func _draw_dashed_circle(radius: float, colour: Color) -> void:
-	const SEGMENTS := 64
+	const SEGMENTS := 48
 	var step := TAU / float(SEGMENTS)
 	for i in range(0, SEGMENTS, 2):
 		var from := Vector2.RIGHT.rotated(i * step) * radius
 		var to := Vector2.RIGHT.rotated((i + 1) * step) * radius
-		draw_line(from, to, colour, 1.5, true)
+		draw_line(from, to, colour, 2.0, true)
 
 
 func _apply_cursor() -> void:
