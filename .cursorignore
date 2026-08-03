@@ -1,0 +1,27 @@
+# Blocks Agent, Tab, Inline Edit and @-mentions. Does NOT block terminal or MCP
+# tools - a shell command can still reach these paths. Cursor already honours
+# .gitignore on top of this list.
+
+# Godot's generated import cache. 7.9 MB, ~500 files, zero signal.
+.godot/
+
+# Generated per-asset metadata and script UIDs.
+*.import
+*.uid
+
+# Binary media. The agent cannot read these usefully and they are 8 MB of the repo.
+*.png
+*.jpg
+*.jpeg
+*.webp
+*.ctex
+*.md5
+*.wav
+*.ogg
+*.mp3
+*.sample
+
+# Editor and OS noise.
+.DS_Store
+*.translation
+export_presets.cfg

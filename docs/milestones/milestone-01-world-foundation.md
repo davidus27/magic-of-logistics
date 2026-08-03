@@ -1,11 +1,4 @@
-# Progress log
-
-Milestone log for the Fantasy Convoy MVP. Newest milestone first. Section numbers
-refer to [`fantasy_convoy_mvp_specification.md`](fantasy_convoy_mvp_specification.md).
-
----
-
-## Milestone 1 — World foundation
+# Milestone 1 — World foundation
 
 **2026-07-31 · complete and verified**
 
@@ -13,7 +6,7 @@ Specification section 41 steps 1 and 2, plus the systems every later milestone
 depends on. The project went from a bare Godot 4.7.1 template (no main scene, no
 input map, one placeholder `node_2d.tscn`) to a playable route.
 
-### What works
+## What works
 
 Select P1 and a seed → read the controls → `Enter` → drive the 9,000 pixel route
 with `W`/`S`/`Space` → cross two mud areas → reach the portal → four second cast →
@@ -44,7 +37,7 @@ Delivered:
   moving a layout testers have already learned.
 - Telemetry recording every field of section 36, and the result screen.
 
-### Verified
+## Verified
 
 | Check | Result |
 |---|---|
@@ -60,14 +53,14 @@ Delivered:
 | Camera lead, measured | **108px** = 15% of the 720px viewport, section 9 |
 | Visual states | 9 captured and reviewed via `tools/screenshot_run.tscn` |
 
-### Not in this build
+## Not in this build
 
 Enemies, defenders, wizard spells, barriers, threat reinforcement spawns, manual
 cargo steering (P3, P4), direct target orders (P2), the full section 30 interface.
 The selection screen shows P2 to P4 as **disabled** rather than silently running
 P1, driven by `ControlProfileData.implemented`.
 
-### Decisions
+## Decisions
 
 | Decision | Choice | Why |
 |---|---|---|
@@ -78,7 +71,7 @@ P1, driven by `ControlProfileData.implemented`.
 | UI screens | Built in code, not authored scenes | One builder keeps five screens consistent, and they will churn while profiles are compared. The full section 30 interface arrives with milestone 6 |
 | Art | The `assets/` pack, except cargo, rider and barrier | See below |
 
-### The assets/ pack
+## The assets/ pack
 
 `assets/` appeared partway through the session, after the initial scan showed it
 absent; 12 SVGs had already been authored by then. Resolution: take the pack for
@@ -100,9 +93,9 @@ cannot be tinted lighter. Pack art is drawn in final ink colours and takes no
 tint; the hand-authored art is drawn in **white** and tinted at runtime, which is
 what allows the damage flash of section 13.2 and the light grey dead marks of
 section 15.11 from a single file. `InkSprite` supports both conventions;
-[`assets/README.md`](assets/README.md) records why.
+[`assets/README.md`](../../assets/README.md) records why.
 
-### Findings worth acting on
+## Findings worth acting on
 
 **The three minute floor of section 7 is not reachable in this build, and the
 specification is not wrong.** 9,000 pixels at the 65 px/s Fast speed of section
@@ -112,21 +105,25 @@ each with the cargo stopped adds roughly 35 seconds. So section 7 and section 13
 are consistent — but only from milestone 4 onward. The smoke test asserts the band
 this build can actually produce, and says so.
 
+> ⚠️ **Later correction.** Section 13.1 and `data/cargo_data.tres` both state Fast =
+> **130 px/s**, not 65. The 138 s figure above only works at 65. See the open
+> discrepancy in [`../spec/04-cargo.md`](../spec/04-cargo.md) §13.1 — unresolved.
+
 **Mud is visually heavy.** The tiled mud fill reads clearly, which is what section
 12.2 asks for, but it dominates the paper-and-ink page more than the rest of the
 palette does. Worth a look when playing; it is one modulate value in
 `TerrainZone.setup_mud`.
 
-### Bugs found and fixed during verification
+## Bugs found and fixed during verification
 
 Two were engine traps that look like working code when wrong. Both are recorded in
-[`README.md`](README.md) because they will recur.
+[`../engine-notes.md`](../engine-notes.md) because they will recur.
 
 1. **A node-typed `@export` never resolves in a hand-authored `.tscn`.** Writing
    `map = NodePath("../World/Map")` leaves the property null: the Godot editor
    stores extra state a text-authored scene does not have. Every scene reference
    now goes through `NodePath` exports and
-   [`scripts/node_ref.gd`](scripts/node_ref.gd), which reports which node and
+   [`scripts/node_ref.gd`](../../scripts/node_ref.gd), which reports which node and
    which field on a bad path.
 2. **`Control.set_anchors_preset()` does not size a control.** It sets the anchors
    and then adjusts the offsets so the rectangle does not move, and a new control
@@ -146,31 +143,18 @@ Two were engine traps that look like working code when wrong. Both are recorded 
    could not be inferred) had cascaded into every exported node reference reading
    as `Nil`.
 
-### Known residual
+## Known residual
 
 The navigation bake still reports **3 edge merge warnings**, down from 39. They
 are warnings, not errors, and nothing navigates yet. Deliberately left for
 milestone 2, when real agents can validate a fix instead of guessing at geometry.
 
-### Notes on tooling
+## Notes on tooling
 
-- `Godot --headless --check-only --script <file>` does not register autoloads, so
-  every reference to `InkClock`, `Telemetry`, `RunContext` or `SoundBank` reports
-  as undefined. Filter those to use it as a lint.
-- `--write-movie` crashes under `--headless`; it needs a real rendering device.
-  `tools/screenshot_run.tscn` runs windowed and saves the viewport instead.
-- `tools/road_calc.py` reproduces Godot's curve baking, so the length and turn
-  demand it prints are the ones the game gets.
+Moved to [`../engine-notes.md`](../engine-notes.md) — the headless autoload gap,
+the `--write-movie` crash, and `tools/road_calc.py`.
 
-### Next: milestone 2, the first combat loop
+## Next
 
-Section 41 steps 3 to 6: one short-range enemy, one defender with Defend, Attack,
-Return and Downed, trigger area 1, cargo damage and the failure state, the wizard
-controller with mana and Arc Bolt, defender selection (`F1` to `F4`, `Q`) and role
-orders (`Z`, `X`, `C`). The balance data for all of it is already in `data/`, so
-this is behaviour only.
-
-**Before starting it:** play milestone 1. Control feel is the entire point of the
-proof of concept and no assertion substitutes for it. Two questions in particular:
-are Slow, Normal and Fast distinct enough to be a real decision, and does the mud
-slowdown read as a threat or as an annoyance?
+Milestone 2, the first combat loop. Scope and the pre-flight playtest questions are
+in [`../status.md`](../status.md).

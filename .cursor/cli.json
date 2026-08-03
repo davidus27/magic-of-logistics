@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Shell(*)",
+      "Read(**)",
+      "Write(**)",
+      "Mcp(godot:*)"
+    ],
+    "deny": [
+      "Write(../**)",
+      "Write(~/**)",
+      "Read(.godot/**)",
+      "Write(.godot/**)",
+      "Write(.git/**)",
+      "Shell(sudo)",
+      "Shell(shutdown)",
+      "Shell(reboot)",
+      "Shell(diskutil)",
+      "Shell(mkfs)",
+      "Shell(dd)"
+    ]
+  }
+}

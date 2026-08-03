@@ -1,0 +1,59 @@
+---
+description: How to run, test and screenshot the game - use when verifying a change or asked whether something works
+alwaysApply: false
+---
+
+# Running and verifying
+
+> 🔴 **The smoke test is currently failing — 5 assertions, as of 2026-08-03.** You did
+> not break it. Its assertions were written for the milestone 1 build and one of them
+> literally reads *"cargo lost health with no enemies in the build"* while enemies now
+> exist. Separately, the cargo dies at 3,882 px of the 8,900 px route. Read
+> [docs/status.md](mdc:docs/status.md) before interpreting any failure, and do not
+> "fix" the game to satisfy a stale assertion.
+
+```sh
+# Play.
+Godot --path .
+
+# End-to-end check: drives a whole run and asserts the result.
+# Exits non-zero on failure, so it can gate a commit.
+Godot --headless --fixed-fps 60 --path . res://tools/smoke_run.tscn
+
+# Screenshots of nine game states, into user://screenshots.
+# Must run windowed - saving a viewport image needs a real rendering device.
+Godot --fixed-fps 60 --resolution 1280x720 --path . res://tools/screenshot_run.tscn
+
+# Regenerate route control points after changing the road shape.
+python3 tools/road_calc.py --target 9000 --wavelength 2800
+```
+
+On this machine the binary is
+`/Applications/Godot.app/Contents/MacOS/Godot`.
+
+## What the smoke test asserts
+
+Route length 9000 px, run completes, terrain events in order
+`Mud, Road, Mud, Road`, time on mud at the ×0.60 factor, the Fast level dominating
+the speed accounting, and the full telemetry key set. **Adding a telemetry field
+means updating `tools/smoke_run.gd` too**, or the key-set assertion fails.
+
+It asserts the duration band this build can actually produce, which is not yet the
+three-minute floor of §7 — see [docs/status.md](mdc:docs/status.md) for why that is
+correct rather than a bug.
+
+## Telemetry output
+
+`user://telemetry`, which on macOS is
+`~/Library/Application Support/Godot/app_userdata/MagicLogisticsInit`. One JSON per
+run, named `run_<date>_P<profile>_seed<n>.json`, 31 keys.
+
+## Standard of proof
+
+An assertion is not a playtest. This project exists to evaluate **control feel**, so
+"the smoke test passes" is not evidence that a control change is good. When a change
+touches how the game feels, say so and ask for a play session rather than reporting
+it as verified.
+
+Report outcomes plainly: if the smoke test fails, paste the output. If you did not
+run it, say you did not run it.

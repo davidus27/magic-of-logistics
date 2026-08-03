@@ -1,30 +1,21 @@
 # Fantasy Convoy MVP
 
 A proof of concept that tests whether one player can control three systems at
-once: the cargo unit, the defenders, and the wizard. Built to
-[`fantasy_convoy_mvp_specification.md`](fantasy_convoy_mvp_specification.md);
-section numbers in code comments refer to it.
+once: the cargo unit, the defenders, and the wizard.
 
 Godot 4.7. GDScript, statically typed.
 
-## Milestone 1 is done: the world foundation
+**Milestone 1 (world foundation) is committed.** Select profile P1 and a seed, read
+the controls, drive the cargo the length of the 9,000 pixel route through two mud
+areas to the final portal, and complete the four second portal cast into a result
+screen that writes a telemetry file.
 
-Specification section 41 steps 1 and 2, plus the systems the later milestones
-need. You can select profile P1 and a seed, read the controls, and drive the cargo
-the length of the 9,000 pixel route to the final portal, through two mud areas,
-and complete the four second portal cast into a result screen that writes a
-telemetry file.
-
-A fast run takes about 2 minutes 34 seconds. That is short of the three minute
-floor in section 7, which assumes the two barriers are in the route: 9,000 pixels
-at the 65 px/s Fast speed of section 13.1 is 138 seconds of driving whatever else
-happens. The barriers are disabled until the Repair state can open them, so the
-floor arrives with milestone 4.
-
-**Not in this build:** enemies, defenders, wizard spells, barriers, the threat
-reinforcement spawns, manual cargo steering (profiles P3 and P4), direct target
-orders (P2), the full section 30 interface. The selection screen shows P2 to P4
-as disabled rather than silently running P1.
+**Milestone 2 (the first combat loop) is in progress and uncommitted** — roughly
+2,550 lines of defenders, enemies, wizard and squad selection sit in the working
+tree. The smoke test currently **fails**: its assertions predate the combat build,
+and the cargo dies partway along the route. Neither is a mystery; both are written
+up with next actions in **[`docs/status.md`](docs/status.md)**, which is the file to
+read before doing anything here.
 
 ## Controls
 
@@ -37,14 +28,14 @@ as disabled rather than silently running P1.
 | `Enter` | Start the run, or leave the pause screen |
 | `F9` | Developer readout |
 
-The remaining keys of sections 14, 16 and 17 are already in the input map, so
+The remaining keys of spec sections 14, 16 and 17 are already in the input map, so
 later milestones add no configuration.
 
 ## Running it
 
 ```sh
 # Play.
-Godot --path . 
+Godot --path .
 
 # End to end check: drives a whole run and asserts the result. Exits non-zero on
 # failure, so it can gate a commit.
@@ -73,45 +64,44 @@ main/main.tscn            the scene tree of section 32
   TelemetryRecorder       samples the per frame values of section 36
 autoload/                 InkClock, SoundBank, Telemetry, RunContext
 data/                     every balance value from the specification tables
+docs/                     the specification, split by system, plus status
+tools/                    smoke_run, screenshot_run, road_calc.py
 ```
 
 Three decisions worth knowing before you change anything:
 
 **The map is generated, never placed.** `Map.build()` derives the road lines, road
 walls, border walls, navigation region, mud zones, barriers and portal from the
-control points in `data/map_route.tres`. The route is 9,000 pixels long; hand
-placing that much geometry is not maintainable. Move a control point and
-everything follows. `tools/road_calc.py` reproduces Godot's curve baking, so the
-length and turn demand it prints are the ones the game gets.
+control points in `data/map_route.tres`. Move a control point and everything
+follows. `tools/road_calc.py` reproduces Godot's curve baking, so the length and
+turn demand it prints are the ones the game gets.
 
 **Cargo movement belongs to the motor, not the cargo.** `AutoPathMotor` rides the
-route centre line and writes the transform directly; the manual motors of
-milestone 5 will steer and use `move_and_slide()`. Keeping that inside the motor is
-why `CargoUnit` never branches on the control profile.
+route centre line and writes the transform directly; the manual motors of milestone
+5 will steer and use `move_and_slide()`. Keeping that inside the motor is why
+`CargoUnit` never branches on the control profile.
 
-**Balance values live in resources.** Section 32.5 requires it. All six resource
+**Balance values live in resources.** Section 32.5 requires it. All eight resource
 types exist already, filled from the specification tables, including the ones for
-systems that do not exist yet, so milestone 2 is behaviour only.
+systems that do not exist yet, so the remaining milestones are behaviour only.
 
-## Two engine details that cost time
+## Documentation
 
-Both are load-bearing, and both look like working code when wrong.
+The specification used to be one 32 KB file. It is now split by system under
+[`docs/`](docs/), so you load only the part you are working on. Section numbers are
+preserved in every heading, so a code comment reading "section 15.7" still resolves.
 
-**A node-typed `@export` does not resolve in a hand-authored `.tscn`.** Writing
-`map = NodePath("../World/Map")` leaves the property null, because the Godot editor
-stores extra state that a text-authored scene does not have. Scenes here use
-`NodePath` exports resolved through [`NodeRef`](scripts/node_ref.gd). The editor
-still offers a node picker.
+| Start here | For |
+|---|---|
+| [`docs/status.md`](docs/status.md) | What is built, what is next, open findings |
+| [`docs/README.md`](docs/README.md) | Index mapping every spec section to its file |
+| [`docs/engine-notes.md`](docs/engine-notes.md) | Godot behaviours that look like working code when wrong |
+| [`docs/spec/`](docs/spec/) | The behaviour specification, one file per system |
+| [`docs/milestones/`](docs/milestones/) | Closed milestone reports |
 
-**`Control.set_anchors_preset()` does not size a control.** It sets the anchors and
-then adjusts the offsets so the rectangle does not move, and a new control has a
-zero sized rectangle. Use `InkUi.fill_parent()`, which calls
-`set_anchors_and_offsets_preset()`. A plain `Control` does not clip, so a zero
-sized screen still draws its contents and looks like it works while every anchor
-inside collapses onto the origin; a `ScrollContainer` does clip and shows nothing.
+## Editor setup
 
-## Known residual
-
-The navigation bake reports 3 edge merge warnings, down from 39 after decimating
-the spine and snapping the outline. They are warnings, not errors, and nothing
-navigates yet. Worth finishing in milestone 2, when real agents can validate a fix.
+This repo is configured for Cursor. `.cursor/rules/` carries the project context and
+conventions, `.cursor/mcp.json` wires up the Godot MCP server, `.cursor/cli.json`
+scopes agent permissions to this folder, and `.cursorignore` keeps the 8 MB of
+generated import cache and binary art out of agent context.

@@ -1,0 +1,47 @@
+---
+description: GDScript conventions used throughout this project
+globs: **/*.gd
+alwaysApply: false
+---
+
+# GDScript conventions
+
+**Static typing everywhere.** Every variable, parameter and return type is annotated.
+`var speed: float = 0.0`, `func apply(delta: float) -> void:`. This is not optional
+here — the project was written this way and untyped additions stand out.
+
+Watch the inference trap that already cost a debugging session: `get_meta()` returns
+`Variant`, so `var x := get_meta("k")` fails to infer and the parse error cascades
+into unrelated exported node references reading as `Nil`. Annotate explicitly when
+a call returns `Variant`.
+
+**Naming.** `snake_case` for functions, variables and file names. `PascalCase` for
+class names and `class_name` declarations. Leading underscore for private members
+and for Godot virtuals you implement (`_ready`, `_physics_process`).
+
+**Comments carry spec section numbers.** `# Terrain changes the maximum speed, not
+the acceleration. Section 12.` — that pattern is deliberate and greppable. Use
+`§`-free plain "Section N" to match the existing text. Keep the number correct; if
+you change behaviour, check the section still says what you claim.
+
+Only write a comment to state something the code cannot show — a constraint, a spec
+reference, or a non-obvious engine behaviour. Do not narrate the next line.
+
+**Signals over polling.** `InkClock` drives every two-frame line change through one
+signal rather than each sprite running its own timer. Follow that shape: one owner
+emits, many listen.
+
+**Resource access.** Read balance values from the `.tres` through the typed resource
+class in `scripts/data/`. Never inline a number that the spec puts in a table.
+
+**Physics layers** come from `scripts/layers.gd` constants, never a raw bit index.
+
+## Lint
+
+```sh
+Godot --headless --check-only --script <file>
+```
+
+Autoloads are **not** registered under `--check-only`, so every reference to
+`InkClock`, `SoundBank`, `Telemetry` or `RunContext` reports as undefined. Filter
+those four out; anything else it reports is real.
