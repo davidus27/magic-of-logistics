@@ -1,0 +1,11 @@
+<!-- Cargo unit body: large rectangle with two wheel circles. Specification 10.4.
+     Body is 120x64 centred in a 132x96 canvas; the wheels straddle the long edges.
+     White on purpose: InkSprite tints this at runtime. See art/README.md. -->
+<svg xmlns="http://www.w3.org/2000/svg" width="132" height="96" viewBox="0 0 132 96">
+  <g fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M 7,17 L 125,15 L 127,79 L 5,81 Z"/>
+    <path d="M 96,18 L 96,78"/>
+    <circle cx="44" cy="16" r="12"/>
+    <circle cx="44" cy="80" r="12"/>
+  </g>
+</svg>

@@ -1,0 +1,9 @@
+<!-- Cargo unit body, line frame B. Frame A with each vertex moved 1-2px. -->
+<svg xmlns="http://www.w3.org/2000/svg" width="132" height="96" viewBox="0 0 132 96">
+  <g fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M 5,15 L 127,17 L 125,81 L 7,79 Z"/>
+    <path d="M 97,17 L 95,79"/>
+    <circle cx="45" cy="15" r="11.5"/>
+    <circle cx="43" cy="81" r="12.5"/>
+  </g>
+</svg>

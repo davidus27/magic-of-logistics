@@ -1,0 +1,30 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://world/map/map.gd" id="1_map"]
+[ext_resource type="Resource" path="res://data/map_route.tres" id="2_route"]
+[ext_resource type="PackedScene" path="res://world/map/terrain_zone.tscn" id="3_zone"]
+[ext_resource type="PackedScene" path="res://world/map/barrier.tscn" id="4_barrier"]
+[ext_resource type="PackedScene" path="res://world/map/final_portal.tscn" id="5_portal"]
+
+[node name="Map" type="Node2D"]
+script = ExtResource("1_map")
+route = ExtResource("2_route")
+terrain_zone_scene = ExtResource("3_zone")
+barrier_scene = ExtResource("4_barrier")
+
+[node name="PaperBackground" type="Polygon2D" parent="."]
+color = Color(0.952941, 0.937255, 0.894118, 1)
+
+[node name="TerrainZones" type="Node2D" parent="."]
+
+[node name="Road" type="Node2D" parent="."]
+
+[node name="RoadWalls" type="Node2D" parent="."]
+
+[node name="MapWalls" type="Node2D" parent="."]
+
+[node name="NavigationRegion2D" type="NavigationRegion2D" parent="."]
+
+[node name="BarrierContainer" type="Node2D" parent="."]
+
+[node name="FinalPortal" parent="." instance=ExtResource("5_portal")]

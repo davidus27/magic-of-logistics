@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="SpellData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/spell_data.gd" id="1_spell"]
+
+[resource]
+script = ExtResource("1_spell")
+id = "mend"
+display_name = "Mend"
+kind = 1
+hotkey_index = 2
+mana_cost = 25
+cooldown = 5.0
+cast_range = 350.0
+allow_hold_repeat = false
+heal_defender = 20
+heal_cargo = 15
+revive_health = 20
+target_pick_radius = 35.0

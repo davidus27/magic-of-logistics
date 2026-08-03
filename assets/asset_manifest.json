@@ -1,0 +1,2035 @@
+{
+  "project": "Fantasy Convoy MVP",
+  "document_version": "0.1",
+  "engine": "Godot 4.x",
+  "asset_pack_version": "1.0",
+  "palette": {
+    "paper": "#F3EFE4",
+    "primary_ink": "#1A1A1A",
+    "light_line": "#B7B2A8",
+    "medium_gray": "#77736C",
+    "white": "#FFFFFF"
+  },
+  "spec_derived": [
+    "paper-and-ink style",
+    "black, white, and gray only",
+    "off-white paper background",
+    "8 percent static paper grain",
+    "two line-frame variants for important world objects",
+    "entity silhouettes and selection symbols",
+    "HUD region placement",
+    "five placeholder sound cues"
+  ],
+  "implementation_assumptions": [
+    "World sprite source canvases use 256x256 view boxes.",
+    "UI icons use 96x96 view boxes.",
+    "Buttons use 240x88 view boxes.",
+    "Screen mockups use 1920x1080.",
+    "Role monograms are optional identifiers layered over the required defender silhouette.",
+    "Typography is not defined by the specification; mockups use a generic serif stack and no font files are included."
+  ],
+  "recommended_animation": {
+    "hand_drawn_frame_period_seconds": 0.15,
+    "world_asset_frame_sequence": [
+      "_a",
+      "_b"
+    ],
+    "paper_grain_motion": "static"
+  },
+  "assets": [
+    {
+      "file": "palette/palette.json",
+      "category": "palette",
+      "purpose": "Exact visual palette from the specification"
+    },
+    {
+      "file": "palette/fantasy_convoy.gpl",
+      "category": "palette",
+      "purpose": "GIMP-compatible palette"
+    },
+    {
+      "file": "textures/paper_grain_512.png",
+      "category": "texture",
+      "purpose": "Static full-screen paper grain overlay at up to 8 percent opacity",
+      "dimensions": [
+        512,
+        512
+      ]
+    },
+    {
+      "file": "textures/paper_grain_1024.png",
+      "category": "texture",
+      "purpose": "Static full-screen paper grain overlay at up to 8 percent opacity",
+      "dimensions": [
+        1024,
+        1024
+      ]
+    },
+    {
+      "file": "terrain/road_tile_512.png",
+      "category": "terrain",
+      "purpose": "Default road terrain",
+      "dimensions": [
+        512,
+        512
+      ]
+    },
+    {
+      "file": "terrain/mud_tile_512.png",
+      "category": "terrain",
+      "purpose": "Mud terrain with clear gray fill",
+      "dimensions": [
+        512,
+        512
+      ]
+    },
+    {
+      "file": "terrain/offroad_tile_512.png",
+      "category": "terrain",
+      "purpose": "Off-road paper terrain",
+      "dimensions": [
+        512,
+        512
+      ]
+    },
+    {
+      "file": "world/wizard_marker.svg",
+      "category": "world",
+      "purpose": "Wizard triangle symbol",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "world/wizard_marker.png",
+      "category": "world",
+      "purpose": "Wizard triangle symbol raster export",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "world/defender_generic_a.svg",
+      "category": "world",
+      "purpose": "Defender hand-drawn frame A",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "world/defender_generic_a.png",
+      "category": "world",
+      "purpose": "Defender hand-drawn frame A raster export",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "world/defender_generic_b.svg",
+      "category": "world",
+      "purpose": "Defender hand-drawn frame B",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "world/defender_generic_b.png",
+      "category": "world",
+      "purpose": "Defender hand-drawn frame B raster export",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "world/defender_guard_a.svg",
+      "category": "world",
+      "purpose": "Guard defender hand-drawn frame A",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "world/defender_guard_a.png",
+      "category": "world",
+      "purpose": "Guard defender hand-drawn frame A raster export",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "world/defender_guard_b.svg",
+      "category": "world",
+      "purpose": "Guard defender hand-drawn frame B",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "world/defender_guard_b.png",
+      "category": "world",
+      "purpose": "Guard defender hand-drawn frame B raster export",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "world/defender_striker_a.svg",
+      "category": "world",
+      "purpose": "Striker defender hand-drawn frame A",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "world/defender_striker_a.png",
+      "category": "world",
+      "purpose": "Striker defender hand-drawn frame A raster export",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "world/defender_striker_b.svg",
+      "category": "world",
+      "purpose": "Striker defender hand-drawn frame B",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "world/defender_striker_b.png",
+      "category": "world",
+      "purpose": "Striker defender hand-drawn frame B raster export",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "world/defender_engineer_a.svg",
+      "category": "world",
+      "purpose": "Engineer defender hand-drawn frame A",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "world/defender_engineer_a.png",
+      "category": "world",
+      "purpose": "Engineer defender hand-drawn frame A raster export",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "world/defender_engineer_b.svg",
+      "category": "world",
+      "purpose": "Engineer defender hand-drawn frame B",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "world/defender_engineer_b.png",
+      "category": "world",
+      "purpose": "Engineer defender hand-drawn frame B raster export",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "world/defender_warden_a.svg",
+      "category": "world",
+      "purpose": "Warden defender hand-drawn frame A",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "world/defender_warden_a.png",
+      "category": "world",
+      "purpose": "Warden defender hand-drawn frame A raster export",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "world/defender_warden_b.svg",
+      "category": "world",
+      "purpose": "Warden defender hand-drawn frame B",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "world/defender_warden_b.png",
+      "category": "world",
+      "purpose": "Warden defender hand-drawn frame B raster export",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "world/enemy_short_a.svg",
+      "category": "world",
+      "purpose": "Short-range enemy hand-drawn frame A",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "world/enemy_short_a.png",
+      "category": "world",
+      "purpose": "Short-range enemy hand-drawn frame A raster export",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "world/enemy_long_a.svg",
+      "category": "world",
+      "purpose": "Long-range enemy hand-drawn frame A",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "world/enemy_long_a.png",
+      "category": "world",
+      "purpose": "Long-range enemy hand-drawn frame A raster export",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "world/enemy_short_b.svg",
+      "category": "world",
+      "purpose": "Short-range enemy hand-drawn frame B",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "world/enemy_short_b.png",
+      "category": "world",
+      "purpose": "Short-range enemy hand-drawn frame B raster export",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "world/enemy_long_b.svg",
+      "category": "world",
+      "purpose": "Long-range enemy hand-drawn frame B",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "world/enemy_long_b.png",
+      "category": "world",
+      "purpose": "Long-range enemy hand-drawn frame B raster export",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "world/final_portal_a.svg",
+      "category": "world",
+      "purpose": "Final portal hand-drawn frame A",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "world/final_portal_a.png",
+      "category": "world",
+      "purpose": "Final portal hand-drawn frame A raster export",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "world/final_portal_b.svg",
+      "category": "world",
+      "purpose": "Final portal hand-drawn frame B",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "world/final_portal_b.png",
+      "category": "world",
+      "purpose": "Final portal hand-drawn frame B raster export",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "world/cargo_crack_1.svg",
+      "category": "world",
+      "purpose": "Cargo crack mark below 60 health",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "world/cargo_crack_1.png",
+      "category": "world",
+      "purpose": "Cargo crack mark below 60 health raster export",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "world/cargo_crack_2.svg",
+      "category": "world",
+      "purpose": "Second cargo crack mark below 30 health",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "world/cargo_crack_2.png",
+      "category": "world",
+      "purpose": "Second cargo crack mark below 30 health raster export",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "world/dead_paper_mark.svg",
+      "category": "world",
+      "purpose": "Dead defender and enemy paper mark",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "world/dead_paper_mark.png",
+      "category": "world",
+      "purpose": "Dead defender and enemy paper mark raster export",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "world/tintable/cargo_body_a.svg",
+      "category": "world",
+      "purpose": "Cargo unit body, top-down, hand-drawn frame A",
+      "dimensions": [
+        132,
+        96
+      ],
+      "anchor": "center",
+      "source": "hand-authored",
+      "tint": "white source, tinted at runtime"
+    },
+    {
+      "file": "world/tintable/cargo_body_b.svg",
+      "category": "world",
+      "purpose": "Cargo unit body, top-down, hand-drawn frame B",
+      "dimensions": [
+        132,
+        96
+      ],
+      "anchor": "center",
+      "source": "hand-authored",
+      "tint": "white source, tinted at runtime"
+    },
+    {
+      "file": "world/tintable/cargo_rider_a.svg",
+      "category": "world",
+      "purpose": "Cargo rider circle with heading tick, hand-drawn frame A",
+      "dimensions": [
+        30,
+        24
+      ],
+      "anchor": "center",
+      "source": "hand-authored",
+      "tint": "white source, tinted at runtime"
+    },
+    {
+      "file": "world/tintable/cargo_rider_b.svg",
+      "category": "world",
+      "purpose": "Cargo rider circle with heading tick, hand-drawn frame B",
+      "dimensions": [
+        30,
+        24
+      ],
+      "anchor": "center",
+      "source": "hand-authored",
+      "tint": "white source, tinted at runtime"
+    },
+    {
+      "file": "world/tintable/barrier_a.svg",
+      "category": "world",
+      "purpose": "Barrier spanning the full 420 pixel road width, hand-drawn frame A",
+      "dimensions": [
+        432,
+        56
+      ],
+      "anchor": "center",
+      "source": "hand-authored",
+      "tint": "white source, tinted at runtime"
+    },
+    {
+      "file": "world/tintable/barrier_b.svg",
+      "category": "world",
+      "purpose": "Barrier spanning the full 420 pixel road width, hand-drawn frame B",
+      "dimensions": [
+        432,
+        56
+      ],
+      "anchor": "center",
+      "source": "hand-authored",
+      "tint": "white source, tinted at runtime"
+    },
+    {
+      "file": "spells/arc_bolt_projectile_a.svg",
+      "category": "spell",
+      "purpose": "Arc Bolt projectile frame A",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "spells/arc_bolt_projectile_a.png",
+      "category": "spell",
+      "purpose": "Arc Bolt projectile frame A raster export",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "spells/arc_bolt_projectile_b.svg",
+      "category": "spell",
+      "purpose": "Arc Bolt projectile frame B",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "spells/arc_bolt_projectile_b.png",
+      "category": "spell",
+      "purpose": "Arc Bolt projectile frame B raster export",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "spells/arc_bolt_impact.svg",
+      "category": "spell",
+      "purpose": "Arc Bolt impact burst",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "spells/arc_bolt_impact.png",
+      "category": "spell",
+      "purpose": "Arc Bolt impact burst raster export",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "spells/mend_cursor.svg",
+      "category": "spell",
+      "purpose": "Mend cursor and target symbol",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "spells/mend_cursor.png",
+      "category": "spell",
+      "purpose": "Mend cursor and target symbol raster export",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "spells/mend_effect.svg",
+      "category": "spell",
+      "purpose": "Mend healing effect",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "spells/mend_effect.png",
+      "category": "spell",
+      "purpose": "Mend healing effect raster export",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "spells/mend_revive.svg",
+      "category": "spell",
+      "purpose": "Mend revive feedback",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "spells/mend_revive.png",
+      "category": "spell",
+      "purpose": "Mend revive feedback raster export",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "spells/ward_area_a.svg",
+      "category": "spell",
+      "purpose": "Ward area frame A",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "spells/ward_area_a.png",
+      "category": "spell",
+      "purpose": "Ward area frame A raster export",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "spells/ward_area_b.svg",
+      "category": "spell",
+      "purpose": "Ward area frame B",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "spells/ward_area_b.png",
+      "category": "spell",
+      "purpose": "Ward area frame B raster export",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "feedback/selection_double_circle.svg",
+      "category": "feedback",
+      "purpose": "Selected defender world ring",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "feedback/selection_double_circle.png",
+      "category": "feedback",
+      "purpose": "Selected defender world ring raster export",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "feedback/order_attack.svg",
+      "category": "feedback",
+      "purpose": "Attack order symbol",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "feedback/order_attack.png",
+      "category": "feedback",
+      "purpose": "Attack order symbol raster export",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "feedback/order_defend.svg",
+      "category": "feedback",
+      "purpose": "Defend order symbol",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "feedback/order_defend.png",
+      "category": "feedback",
+      "purpose": "Defend order symbol raster export",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "feedback/order_repair.svg",
+      "category": "feedback",
+      "purpose": "Repair order symbol",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "feedback/order_repair.png",
+      "category": "feedback",
+      "purpose": "Repair order symbol raster export",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "feedback/leash_radius_dashed.svg",
+      "category": "feedback",
+      "purpose": "Scalable dashed active leash radius",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "feedback/leash_radius_dashed.png",
+      "category": "feedback",
+      "purpose": "Scalable dashed active leash radius raster export",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "feedback/return_arrow.svg",
+      "category": "feedback",
+      "purpose": "Defender Return action arrow",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "feedback/return_arrow.png",
+      "category": "feedback",
+      "purpose": "Defender Return action arrow raster export",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "feedback/direct_target_marker.svg",
+      "category": "feedback",
+      "purpose": "Direct target order marker",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "feedback/direct_target_marker.png",
+      "category": "feedback",
+      "purpose": "Direct target order marker raster export",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "feedback/target_line_segment.svg",
+      "category": "feedback",
+      "purpose": "Direct target connection line segment",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "feedback/target_line_segment.png",
+      "category": "feedback",
+      "purpose": "Direct target connection line segment raster export",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "feedback/health_bar_frame.svg",
+      "category": "feedback",
+      "purpose": "Scalable health bar frame",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "feedback/health_bar_frame.png",
+      "category": "feedback",
+      "purpose": "Scalable health bar frame raster export",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "feedback/health_bar_fill.svg",
+      "category": "feedback",
+      "purpose": "Scalable health bar fill",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "feedback/health_bar_fill.png",
+      "category": "feedback",
+      "purpose": "Scalable health bar fill raster export",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "feedback/barrier_progress_frame.svg",
+      "category": "feedback",
+      "purpose": "Barrier work progress frame",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "feedback/barrier_progress_frame.png",
+      "category": "feedback",
+      "purpose": "Barrier work progress frame raster export",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "feedback/downed_timer_ring.svg",
+      "category": "feedback",
+      "purpose": "Downed timer ring",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "feedback/downed_timer_ring.png",
+      "category": "feedback",
+      "purpose": "Downed timer ring raster export",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "ui/icons/cargo_health.svg",
+      "category": "ui_icon",
+      "purpose": "Cargo health HUD icon",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "ui/icons/cargo_health.png",
+      "category": "ui_icon",
+      "purpose": "Cargo health HUD icon raster export",
+      "dimensions": [
+        96,
+        96
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "ui/icons/cargo_speed.svg",
+      "category": "ui_icon",
+      "purpose": "Cargo speed HUD icon",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "ui/icons/cargo_speed.png",
+      "category": "ui_icon",
+      "purpose": "Cargo speed HUD icon raster export",
+      "dimensions": [
+        96,
+        96
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "ui/icons/terrain.svg",
+      "category": "ui_icon",
+      "purpose": "Terrain factor HUD icon",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "ui/icons/terrain.png",
+      "category": "ui_icon",
+      "purpose": "Terrain factor HUD icon raster export",
+      "dimensions": [
+        96,
+        96
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "ui/icons/distance.svg",
+      "category": "ui_icon",
+      "purpose": "Distance to portal HUD icon",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "ui/icons/distance.png",
+      "category": "ui_icon",
+      "purpose": "Distance to portal HUD icon raster export",
+      "dimensions": [
+        96,
+        96
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "ui/icons/threat.svg",
+      "category": "ui_icon",
+      "purpose": "Threat HUD icon",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "ui/icons/threat.png",
+      "category": "ui_icon",
+      "purpose": "Threat HUD icon raster export",
+      "dimensions": [
+        96,
+        96
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "ui/icons/timer.svg",
+      "category": "ui_icon",
+      "purpose": "Run timer HUD icon",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "ui/icons/timer.png",
+      "category": "ui_icon",
+      "purpose": "Run timer HUD icon raster export",
+      "dimensions": [
+        96,
+        96
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "ui/icons/pause.svg",
+      "category": "ui_icon",
+      "purpose": "Pause icon",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "ui/icons/pause.png",
+      "category": "ui_icon",
+      "purpose": "Pause icon raster export",
+      "dimensions": [
+        96,
+        96
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "ui/icons/seed.svg",
+      "category": "ui_icon",
+      "purpose": "Test seed icon",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "ui/icons/seed.png",
+      "category": "ui_icon",
+      "purpose": "Test seed icon raster export",
+      "dimensions": [
+        96,
+        96
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "ui/icons/mana.svg",
+      "category": "ui_icon",
+      "purpose": "Mana icon",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "ui/icons/mana.png",
+      "category": "ui_icon",
+      "purpose": "Mana icon raster export",
+      "dimensions": [
+        96,
+        96
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "ui/icons/profile_p1.svg",
+      "category": "ui_icon",
+      "purpose": "P1 control profile badge",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "ui/icons/profile_p1.png",
+      "category": "ui_icon",
+      "purpose": "P1 control profile badge raster export",
+      "dimensions": [
+        128,
+        128
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "ui/icons/profile_p2.svg",
+      "category": "ui_icon",
+      "purpose": "P2 control profile badge",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "ui/icons/profile_p2.png",
+      "category": "ui_icon",
+      "purpose": "P2 control profile badge raster export",
+      "dimensions": [
+        128,
+        128
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "ui/icons/profile_p3.svg",
+      "category": "ui_icon",
+      "purpose": "P3 control profile badge",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "ui/icons/profile_p3.png",
+      "category": "ui_icon",
+      "purpose": "P3 control profile badge raster export",
+      "dimensions": [
+        128,
+        128
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "ui/icons/profile_p4.svg",
+      "category": "ui_icon",
+      "purpose": "P4 control profile badge",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "ui/icons/profile_p4.png",
+      "category": "ui_icon",
+      "purpose": "P4 control profile badge raster export",
+      "dimensions": [
+        128,
+        128
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "ui/icons/spell_arc_bolt.svg",
+      "category": "ui_icon",
+      "purpose": "Arc Bolt spell icon",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "ui/icons/spell_arc_bolt.png",
+      "category": "ui_icon",
+      "purpose": "Arc Bolt spell icon raster export",
+      "dimensions": [
+        96,
+        96
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "ui/icons/spell_mend.svg",
+      "category": "ui_icon",
+      "purpose": "Mend spell icon",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "ui/icons/spell_mend.png",
+      "category": "ui_icon",
+      "purpose": "Mend spell icon raster export",
+      "dimensions": [
+        96,
+        96
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "ui/icons/spell_ward.svg",
+      "category": "ui_icon",
+      "purpose": "Ward spell icon",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "ui/icons/spell_ward.png",
+      "category": "ui_icon",
+      "purpose": "Ward spell icon raster export",
+      "dimensions": [
+        96,
+        96
+      ],
+      "anchor": "center"
+    },
+    {
+      "file": "ui/buttons/attack.svg",
+      "category": "ui_button",
+      "purpose": "Attack control button",
+      "dimensions": [
+        240,
+        88
+      ],
+      "anchor": "top-left"
+    },
+    {
+      "file": "ui/buttons/attack.png",
+      "category": "ui_button",
+      "purpose": "Attack control button raster export",
+      "dimensions": [
+        240,
+        88
+      ],
+      "anchor": "top-left"
+    },
+    {
+      "file": "ui/buttons/defend.svg",
+      "category": "ui_button",
+      "purpose": "Defend control button",
+      "dimensions": [
+        240,
+        88
+      ],
+      "anchor": "top-left"
+    },
+    {
+      "file": "ui/buttons/defend.png",
+      "category": "ui_button",
+      "purpose": "Defend control button raster export",
+      "dimensions": [
+        240,
+        88
+      ],
+      "anchor": "top-left"
+    },
+    {
+      "file": "ui/buttons/repair.svg",
+      "category": "ui_button",
+      "purpose": "Repair control button",
+      "dimensions": [
+        240,
+        88
+      ],
+      "anchor": "top-left"
+    },
+    {
+      "file": "ui/buttons/repair.png",
+      "category": "ui_button",
+      "purpose": "Repair control button raster export",
+      "dimensions": [
+        240,
+        88
+      ],
+      "anchor": "top-left"
+    },
+    {
+      "file": "ui/buttons/attack_target.svg",
+      "category": "ui_button",
+      "purpose": "Attack Target control button",
+      "dimensions": [
+        240,
+        88
+      ],
+      "anchor": "top-left"
+    },
+    {
+      "file": "ui/buttons/attack_target.png",
+      "category": "ui_button",
+      "purpose": "Attack Target control button raster export",
+      "dimensions": [
+        240,
+        88
+      ],
+      "anchor": "top-left"
+    },
+    {
+      "file": "ui/buttons/defend_cargo.svg",
+      "category": "ui_button",
+      "purpose": "Defend Cargo control button",
+      "dimensions": [
+        240,
+        88
+      ],
+      "anchor": "top-left"
+    },
+    {
+      "file": "ui/buttons/defend_cargo.png",
+      "category": "ui_button",
+      "purpose": "Defend Cargo control button raster export",
+      "dimensions": [
+        240,
+        88
+      ],
+      "anchor": "top-left"
+    },
+    {
+      "file": "ui/buttons/repair_cargo.svg",
+      "category": "ui_button",
+      "purpose": "Repair Cargo control button",
+      "dimensions": [
+        240,
+        88
+      ],
+      "anchor": "top-left"
+    },
+    {
+      "file": "ui/buttons/repair_cargo.png",
+      "category": "ui_button",
+      "purpose": "Repair Cargo control button raster export",
+      "dimensions": [
+        240,
+        88
+      ],
+      "anchor": "top-left"
+    },
+    {
+      "file": "ui/buttons/spell_arc_bolt.svg",
+      "category": "ui_button",
+      "purpose": "Arc Bolt spell control button",
+      "dimensions": [
+        240,
+        88
+      ],
+      "anchor": "top-left"
+    },
+    {
+      "file": "ui/buttons/spell_arc_bolt.png",
+      "category": "ui_button",
+      "purpose": "Arc Bolt spell control button raster export",
+      "dimensions": [
+        240,
+        88
+      ],
+      "anchor": "top-left"
+    },
+    {
+      "file": "ui/buttons/spell_mend.svg",
+      "category": "ui_button",
+      "purpose": "Mend spell control button",
+      "dimensions": [
+        240,
+        88
+      ],
+      "anchor": "top-left"
+    },
+    {
+      "file": "ui/buttons/spell_mend.png",
+      "category": "ui_button",
+      "purpose": "Mend spell control button raster export",
+      "dimensions": [
+        240,
+        88
+      ],
+      "anchor": "top-left"
+    },
+    {
+      "file": "ui/buttons/spell_ward.svg",
+      "category": "ui_button",
+      "purpose": "Ward spell control button",
+      "dimensions": [
+        240,
+        88
+      ],
+      "anchor": "top-left"
+    },
+    {
+      "file": "ui/buttons/spell_ward.png",
+      "category": "ui_button",
+      "purpose": "Ward spell control button raster export",
+      "dimensions": [
+        240,
+        88
+      ],
+      "anchor": "top-left"
+    },
+    {
+      "file": "ui/portraits/guard.svg",
+      "category": "ui_portrait",
+      "purpose": "Guard defender portrait",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "top-left"
+    },
+    {
+      "file": "ui/portraits/guard.png",
+      "category": "ui_portrait",
+      "purpose": "Guard defender portrait raster export",
+      "dimensions": [
+        128,
+        128
+      ],
+      "anchor": "top-left"
+    },
+    {
+      "file": "ui/portraits/guard_selected.svg",
+      "category": "ui_portrait",
+      "purpose": "Guard selected portrait",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "top-left"
+    },
+    {
+      "file": "ui/portraits/guard_selected.png",
+      "category": "ui_portrait",
+      "purpose": "Guard selected portrait raster export",
+      "dimensions": [
+        128,
+        128
+      ],
+      "anchor": "top-left"
+    },
+    {
+      "file": "ui/portraits/striker.svg",
+      "category": "ui_portrait",
+      "purpose": "Striker defender portrait",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "top-left"
+    },
+    {
+      "file": "ui/portraits/striker.png",
+      "category": "ui_portrait",
+      "purpose": "Striker defender portrait raster export",
+      "dimensions": [
+        128,
+        128
+      ],
+      "anchor": "top-left"
+    },
+    {
+      "file": "ui/portraits/striker_selected.svg",
+      "category": "ui_portrait",
+      "purpose": "Striker selected portrait",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "top-left"
+    },
+    {
+      "file": "ui/portraits/striker_selected.png",
+      "category": "ui_portrait",
+      "purpose": "Striker selected portrait raster export",
+      "dimensions": [
+        128,
+        128
+      ],
+      "anchor": "top-left"
+    },
+    {
+      "file": "ui/portraits/engineer.svg",
+      "category": "ui_portrait",
+      "purpose": "Engineer defender portrait",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "top-left"
+    },
+    {
+      "file": "ui/portraits/engineer.png",
+      "category": "ui_portrait",
+      "purpose": "Engineer defender portrait raster export",
+      "dimensions": [
+        128,
+        128
+      ],
+      "anchor": "top-left"
+    },
+    {
+      "file": "ui/portraits/engineer_selected.svg",
+      "category": "ui_portrait",
+      "purpose": "Engineer selected portrait",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "top-left"
+    },
+    {
+      "file": "ui/portraits/engineer_selected.png",
+      "category": "ui_portrait",
+      "purpose": "Engineer selected portrait raster export",
+      "dimensions": [
+        128,
+        128
+      ],
+      "anchor": "top-left"
+    },
+    {
+      "file": "ui/portraits/warden.svg",
+      "category": "ui_portrait",
+      "purpose": "Warden defender portrait",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "top-left"
+    },
+    {
+      "file": "ui/portraits/warden.png",
+      "category": "ui_portrait",
+      "purpose": "Warden defender portrait raster export",
+      "dimensions": [
+        128,
+        128
+      ],
+      "anchor": "top-left"
+    },
+    {
+      "file": "ui/portraits/warden_selected.svg",
+      "category": "ui_portrait",
+      "purpose": "Warden selected portrait",
+      "dimensions": [
+        256,
+        256
+      ],
+      "anchor": "top-left"
+    },
+    {
+      "file": "ui/portraits/warden_selected.png",
+      "category": "ui_portrait",
+      "purpose": "Warden selected portrait raster export",
+      "dimensions": [
+        128,
+        128
+      ],
+      "anchor": "top-left"
+    },
+    {
+      "file": "ui/buttons/mana_bar_frame.svg",
+      "category": "ui_widget",
+      "purpose": "Mana bar frame",
+      "dimensions": [
+        512,
+        128
+      ],
+      "anchor": "top-left"
+    },
+    {
+      "file": "ui/buttons/mana_bar_frame.png",
+      "category": "ui_widget",
+      "purpose": "Mana bar frame raster export",
+      "dimensions": [
+        512,
+        128
+      ],
+      "anchor": "top-left"
+    },
+    {
+      "file": "ui/buttons/mana_bar_fill.svg",
+      "category": "ui_widget",
+      "purpose": "Mana bar fill",
+      "dimensions": [
+        512,
+        128
+      ],
+      "anchor": "top-left"
+    },
+    {
+      "file": "ui/buttons/mana_bar_fill.png",
+      "category": "ui_widget",
+      "purpose": "Mana bar fill raster export",
+      "dimensions": [
+        512,
+        128
+      ],
+      "anchor": "top-left"
+    },
+    {
+      "file": "screens/profile_selection.svg",
+      "category": "screen",
+      "purpose": "Control profile selection screen mockup",
+      "dimensions": [
+        1920,
+        1080
+      ],
+      "anchor": "top-left"
+    },
+    {
+      "file": "screens/profile_selection.png",
+      "category": "screen",
+      "purpose": "Control profile selection screen mockup raster export",
+      "dimensions": [
+        1920,
+        1080
+      ],
+      "anchor": "top-left"
+    },
+    {
+      "file": "screens/instruction_p1.svg",
+      "category": "screen",
+      "purpose": "P1 instruction screen mockup",
+      "dimensions": [
+        1920,
+        1080
+      ],
+      "anchor": "top-left"
+    },
+    {
+      "file": "screens/instruction_p1.png",
+      "category": "screen",
+      "purpose": "P1 instruction screen mockup raster export",
+      "dimensions": [
+        1920,
+        1080
+      ],
+      "anchor": "top-left"
+    },
+    {
+      "file": "screens/instruction_p2.svg",
+      "category": "screen",
+      "purpose": "P2 instruction screen mockup",
+      "dimensions": [
+        1920,
+        1080
+      ],
+      "anchor": "top-left"
+    },
+    {
+      "file": "screens/instruction_p2.png",
+      "category": "screen",
+      "purpose": "P2 instruction screen mockup raster export",
+      "dimensions": [
+        1920,
+        1080
+      ],
+      "anchor": "top-left"
+    },
+    {
+      "file": "screens/instruction_p3.svg",
+      "category": "screen",
+      "purpose": "P3 instruction screen mockup",
+      "dimensions": [
+        1920,
+        1080
+      ],
+      "anchor": "top-left"
+    },
+    {
+      "file": "screens/instruction_p3.png",
+      "category": "screen",
+      "purpose": "P3 instruction screen mockup raster export",
+      "dimensions": [
+        1920,
+        1080
+      ],
+      "anchor": "top-left"
+    },
+    {
+      "file": "screens/instruction_p4.svg",
+      "category": "screen",
+      "purpose": "P4 instruction screen mockup",
+      "dimensions": [
+        1920,
+        1080
+      ],
+      "anchor": "top-left"
+    },
+    {
+      "file": "screens/instruction_p4.png",
+      "category": "screen",
+      "purpose": "P4 instruction screen mockup raster export",
+      "dimensions": [
+        1920,
+        1080
+      ],
+      "anchor": "top-left"
+    },
+    {
+      "file": "screens/hud_p1.svg",
+      "category": "screen",
+      "purpose": "P1 active-run HUD mockup",
+      "dimensions": [
+        1920,
+        1080
+      ],
+      "anchor": "top-left"
+    },
+    {
+      "file": "screens/hud_p1.png",
+      "category": "screen",
+      "purpose": "P1 active-run HUD mockup raster export",
+      "dimensions": [
+        1920,
+        1080
+      ],
+      "anchor": "top-left"
+    },
+    {
+      "file": "screens/hud_p2.svg",
+      "category": "screen",
+      "purpose": "P2 active-run HUD mockup",
+      "dimensions": [
+        1920,
+        1080
+      ],
+      "anchor": "top-left"
+    },
+    {
+      "file": "screens/hud_p2.png",
+      "category": "screen",
+      "purpose": "P2 active-run HUD mockup raster export",
+      "dimensions": [
+        1920,
+        1080
+      ],
+      "anchor": "top-left"
+    },
+    {
+      "file": "screens/hud_p3.svg",
+      "category": "screen",
+      "purpose": "P3 active-run HUD mockup",
+      "dimensions": [
+        1920,
+        1080
+      ],
+      "anchor": "top-left"
+    },
+    {
+      "file": "screens/hud_p3.png",
+      "category": "screen",
+      "purpose": "P3 active-run HUD mockup raster export",
+      "dimensions": [
+        1920,
+        1080
+      ],
+      "anchor": "top-left"
+    },
+    {
+      "file": "screens/hud_p4.svg",
+      "category": "screen",
+      "purpose": "P4 active-run HUD mockup",
+      "dimensions": [
+        1920,
+        1080
+      ],
+      "anchor": "top-left"
+    },
+    {
+      "file": "screens/hud_p4.png",
+      "category": "screen",
+      "purpose": "P4 active-run HUD mockup raster export",
+      "dimensions": [
+        1920,
+        1080
+      ],
+      "anchor": "top-left"
+    },
+    {
+      "file": "screens/pause_overlay.svg",
+      "category": "screen",
+      "purpose": "Paused screen overlay mockup",
+      "dimensions": [
+        1920,
+        1080
+      ],
+      "anchor": "top-left"
+    },
+    {
+      "file": "screens/pause_overlay.png",
+      "category": "screen",
+      "purpose": "Paused screen overlay mockup raster export",
+      "dimensions": [
+        1920,
+        1080
+      ],
+      "anchor": "top-left"
+    },
+    {
+      "file": "screens/portal_cast_overlay.svg",
+      "category": "screen",
+      "purpose": "Portal Cast screen overlay mockup",
+      "dimensions": [
+        1920,
+        1080
+      ],
+      "anchor": "top-left"
+    },
+    {
+      "file": "screens/portal_cast_overlay.png",
+      "category": "screen",
+      "purpose": "Portal Cast screen overlay mockup raster export",
+      "dimensions": [
+        1920,
+        1080
+      ],
+      "anchor": "top-left"
+    },
+    {
+      "file": "screens/success_overlay.svg",
+      "category": "screen",
+      "purpose": "Run Complete screen overlay mockup",
+      "dimensions": [
+        1920,
+        1080
+      ],
+      "anchor": "top-left"
+    },
+    {
+      "file": "screens/success_overlay.png",
+      "category": "screen",
+      "purpose": "Run Complete screen overlay mockup raster export",
+      "dimensions": [
+        1920,
+        1080
+      ],
+      "anchor": "top-left"
+    },
+    {
+      "file": "screens/failure_overlay.svg",
+      "category": "screen",
+      "purpose": "Run Failed screen overlay mockup",
+      "dimensions": [
+        1920,
+        1080
+      ],
+      "anchor": "top-left"
+    },
+    {
+      "file": "screens/failure_overlay.png",
+      "category": "screen",
+      "purpose": "Run Failed screen overlay mockup raster export",
+      "dimensions": [
+        1920,
+        1080
+      ],
+      "anchor": "top-left"
+    },
+    {
+      "file": "screens/result_screen.svg",
+      "category": "screen",
+      "purpose": "Result screen with objective metrics and five test questions",
+      "dimensions": [
+        1920,
+        1080
+      ],
+      "anchor": "top-left"
+    },
+    {
+      "file": "screens/result_screen.png",
+      "category": "screen",
+      "purpose": "Result screen with objective metrics and five test questions raster export",
+      "dimensions": [
+        1920,
+        1080
+      ],
+      "anchor": "top-left"
+    },
+    {
+      "file": "audio/cargo_speed_click.wav",
+      "category": "audio",
+      "purpose": "Short click for cargo speed change",
+      "dimensions": [
+        3969,
+        1
+      ]
+    },
+    {
+      "file": "audio/defender_order_paper_tap.wav",
+      "category": "audio",
+      "purpose": "Paper tap for defender order",
+      "dimensions": [
+        6174,
+        1
+      ]
+    },
+    {
+      "file": "audio/spell_cast_ink_stroke.wav",
+      "category": "audio",
+      "purpose": "Ink stroke for spell cast",
+      "dimensions": [
+        14994,
+        1
+      ]
+    },
+    {
+      "file": "audio/cargo_damage_paper_tear.wav",
+      "category": "audio",
+      "purpose": "Paper tear for cargo damage",
+      "dimensions": [
+        21168,
+        1
+      ]
+    },
+    {
+      "file": "audio/portal_cast_low_tone_4s.wav",
+      "category": "audio",
+      "purpose": "Continuous low tone for four-second portal cast",
+      "dimensions": [
+        176400,
+        1
+      ]
+    },
+    {
+      "file": "README.md",
+      "category": "documentation",
+      "purpose": "Asset pack overview and Godot import guidance"
+    },
+    {
+      "file": "GODOT_IMPORT.md",
+      "category": "documentation",
+      "purpose": "Godot 4 import checklist"
+    },
+    {
+      "file": "SPEC_COVERAGE.md",
+      "category": "documentation",
+      "purpose": "Mapping from specification sections to generated assets"
+    },
+    {
+      "file": "previews/world_assets.jpg",
+      "category": "preview",
+      "purpose": "Contact sheet preview",
+      "dimensions": [
+        1280,
+        810
+      ]
+    },
+    {
+      "file": "previews/ui_assets.jpg",
+      "category": "preview",
+      "purpose": "Contact sheet preview",
+      "dimensions": [
+        1280,
+        810
+      ]
+    },
+    {
+      "file": "previews/screens.jpg",
+      "category": "preview",
+      "purpose": "Contact sheet preview",
+      "dimensions": [
+        1440,
+        940
+      ]
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://world/map/final_portal.gd" id="1_portal"]
+[ext_resource type="Script" path="res://scripts/ink_sprite.gd" id="2_ink"]
+[ext_resource type="Texture2D" path="res://assets/world/final_portal_a.svg" id="3_frame_a"]
+[ext_resource type="Texture2D" path="res://assets/world/final_portal_b.svg" id="4_frame_b"]
+
+[node name="FinalPortal" type="Node2D"]
+script = ExtResource("1_portal")
+radius = 70.0
+
+[node name="Ink" type="Sprite2D" parent="."]
+script = ExtResource("2_ink")
+frames = Array[Texture2D]([ExtResource("3_frame_a"), ExtResource("4_frame_b")])
+supersample = 2.0
+extra_scale = 1.0

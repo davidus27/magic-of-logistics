@@ -1,0 +1,83 @@
+[gd_scene load_steps=13 format=3]
+
+[ext_resource type="Script" path="res://main/game_controller.gd" id="1_controller"]
+[ext_resource type="Texture2D" path="res://assets/textures/paper_grain_1024.png" id="12_grain"]
+[ext_resource type="PackedScene" path="res://world/map/map.tscn" id="2_map"]
+[ext_resource type="PackedScene" path="res://world/cargo/cargo_unit.tscn" id="3_cargo"]
+[ext_resource type="Script" path="res://world/camera_rig.gd" id="4_camera"]
+[ext_resource type="Script" path="res://ui/paper_grain.gd" id="5_grain"]
+[ext_resource type="Script" path="res://ui/hud.gd" id="6_hud"]
+[ext_resource type="Script" path="res://ui/profile_select.gd" id="7_profile"]
+[ext_resource type="Script" path="res://ui/instructions.gd" id="8_instructions"]
+[ext_resource type="Script" path="res://ui/result_screen.gd" id="9_result"]
+[ext_resource type="Script" path="res://ui/debug_overlay.gd" id="10_debug"]
+[ext_resource type="Script" path="res://main/telemetry_recorder.gd" id="11_recorder"]
+
+[node name="Main" type="Node2D"]
+
+[node name="World" type="Node2D" parent="."]
+
+[node name="Map" parent="World" instance=ExtResource("2_map")]
+
+[node name="CargoUnit" parent="World" instance=ExtResource("3_cargo")]
+
+[node name="DefenderContainer" type="Node2D" parent="World"]
+
+[node name="EnemyContainer" type="Node2D" parent="World"]
+
+[node name="ProjectileContainer" type="Node2D" parent="World"]
+
+[node name="EffectContainer" type="Node2D" parent="World"]
+
+[node name="CameraRig" type="Camera2D" parent="World"]
+script = ExtResource("4_camera")
+
+[node name="GrainLayer" type="CanvasLayer" parent="."]
+layer = 5
+
+[node name="PaperGrain" type="TextureRect" parent="GrainLayer"]
+script = ExtResource("5_grain")
+grain_texture = ExtResource("12_grain")
+
+[node name="UserInterface" type="CanvasLayer" parent="."]
+process_mode = 3
+layer = 10
+
+[node name="Hud" type="Control" parent="UserInterface"]
+script = ExtResource("6_hud")
+controller_path = NodePath("../../GameController")
+cargo_path = NodePath("../../World/CargoUnit")
+map_path = NodePath("../../World/Map")
+
+[node name="ProfileSelect" type="Control" parent="UserInterface"]
+script = ExtResource("7_profile")
+
+[node name="Instructions" type="Control" parent="UserInterface"]
+script = ExtResource("8_instructions")
+
+[node name="ResultScreen" type="Control" parent="UserInterface"]
+script = ExtResource("9_result")
+
+[node name="DebugOverlay" type="Control" parent="UserInterface"]
+script = ExtResource("10_debug")
+controller_path = NodePath("../../GameController")
+cargo_path = NodePath("../../World/CargoUnit")
+map_path = NodePath("../../World/Map")
+camera_path = NodePath("../../World/CameraRig")
+start_visible = false
+
+[node name="GameController" type="Node" parent="."]
+script = ExtResource("1_controller")
+world_path = NodePath("../World")
+map_path = NodePath("../World/Map")
+cargo_path = NodePath("../World/CargoUnit")
+camera_path = NodePath("../World/CameraRig")
+profile_select_path = NodePath("../UserInterface/ProfileSelect")
+instructions_path = NodePath("../UserInterface/Instructions")
+hud_path = NodePath("../UserInterface/Hud")
+result_screen_path = NodePath("../UserInterface/ResultScreen")
+
+[node name="TelemetryRecorder" type="Node" parent="."]
+script = ExtResource("11_recorder")
+controller_path = NodePath("../GameController")
+cargo_path = NodePath("../World/CargoUnit")

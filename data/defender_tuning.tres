@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="DefenderTuning" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/defender_tuning.gd" id="1_tuning"]
+
+[resource]
+script = ExtResource("1_tuning")
+defend_slot_min = 90.0
+defend_slot_max = 130.0
+defend_radius = 200.0
+defend_leash = 260.0
+attack_radius = 420.0
+attack_leash = 480.0
+attack_interval = 1.0
+retarget_interval = 0.25
+path_interval = 0.25
+downed_seconds = 15.0
+barrier_search_distance = 180.0
+separation_radius = 26.0
+separation_strength = 40.0
+blocked_timeout = 2.0

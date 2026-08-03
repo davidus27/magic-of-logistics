@@ -1,0 +1,45 @@
+[gd_resource type="Resource" script_class="MapRouteData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/map_route_data.gd" id="1_route"]
+
+[resource]
+script = ExtResource("1_route")
+
+; Route centre line. A straight 600px lead-in, then four sweeping bends of a
+; sine with amplitude 472 and wavelength 2800, then a straight 600px run-out to
+; the portal. Baked length is 9000px, matching section 11.
+;
+; The bends give a minimum turn radius of 421px. At the 65px/s Fast speed that
+; asks 8.8 degrees per second of the 80 degrees per second turn rate of section
+; 13.1, so manual steering in profiles P3 and P4 has wide margin.
+;
+; Regenerate with tools/road_calc.py after changing amplitude or wavelength.
+control_points = PackedVector2Array(-600, 0, -300, 0, 0, 0, 350, 333.7, 700, 471.9, 1050, 333.7, 1400, 0, 1750, -333.7, 2100, -471.9, 2450, -333.7, 2800, 0, 3150, 333.7, 3500, 471.9, 3850, 333.7, 4200, 0, 4550, -333.7, 4900, -471.9, 5250, -333.7, 5600, 0, 5950, 333.7, 6300, 471.9, 6600, 471.9, 6900, 471.9)
+road_width = 420.0
+
+; 210 of road half width plus this must cover the 480px defender attack leash of
+; section 15.7 and the 360px long-range enemy maximum range of section 25.2.
+navigation_margin = 360.0
+
+; Two mud areas as (offset along the route, length). Section 11 and 12.2.
+; The first sits under enemy trigger 2 so that one fight happens in mud.
+mud_zones = Array[Vector2]([Vector2(1800, 600), Vector2(5200, 700)])
+
+; Two barriers. Section 28.
+barrier_offsets = PackedFloat32Array(3900, 7000)
+
+; Six enemy trigger areas. Section 26. The first is at 700px, which is past the
+; 675px the cargo covers in the 15 second practice area of section 11 at the
+; 45px/s Normal speed.
+trigger_offsets = PackedFloat32Array(700, 2100, 3400, 4700, 6000, 7300)
+
+; 100px before the route ends, inside the straight run-out, so the portal
+; approach is not on a bend.
+portal_offset = 8900.0
+portal_radius = 70.0
+
+sample_step = 40.0
+
+; Barriers need the Repair state to open. Until that exists, spawning them would
+; make the route impossible to finish.
+enable_barriers = false

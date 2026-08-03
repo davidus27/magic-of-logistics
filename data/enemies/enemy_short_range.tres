@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="EnemyData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/enemy_data.gd" id="1_enemy"]
+
+[resource]
+script = ExtResource("1_enemy")
+id = "short_range"
+display_name = "Short Range"
+kind = 0
+max_health = 32
+speed = 82.0
+attack_damage = 8
+attack_interval = 1.0
+defense = 0
+body_radius = 11.0
+attack_range = 28.0
+retarget_interval = 0.5

@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ControlProfileData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/control_profile_data.gd" id="1_profile"]
+
+[resource]
+script = ExtResource("1_profile")
+id = "P3"
+display_name = "P3 Road Steering"
+description = "You steer the cargo yourself, but walls keep it on the road.
+You give your defenders a role, and they pick their own targets."
+test_purpose = "Cargo steering load"
+cargo_mode = 1
+defender_mode = 0
+use_road_walls = true
+implemented = false

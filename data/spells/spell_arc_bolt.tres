@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="SpellData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/spell_data.gd" id="1_spell"]
+
+[resource]
+script = ExtResource("1_spell")
+id = "arc_bolt"
+display_name = "Arc Bolt"
+kind = 0
+hotkey_index = 1
+mana_cost = 5
+cooldown = 0.5
+cast_range = 500.0
+allow_hold_repeat = true
+damage = 18
+projectile_speed = 700.0

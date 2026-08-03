@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="CargoData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/cargo_data.gd" id="1_cargo"]
+
+[resource]
+script = ExtResource("1_cargo")
+max_health = 100
+initial_health = 100
+speed_slow = 50.0
+speed_normal = 90.0
+speed_fast = 130.0
+speed_reverse = 15.0
+acceleration = 60.0
+brake_rate = 100.0
+turn_rate = 80.0
+body_size = Vector2(120, 64)
+damage_flash_seconds = 0.1
+first_crack_health = 60
+second_crack_health = 30

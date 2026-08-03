@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="DefenderData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/defender_data.gd" id="1_defender"]
+
+[resource]
+script = ExtResource("1_defender")
+id = "warden"
+display_name = "Warden"
+portrait_mark = "W"
+max_health = 120
+attack_damage = 11
+defense = 5
+repair_rate = 3.0
+speed = 70.0

@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ControlProfileData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/control_profile_data.gd" id="1_profile"]
+
+[resource]
+script = ExtResource("1_profile")
+id = "P2"
+display_name = "P2 Defender Targets"
+description = "The cargo drives itself along the road. You choose a speed level.
+You right-click an enemy to tell your defenders exactly what to attack."
+test_purpose = "Defender target load"
+cargo_mode = 0
+defender_mode = 1
+use_road_walls = false
+implemented = false

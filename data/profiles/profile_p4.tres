@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ControlProfileData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/control_profile_data.gd" id="1_profile"]
+
+[resource]
+script = ExtResource("1_profile")
+id = "P4"
+display_name = "P4 Free Steering"
+description = "You steer the cargo yourself and there are no road walls.
+Off-road ground is slow and turns badly."
+test_purpose = "Maximum cargo control load"
+cargo_mode = 2
+defender_mode = 0
+use_road_walls = false
+implemented = false

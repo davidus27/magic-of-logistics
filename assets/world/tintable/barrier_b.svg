@@ -1,0 +1,12 @@
+<!-- Barrier, line frame B. -->
+<svg xmlns="http://www.w3.org/2000/svg" width="432" height="56" viewBox="0 0 432 56">
+  <g fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M 6,15 L 426,17 L 425,39 L 7,41 Z"/>
+    <path d="M 7,16 L 75,40 M 77,16 L 5,40"/>
+    <path d="M 75,18 L 147,38 M 145,18 L 77,40"/>
+    <path d="M 147,16 L 215,40 M 217,16 L 145,40"/>
+    <path d="M 215,18 L 287,38 M 285,18 L 217,40"/>
+    <path d="M 287,16 L 355,40 M 357,16 L 285,40"/>
+    <path d="M 355,18 L 427,38 M 425,18 L 357,40"/>
+  </g>
+</svg>

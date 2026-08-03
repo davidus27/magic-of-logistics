@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="DefenderData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/defender_data.gd" id="1_defender"]
+
+[resource]
+script = ExtResource("1_defender")
+id = "engineer"
+display_name = "Engineer"
+portrait_mark = "E"
+max_health = 90
+attack_damage = 9
+defense = 2
+repair_rate = 6.0
+speed = 80.0
