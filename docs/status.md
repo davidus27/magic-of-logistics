@@ -6,44 +6,10 @@ in the same commit as the work it describes.
 | | |
 |---|---|
 | Engine | Godot 4.7.1, GDScript, statically typed |
-| Last committed milestone | **Milestone 1 — World foundation**, verified 2026-07-31 |
-| Current work | **Milestone 2 — first combat loop**, branch `first-combat`, **~2,550 lines uncommitted** |
-| Smoke test | 🔴 **FAILING — 5 assertions.** See below. This is the commit gate. |
-| Last verified run | 2026-08-03: cargo destroyed at 3,882 px of the 8,900 px route, 34.1 s |
-
----
-
-## 🔴 The smoke test is failing
-
-`tools/smoke_run.tscn` is the commit gate and it does not pass. Two separate
-problems are tangled together in the output — sort them apart before touching
-anything else.
-
-**1. The harness is stale.** Its assertions were written for the milestone 1 build
-and now contradict the game. Verbatim from the run:
-
-```
-FAIL: cargo lost health with no enemies in the build
-FAIL: run took 34.1s, outside the 120 to 360 band this build should produce
-FAIL: entered mud 1 times, expected 2
-FAIL: travelled only 3882px of a 8900px route
-FAIL: run failed, reason cargo_destroyed
-```
-
-Only the first is purely a stale assertion — there *are* enemies now. The middle
-three are all downstream of the run ending early, not independent bugs. Rewrite the
-harness so it drives and asserts a combat run: survive to the portal, or assert a
-deliberate expected outcome.
-
-**2. The combat loop is lethal.** With four defenders on the field the cargo dies
-43 % of the way along the route, inside the first three enemy groups. That is a real
-balance or defender-behaviour finding, not a test artefact. Decide which it is before
-tuning numbers — a defender that never engages looks identical to an enemy that hits
-too hard.
-
-Also still open from milestone 1: the navigation bake logs **3 edge-merge errors**
-on every run. Real agents now exist to validate a fix, which is why this milestone
-owns it.
+| Last completed milestone | **Milestone 2 — the first combat loop**, verified 2026-08-03 |
+| Current work | none in progress; milestone 3 is not yet cut |
+| Commit gates | 🟢 `smoke_run` exit 0 · 🟢 `behaviour_checks` exit 0 |
+| Last verified run | 2026-08-03: portal reached in 112.7 s at Normal, cargo 68/100, 27 of 27 enemies killed |
 
 ---
 
@@ -54,72 +20,71 @@ The 18 steps of [`spec/12-profiles-and-testing.md`](spec/12-profiles-and-testing
 
 | # | §41 step | Status | Milestone |
 |---:|---|---|---|
-| 1 | Build the map, road, cargo unit, and final portal | ✅ committed | M1 |
-| 2 | Add automatic cargo movement | ✅ committed | M1 |
-| 3 | Add one short-range enemy | 🟡 built, uncommitted — spawns in groups 1–3 | M2 |
-| 4 | Add one defender with Defend and Attack states | 🟡 built, uncommitted — four on the field, not one | M2 |
-| 5 | Add cargo health and run failure | 🟡 built, uncommitted — failure path fires, currently too easily | M2 |
-| 6 | Add Arc Bolt | 🟡 built, uncommitted — **unverified**, the smoke test never casts | M2 |
-| 7 | Add all four defenders | 🟡 arrived early with step 4 | M3 → M2 |
-| 8 | Add Repair state and one barrier | ⬜ map reports `0 barriers` | M4 |
-| 9 | Add the long-range enemy | ⬜ group 2 logs `2 long-range deferred` | M4 |
-| 10 | Add Mend and Ward | ⬜ | not pinned |
-| 11 | Add direct target orders | ⬜ | not pinned |
-| 12 | Add road-limited cargo movement | ⬜ | M5 |
-| 13 | Add free cargo movement | ⬜ | M5 |
-| 14 | Add user interface feedback | 🟡 partial — portraits, spell buttons, mana bar and health bars exist | M6 |
-| 15 | Add the threat system | ⬜ | |
-| 16 | Add telemetry and the result screen | ✅ committed, now 34 keys | M1 |
-| 17 | Add the second barrier and final balance values | ⬜ | |
-| 18 | Run the four profile tests | ⬜ | |
+| 1 | Build the map, road, cargo unit, and final portal | ✅ done | M1 |
+| 2 | Add automatic cargo movement | ✅ done | M1 |
+| 3 | Add one short-range enemy | ✅ done — all six groups, seeded | M2 |
+| 4 | Add one defender with Defend and Attack states | ✅ done — all seven states of §15.4 | M2 |
+| 5 | Add cargo health and run failure | ✅ done — failure path asserted | M2 |
+| 6 | Add Arc Bolt | ✅ done — 45 casts in the smoke run, rejections asserted | M2 |
+| 7 | Add all four defenders | ✅ done — arrived with step 4 | M2 |
+| 8 | Add Repair state and one barrier | 🟡 **half done** — the Repair state works against the cargo; barriers still disabled | M3 |
+| 9 | Add the long-range enemy | ⬜ spawner logs `N long-range deferred` in four of six groups | M3 |
+| 10 | Add Mend and Ward | ⬜ selectable = false, shown "not in this build" | M3 |
+| 11 | Add direct target orders | ⬜ profile P2 | M4 |
+| 12 | Add road-limited cargo movement | ⬜ profile P3 | M4 |
+| 13 | Add free cargo movement | ⬜ profile P4 | M4 |
+| 14 | Add user interface feedback | 🟡 §30.1–30.5 done; §30.6 world feedback absent | M5 |
+| 15 | Add the threat system | ⬜ the value counts up; no reinforcement spawns | M5 |
+| 16 | Add telemetry and the result screen | ✅ done, now 35 keys | M1 |
+| 17 | Add the second barrier and final balance values | ⬜ | M5 |
+| 18 | Run the four profile tests | ⬜ | M6 |
 
-Milestone anchors the documents state outright: M1 = steps 1–2, M2 = steps 3–6 plus
-defender selection and role orders, M4 brings the barriers, M5 brings the manual
-cargo motors, M6 brings the full §30 interface. **Steps 10–11 and the M3 boundary
-are not pinned down anywhere** — and step 7 has already landed inside M2, so M3 as
-originally sketched is now empty. Re-cut the remaining milestones before planning.
+**The remaining milestones have been re-cut**, because step 7 landed inside M2 and
+left the original M3 empty:
+
+- **M3** — finish the combat systems: barriers with the Repair state (step 8), the
+  long-range enemy (9), Mend and Ward (10).
+- **M4** — the other three control profiles: direct target orders (11) and both
+  manual cargo motors (12, 13).
+- **M5** — §30.6 world feedback, the threat reinforcements (15), the second
+  barrier and final balance (17).
+- **M6** — run the four profile tests (18).
 
 ---
 
-## Milestone 2 — what exists, uncommitted
+## Next: milestone 3
 
-~2,550 lines across these files. None of it is in git yet.
+Everything here has its data resource, its ranking in the target priority list,
+or its disabled-state flag already in place, so all three are behaviour only.
 
-| Area | Files |
-|---|---|
-| Shared unit base | `world/units/unit_body.gd` (335), `unit_health_bar.gd` (39) |
-| Defenders | `world/defenders/defender.gd` (407), `defender_states.gd` (244), `squad.gd` (225), `defender.tscn` |
-| Enemies | `world/enemies/enemy.gd` (177), `enemy_states.gd` (86), `enemy_spawner.gd` (170), `enemy_short_range.tscn` |
-| Wizard | `world/wizard/wizard.gd` (303), `arc_bolt.gd` (85), `arc_bolt.tscn` |
-| State machine | `scripts/fsm/state_machine.gd` (71), `unit_state.gd` (29) |
-| Targeting | `scripts/combat_target.gd` (82) |
-| UI | `ui/defender_portrait.gd` (108), `ui/spell_button.gd` (97), `ui/mana_bar.gd` (49), plus 232 changed lines in `ui/hud.gd` |
-| Data | `data/enemy_schedule.tres`, `scripts/data/enemy_schedule_data.gd` (28) |
-| Modified | `main/game_controller.gd`, `world/cargo/cargo_unit.gd`, `autoload/telemetry.gd`, `data/enemies/enemy_short_range.tres`, `data/spells/*.tres`, `data/defender_tuning.tres` |
+1. **Barriers with the Repair state.** `Barrier` already carries 100 work points,
+   removes its collision shape at zero and rebakes navigation; `Squad`
+   already allocates a work point per defender along the road width; the Repair
+   state already gives barrier work priority over cargo repair. What is missing is
+   flipping `MapRouteData.enable_barriers` and confirming a barrier can actually be
+   opened, that the cargo stops short of a closed one, and that the navigation
+   rebake of §34 leaves nothing stranded.
+2. **The long-range enemy** (§25.2). Needs a scene and a projectile.
+   `EnemySpawner` already counts one in four of the six groups and reports it as
+   deferred, `Defender.priority_target` already ranks it above short-range as
+   §15.7 requires, and `EnemyData` already holds every value.
+3. **Mend and Ward** (§14.6, §14.7). `Wizard` dispatches on `SpellData.kind` and
+   pushes an error on a kind it cannot cast; add the `HEAL` and `AREA` branches
+   and set `implemented = true`. `Defender.revive()` is written and asserted by
+   `behaviour_checks` already, so Mend has a target to call.
 
-Confirmed working from the run log: the squad forms (`[Squad] 4 defenders on the
-field`), the spawner fires on schedule (`group 1 at offset 700: 4 spawned`), and
-long-range enemies are cleanly deferred rather than faked.
+Then re-measure the §7 run duration, which the barriers should move toward the
+three minute floor for the first time.
 
-### To finish milestone 2
+### Play it before starting
 
-1. **Fix the smoke test**, then use it to judge the balance problem above.
-2. **Verify Arc Bolt.** 388 lines of wizard and projectile code that no automated run exercises. Either extend the harness to cast, or verify by hand and say so.
-3. **Confirm the role orders and selection of §16–17** — `Z`/`X`/`C`, `F1`–`F4`, `Q`, `Shift`+key, portrait clicks. `squad.gd` looks like the owner; nothing tests it.
-4. **Repair orders must not silently do nothing.** §15.8's last line says a defender with no repair work available uses Defend behaviour. Barriers arrive in M4, so `C` must fall through, not no-op.
-5. **Close the 3 navigation edge-merge errors.**
-6. **Commit.** 2,550 lines outside git is the largest risk on this list.
-
-### Do this before calling milestone 2 done
-
-**Play it.** Control feel is the entire point of the proof of concept and no
-assertion substitutes for it. Two questions carried over from milestone 1 that are
-still unanswered, plus two new ones:
+Control feel is the entire point of the proof of concept and no assertion
+substitutes for it. Two questions carried from milestone 1, two from milestone 2:
 
 1. Are Slow, Normal and Fast distinct enough to be a real decision?
 2. Does the mud slowdown read as a threat, or as an annoyance?
 3. Can you cast Arc Bolt without losing track of the cargo? (§42's central question)
-4. When a defender picks its own target, can you tell why?
+4. Is Defend against Attack a real choice, or does one of them dominate?
 
 ---
 
@@ -129,63 +94,94 @@ Not bugs. Do not "fix" these without checking the milestone that owns them.
 
 | Missing | Owner |
 |---|---|
-| Long-range enemy — deferred explicitly by the spawner | M4 |
-| Barriers — generated but collision disabled, map logs `0 barriers` | M4 |
-| Repair defender state | M4, with the barriers |
-| Mend and Ward | §41 step 10 |
-| Threat reinforcement spawns | §41 step 15 |
-| Manual cargo steering, profiles P3 and P4 | M5 |
-| Direct target orders, profile P2 | §41 step 11 |
-| §30.6 world feedback — target lines, leash circles, return arrows | M6 |
+| Long-range enemy — deferred explicitly by the spawner, and logged | M3 |
+| Barriers — generated but disabled by `MapRouteData.enable_barriers` | M3 |
+| Mend and Ward — `SpellData.implemented = false`, cannot be selected | M3 |
+| Direct target orders, profile P2 | M4 |
+| Manual cargo steering, profiles P3 and P4 | M4 |
+| §30.6 world feedback — target lines, leash circles, return arrows | M5 |
+| Threat reinforcement spawns | M5 |
 
 Profiles P2–P4 render as **disabled** on the selection screen rather than silently
-running P1, driven by `ControlProfileData.implemented` in `data/profiles/`. Flip a
-flag only when the profile works end to end.
+running P1, driven by `ControlProfileData.implemented` in `data/profiles/`. Spells
+use the same pattern through `SpellData.implemented`. Flip a flag only when the
+thing works end to end.
+
+---
+
+## Where the specification needed a decision
+
+Milestone 2 hit five cases the text does not decide, or decides in a way that does
+not survive four defenders. Each is a candidate to change in the **specification**
+rather than in the code. Full reasoning in
+[`milestones/milestone-02-first-combat-loop.md`](milestones/milestone-02-first-combat-loop.md).
+
+| Question | Choice |
+|---|---|
+| What does Follow do when an enemy arrives? | Change to Defend, per §15.5's "when no other state applies" |
+| Which enemy does each defender intercept? | The nearest to the cargo that no other defender is on |
+| Defenders cannot keep up with the cargo | A catch-up speed, used only when walking to a slot |
+| Defender attack range, which §15 never gives | 34px, in `DefenderTuning` |
+| What counts as "blocks its route" in §25.1 | Within 55px of the line to the cargo, or already in reach |
+
+The third is the one to decide first, because the two tables genuinely contradict.
 
 ---
 
 ## Open findings
 
-**⚠️ Fast speed is stated as two different numbers.** §13.1 and
-`data/cargo_data.tres` both say **130 px/s**. `README.md`, the milestone 1 report and
-the header comment of `tools/smoke_run.gd` all say **"the 65 px/s Fast speed of
-section 13.1"**, and measurement agrees with the lower figure. `AutoPathMotor` applies
-`speed_for_level() * terrain_factor` with no visible halving. One of the two is
-wrong, and the §7 run-duration maths depends on which. Fix all three comments and the
-harness band in the same commit as whichever value wins.
+**⚠️ Resolved: Fast speed is 130 px/s.** §13.1 and `data/cargo_data.tres` both say
+130, and measurement agrees with them, not with the "65 px/s" that the milestone 1
+report and the old smoke test header both quoted. A Fast-held run on the untouched
+repository covered 8,914 px in 79.9 s with 16.7 s of that in mud; 130 px/s predicts
+9,506 px for those times and 65 px/s predicts 4,753 px. The 65 figure appears
+nowhere the game reads and produced a **failing smoke test on the initial commit**
+— 79.9 s against a 120 to 360 second band derived from the wrong number. The band
+is now based on a measured Normal-speed run. The milestone 1 report is left as
+written, because it is a historical record.
 
-**The three-minute floor of §7 is not reachable until the barriers exist.** 9,000 px
-of driving happens before anything else does; the floor closes once two barriers at
-100 work points each stop the cargo, worth roughly 35 s. §7 and §13.1 are consistent
-— but only from M4 onward.
+**The three minute floor of §7 is not reachable yet.** A full Normal-speed run
+with all six enemy groups is 112.7 s. Slow is 180 s of driving by itself; the two
+barriers at 100 work points each add roughly 35 s. Re-measure at M3 and then decide
+whether the route should be longer or the floor lower.
+
+**A passive player survives.** The smoke run plays badly on purpose — one order, one
+speed, cast at whatever is nearest — and still finishes with the cargo at 68 health.
+Right for a first-time tester, but it leaves little room for the long-range enemy,
+the reinforcements of §27 and the barriers. Revisit after M3 rather than tuning now.
+
+**Combat outcomes are not bit-reproducible between runs of the same seed.** §35
+requires the seed to fix enemy *spawn positions*, and it does — the spawner draws
+only from `RunContext.rng`. But the navigation server resolves avoidance across
+threads, so two runs of seed 1 ended with 0 and 1 defender deaths. Treat a single
+run as a sample when comparing profiles under §38.
 
 **Mud is visually heavy.** The tiled fill reads clearly, which is what §12.2 asks
 for, but it dominates the paper-and-ink page more than the rest of the palette does.
 One `modulate` value in `TerrainZone.setup_mud`.
 
-**Telemetry grew from 31 keys to 34** with the combat fields. The key set must stay
-stable across profile runs — if a field only exists for some profiles, record it as
-zero rather than omitting it (§36).
+**Telemetry is now 35 keys.** The key set must stay stable across profile runs — if
+a field only exists for some profiles, record it as zero rather than omitting it
+(§36).
 
 ---
 
-## Milestone 1 verification, for reference
+## Known residual
 
-Full report: [`milestones/milestone-01-world-foundation.md`](milestones/milestone-01-world-foundation.md).
+The navigation bake reports **3 edge merge warnings**, unchanged since milestone 1.
+Real agents now navigate that mesh and they navigate it correctly: 27 of 27 enemies
+crossed it to reach the cargo, and the blocked-unit fallback of §34 fired **zero**
+times in a full run. Cosmetic on current evidence; revisit only if a unit is
+observed sticking.
 
-| Check | Result |
+---
+
+## Closed milestone reports
+
+| Milestone | Report |
 |---|---|
-| Godot import | clean, no errors |
-| Parse check, all 26 scripts | clean |
-| `tools/smoke_run.tscn` | exit 0, all assertions pass |
-| Baked route length | **9000 px** against a 9000 target |
-| Fast run duration | **154.1 s** |
-| Terrain events | `Mud, Road, Mud, Road` — both zones entered and exited |
-| Time on mud | **34.0 s** at the ×0.60 factor of §12.2 |
-| Distance travelled | 8852 px, portal triggered 70 px short of centre as specified |
-| Telemetry file | 31 keys, named `run_<date>_P1_seed10111.json` |
-| Camera lead, measured | **108 px** = 15 % of the 720 px viewport, §9 |
-| Visual states | 9 captured and reviewed via `tools/screenshot_run.tscn` |
+| M1 — World foundation | [`milestones/milestone-01-world-foundation.md`](milestones/milestone-01-world-foundation.md) |
+| M2 — The first combat loop | [`milestones/milestone-02-first-combat-loop.md`](milestones/milestone-02-first-combat-loop.md) |
 
 ---
 
@@ -193,16 +189,16 @@ Full report: [`milestones/milestone-01-world-foundation.md`](milestones/mileston
 
 §40. The MVP is complete when every line is true.
 
-- [ ] All four control profiles work on the same map
-- [ ] The player can change the control profile before a run
-- [ ] The cargo unit can reach the final portal — **regressed**: it did in M1, it dies at 3,882 px now
-- [ ] Both enemy types can attack the cargo unit — short-range only
-- [ ] Defenders can attack, defend, and repair — no Repair until M4
-- [ ] The wizard can cast all three spells — Arc Bolt built but unverified
+- [ ] All four control profiles work on the same map — P1 only
+- [x] The player can change the control profile before a run
+- [x] The cargo unit can reach the final portal — under attack, verified each run
+- [ ] Both enemy types can attack the cargo unit — short-range only, M3
+- [ ] Defenders can attack, defend, and repair — all three work; repair has no barrier to work on until M3
+- [ ] The wizard can cast all three spells — Arc Bolt only, M3
 - [x] The final portal can complete a run
 - [x] Cargo destruction can fail a run
 - [x] The result screen shows test data
 - [x] The telemetry file contains all required values
-- [ ] No unit stays blocked for more than two seconds — untested, and 3 navmesh errors stand
+- [x] No unit stays blocked for more than two seconds — 0 fallbacks in a full run, and every enemy reached the cargo
 - [x] The game keeps at least 60 frames per second on the test computer
-- [ ] All important orders have visual and sound feedback
+- [ ] All important orders have visual and sound feedback — orders, casts and damage have both; §30.6 world feedback is missing

@@ -36,6 +36,39 @@ The white-plus-tint convention is what lets one file serve both the damage flash
 of §13.2 and the light grey dead marks of §15.11. `InkSprite` supports both
 conventions; [`assets/README.md`](../assets/README.md) records which file is which.
 
+## `NavigationAgent2D` clamps the avoidance result to `max_speed`
+
+With `avoidance_enabled`, you hand the agent a desired velocity and it hands back a
+safe one — clamped to `max_speed`. So `max_speed` is not a statistic to set once at
+setup; it is part of **this frame's** request, and it has to include any temporary
+speed change.
+
+`UnitBody` computes its desired velocity as `base_speed * terrain_factor *
+move_scale` but set the cap from `base_speed * terrain_factor` alone. Every request
+to move faster than the unit's own speed was therefore discarded by the solver,
+while the code that asked for it read as correct. The symptom was defenders who
+never caught up despite a catch-up multiplier that measurably existed.
+
+If a unit moves at the wrong speed and the velocity you pass in looks right, print
+what comes back from `velocity_computed` before looking anywhere else.
+
+## `PROCESS_MODE_ALWAYS` is inherited by every child
+
+A test harness that instances the game as its own child has to say so explicitly:
+
+```gdscript
+_main = (load(MAIN_SCENE) as PackedScene).instantiate()
+_main.process_mode = Node.PROCESS_MODE_PAUSABLE   # or the game never pauses
+add_child(_main)
+```
+
+`smoke_run`, `behaviour_checks` and `screenshot_run` all set
+`PROCESS_MODE_ALWAYS` on themselves so they can drive the paused screens. A child
+left on the default `PROCESS_MODE_INHERIT` follows its parent, so the whole game
+inherited "always" and `get_tree().paused` did nothing under any of them. Pause
+worked correctly in the real game the entire time; the harnesses were simply
+testing a different one.
+
 ## Convex decomposition fails on a repeated vertex
 
 Mud zone offsets in `data/map_route.tres` are round numbers, and a round number can
@@ -51,12 +84,13 @@ rasterisation cell, producing **39 edge-merge errors**. Offsetting a decimated
 200 px spine instead, and snapping the outline to whole pixels, brought it down to
 **3 warnings**.
 
-Those 3 remain. They are warnings, not errors. They are owned by milestone 2, when
-real agents exist to validate a fix rather than guessing at geometry — see
+Those 3 remain, and milestone 2 supplied the agents to judge them: 27 of 27 enemies
+crossed that mesh to reach the cargo and the blocked-unit fallback of §34 fired
+**zero** times in a full run. Cosmetic on current evidence — see
 [`status.md`](status.md).
 
 ## Tooling limits
 
-- `Godot --headless --check-only --script <file>` **does not register autoloads**, so every reference to `InkClock`, `Telemetry`, `RunContext` or `SoundBank` reports as undefined. Filter those out to use it as a lint.
+- `Godot --headless --check-only --script <file>` **does not register autoloads**, so every reference to `InkClock`, `Telemetry`, `RunContext` or `SoundBank` reports as undefined. Filter those out to use it as a lint. Note that this also cascades: a script that merely *depends* on one of those reports `Failed to compile depended scripts` with no clue why, so read the unfiltered output before believing it. Seven of the 53 scripts report the cascade and none of them is broken.
 - `--write-movie` **crashes under `--headless`**; it needs a real rendering device. `tools/screenshot_run.tscn` runs windowed and saves the viewport instead.
 - `tools/road_calc.py` reproduces Godot's curve baking, so the length and turn demand it prints are the ones the game actually gets. Re-run it after changing the route shape.

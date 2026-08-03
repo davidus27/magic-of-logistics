@@ -5,22 +5,22 @@ alwaysApply: false
 
 # Running and verifying
 
-> 🔴 **The smoke test is currently failing — 5 assertions, as of 2026-08-03.** You did
-> not break it. Its assertions were written for the milestone 1 build and one of them
-> literally reads *"cargo lost health with no enemies in the build"* while enemies now
-> exist. Separately, the cargo dies at 3,882 px of the 8,900 px route. Read
-> [docs/status.md](mdc:docs/status.md) before interpreting any failure, and do not
-> "fix" the game to satisfy a stale assertion.
+> Both commit gates pass as of milestone 2, 2026-08-03. If one fails, you probably
+> broke it — but read [docs/status.md](mdc:docs/status.md) before deciding, and never
+> "fix" the game to satisfy an assertion you have not first shown to be right.
 
 ```sh
 # Play.
 Godot --path .
 
-# End-to-end check: drives a whole run and asserts the result.
-# Exits non-zero on failure, so it can gate a commit.
+# Commit gate 1: plays a whole run badly on purpose and asserts the result.
 Godot --headless --fixed-fps 60 --path . res://tools/smoke_run.tscn
 
-# Screenshots of nine game states, into user://screenshots.
+# Commit gate 2: drives the states a successful run never reaches - downed, dead,
+# revive, repair at each speed, rejected casts, and the failure path.
+Godot --headless --fixed-fps 60 --path . res://tools/behaviour_checks.tscn
+
+# Screenshots of 13 game states, into user://screenshots.
 # Must run windowed - saving a viewport image needs a real rendering device.
 Godot --fixed-fps 60 --resolution 1280x720 --path . res://tools/screenshot_run.tscn
 
@@ -33,20 +33,31 @@ On this machine the binary is
 
 ## What the smoke test asserts
 
-Route length 9000 px, run completes, terrain events in order
-`Mud, Road, Mud, Road`, time on mud at the ×0.60 factor, the Fast level dominating
-the speed accounting, and the full telemetry key set. **Adding a telemetry field
-means updating `tools/smoke_run.gd` too**, or the key-set assertion fails.
+Route length 9000 px, the four defenders starting in Follow inside their slot band,
+the run completing, terrain events in order `Mud, Road, Mud, Road`, time on mud at
+the ×0.60 factor, all six enemy groups firing, enemies both landing attacks and
+dying, some defender reaching the Defend state, Arc Bolt being cast, the selection
+and order counts being recorded, the squad staying inside the attack leash, and the
+full telemetry key set. **Adding a telemetry field means updating
+`tools/smoke_run.gd` too**, or the key-set assertion fails.
 
 It asserts the duration band this build can actually produce, which is not yet the
 three-minute floor of §7 — see [docs/status.md](mdc:docs/status.md) for why that is
 correct rather than a bug.
 
+## What behaviour_checks asserts
+
+The paths a successful run never takes: an order reaching the selection and nobody
+else, the 15-second downed timer ending in Dead with no collision shape, revive
+working on a downed defender and refusing a dead one, cargo repair at Stop and not
+at Fast, casts rejected for range, mana and being unimplemented, and cargo
+destruction opening the result screen with `end_reason = cargo_destroyed`.
+
 ## Telemetry output
 
 `user://telemetry`, which on macOS is
 `~/Library/Application Support/Godot/app_userdata/MagicLogisticsInit`. One JSON per
-run, named `run_<date>_P<profile>_seed<n>.json`, 31 keys.
+run, named `run_<date>_P<profile>_seed<n>.json`, 35 keys.
 
 ## Standard of proof
 
