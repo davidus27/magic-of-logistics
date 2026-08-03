@@ -28,6 +28,13 @@ enum Kind {
 @export var attack_range: float = 28.0
 ## The short-range enemy changes target on this period. Section 25.1.
 @export var retarget_interval: float = 0.5
+## How near the line from this enemy to the cargo a defender must be to count as
+## blocking its route. Section 25.1.
+##
+## The specification says the enemy attacks a defender that blocks its route
+## without giving a width for that route. This is a little wider than a defender
+## body, so a defender standing in the way blocks and one walking past does not.
+@export var block_corridor: float = 55.0
 
 @export_group("Long range")
 ## The enemy moves to this distance from the cargo. Section 25.2.

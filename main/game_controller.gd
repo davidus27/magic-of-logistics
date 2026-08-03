@@ -32,6 +32,9 @@ const RUN_TIME_LIMIT := 480.0
 @export var map_path: NodePath
 @export var cargo_path: NodePath
 @export var camera_path: NodePath
+@export var squad_path: NodePath
+@export var spawner_path: NodePath
+@export var wizard_path: NodePath
 @export var profile_select_path: NodePath
 @export var instructions_path: NodePath
 @export var hud_path: NodePath
@@ -41,6 +44,9 @@ var world: Node2D
 var map: Map
 var cargo: CargoUnit
 var camera: CameraRig
+var squad: Squad
+var spawner: EnemySpawner
+var wizard: Wizard
 var profile_select: Control
 var instructions: Control
 var hud: Control
@@ -63,6 +69,9 @@ func _ready() -> void:
 	map = NodeRef.get_required(self, map_path, "map")
 	cargo = NodeRef.get_required(self, cargo_path, "cargo")
 	camera = NodeRef.get_required(self, camera_path, "camera")
+	squad = NodeRef.get_required(self, squad_path, "squad")
+	spawner = NodeRef.get_required(self, spawner_path, "enemy spawner")
+	wizard = NodeRef.get_required(self, wizard_path, "wizard")
 	profile_select = NodeRef.get_required(self, profile_select_path, "profile select")
 	instructions = NodeRef.get_required(self, instructions_path, "instructions")
 	hud = NodeRef.get_required(self, hud_path, "hud")
@@ -126,6 +135,13 @@ func begin_session(profile: ControlProfileData, seed_data: TestSeedData) -> void
 	cargo.setup(map, _make_motor(profile))
 	camera.target = cargo
 	camera.snap_to_target()
+
+	# Order matters. The spawner clears the field before the squad places
+	# defenders around a cargo unit that is already at the start of the route,
+	# and the wizard reads nothing from either.
+	spawner.build()
+	squad.build()
+	wizard.build()
 
 	run_seconds = 0.0
 	threat = 0.0
@@ -208,6 +224,7 @@ func _on_cargo_destroyed() -> void:
 
 func _finish(success: bool) -> void:
 	Telemetry.set_value("end_reason", _end_reason)
+	Telemetry.set_value("defender_survivors", squad.survivor_count())
 	Telemetry.end_run(success, run_seconds, cargo.health)
 	result_screen.show_results(success, run_seconds, cargo.health, threat)
 	_enter(State.RESULT)
@@ -225,6 +242,9 @@ func _enter(next_state: State) -> void:
 	var simulating := state == State.RUN or state == State.PORTAL_CAST
 	get_tree().paused = not simulating
 	cargo.simulating = simulating
+	# Enemies can attack during the cast, so the wizard keeps working through it.
+	# Section 8.5.
+	wizard.active = simulating
 
 	if state == State.PORTAL_CAST:
 		# The cargo unit stops during the cast. Section 8.5.

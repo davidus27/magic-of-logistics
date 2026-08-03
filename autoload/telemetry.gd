@@ -77,6 +77,20 @@ func add_terrain_time(terrain_key: String, delta: float) -> void:
 	table[terrain_key] = float(table.get(terrain_key, 0.0)) + delta
 
 
+## Count one defender state change, by the state entered. Section 33 requires
+## the telemetry recorder to store each defender state change; a count for each
+## state answers the questions of section 42 about defender control without a
+## per-event log that no one would read.
+func count_state_change(state_id: StringName) -> void:
+	if not _recording:
+		return
+	var table: Dictionary = _record["defender_state_changes"]
+	var key := String(state_id)
+	table[key] = int(table.get(key, 0)) + 1
+	_record["defender_state_changes_total"] = \
+		int(_record.get("defender_state_changes_total", 0)) + 1
+
+
 ## Store the five result screen answers. Section 37.
 func set_questionnaire(answers: PackedInt32Array) -> void:
 	if not _recording:
@@ -161,6 +175,7 @@ func _blank_record() -> Dictionary:
 		"success": false,
 		"run_duration": 0.0,
 		"cargo_health_end": 0,
+		"defender_survivors": 0,
 		"max_threat": 0.0,
 		# Movement.
 		"distance_traveled": 0.0,
@@ -171,6 +186,10 @@ func _blank_record() -> Dictionary:
 		"defender_selections": 0,
 		"defender_orders": 0,
 		"direct_target_orders": 0,
+		# Section 33. Not one of the section 36 fields, but the recorder is
+		# required to store state changes and this is where a run is recorded.
+		"defender_state_changes": {},
+		"defender_state_changes_total": 0,
 		# Wizard control.
 		"spell_selections": 0,
 		"spell_casts": 0,

@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="EnemyScheduleData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/enemy_schedule_data.gd" id="1_schedule"]
+
+[resource]
+script = ExtResource("1_schedule")
+
+; The six fixed enemy groups of section 26, as (short-range, long-range).
+; Trigger positions are in data/map_route.tres, because where a trigger sits is
+; a property of the map and not of the group it creates.
+groups = Array[Vector2i]([Vector2i(4, 0), Vector2i(2, 2), Vector2i(6, 0), Vector2i(4, 3), Vector2i(3, 5), Vector2i(8, 4)])
+
+; 210 of road half width plus 360 of navigation margin is 570. Staying inside
+; 380 keeps a spawned enemy on the navigation mesh with room to spare.
+spawn_ahead_min = 200.0
+spawn_ahead_max = 640.0
+spawn_lateral_max = 380.0

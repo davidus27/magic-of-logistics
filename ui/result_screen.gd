@@ -94,7 +94,7 @@ func show_results(success: bool, run_seconds: float, cargo_health: int, threat: 
 		["Test seed", str(record.get("test_seed", 0))],
 		["Run time", "%d:%02d" % [seconds / 60.0, seconds % 60]],
 		["Cargo health", "%d" % cargo_health],
-		["Defender survivors", "not in this build"],
+		["Defender survivors", "%d of 4" % int(record.get("defender_survivors", 0))],
 		["Defender orders", str(record.get("defender_orders", 0))],
 		["Spell casts", str(record.get("spell_casts", 0))],
 		["Pause count", str(record.get("pause_count", 0))],

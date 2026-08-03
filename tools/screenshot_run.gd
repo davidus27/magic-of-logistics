@@ -12,12 +12,15 @@ extends Node
 
 const MAIN_SCENE := "res://main/main.tscn"
 const OUTPUT_DIR := "user://screenshots"
+const States := preload("res://world/defenders/defender_states.gd")
 
 var _main: Node = null
 var _controller: GameController = null
 var _cargo: CargoUnit = null
 var _camera: CameraRig = null
-var _hud: Control = null
+var _squad: Squad = null
+var _spawner: EnemySpawner = null
+var _wizard: Wizard = null
 var _shots: PackedStringArray = PackedStringArray()
 
 
@@ -28,12 +31,18 @@ func _ready() -> void:
 
 	var scene: PackedScene = load(MAIN_SCENE)
 	_main = scene.instantiate()
+	# This node processes while paused so that it can drive the paused screens.
+	# Without this line the game would inherit that from it and never really
+	# pause, because a child with the default mode follows its parent.
+	_main.process_mode = Node.PROCESS_MODE_PAUSABLE
 	add_child(_main)
 
 	_controller = _main.get_node("GameController")
 	_cargo = _main.get_node("World/CargoUnit")
 	_camera = _main.get_node("World/CameraRig")
-	_hud = _main.get_node("UserInterface/Hud")
+	_squad = _main.get_node("World/Squad")
+	_spawner = _main.get_node("World/EnemySpawner")
+	_wizard = _main.get_node("World/Wizard")
 
 	await _run_shots()
 
@@ -62,50 +71,92 @@ func _run_shots() -> void:
 	_controller.start_run()
 	var motor := _cargo.motor as AutoPathMotor
 
-	# 3. The start area, at Normal speed. Sections 11 and 19.
+	# 3. The start area at Normal speed, with the escort formation of section
+	# 15.6 settled around the wagon.
 	motor.set_speed_level(CargoData.SpeedLevel.NORMAL)
-	await _wait(40)
-	await _capture("03_start_area")
+	await _wait(60)
+	await _capture("03_formation")
 
-	# 4. A bend at Fast speed, showing the camera lead of section 9.
-	motor.set_speed_level(CargoData.SpeedLevel.FAST)
-	_jump(700.0)
-	await _wait(30)
-	await _capture("04_bend")
+	# 4. The first enemy group on the approach. Sections 25.1 and 26.
+	_jump(620.0)
+	await _wait(150)
+	await _capture("04_first_contact")
 
-	# 5. The first mud area, with the terrain label of section 12.4.
+	# 5. Selection rings and order marks. Sections 10.5 and 17.
+	_squad.select_all_living()
+	_squad.order(States.ATTACK)
+	await _wait(60)
+	await _capture("05_selected_and_ordered")
+
+	# 6. The spell range circle and the out-of-range line. Sections 14.3 and 14.4.
+	_point_at(Vector2(1200.0, 180.0))
+	await _wait(10)
+	await _capture("06_spell_range")
+
+	# 7. Arc Bolt in flight, with a health bar on whatever it has already hit.
+	# Sections 14.5 and 30.6.
+	var enemy := _nearest_enemy()
+	if enemy != null:
+		_wizard.try_cast(enemy.global_position)
+	await _wait(3)
+	await _capture("07_arc_bolt")
+
+	# 8. The first mud area, with the terrain label of section 12.4.
+	_squad.order(States.DEFEND)
 	_jump(1790.0)
 	await _wait(20)
-	await _capture("05_mud")
+	await _capture("08_mud")
 
-	# 6. Both crack marks, which appear below 30 health. Section 13.2.
+	# 9. A downed defender with its timer ring. Section 15.10.
+	var victim := _squad.get_defenders()[0]
+	victim.apply_damage(victim.max_health + victim.defense)
+	await _wait(20)
+	await _capture("09_downed_defender")
+
+	# 10. Both crack marks, which appear below 30 health. Section 13.2.
 	_cargo.apply_damage(_cargo.data.max_health - 25)
 	await _wait(20)
-	await _capture("06_damaged")
+	await _capture("10_damaged_cargo")
 
-	# 7. The pause screen. Section 8.4.
+	# 11. The pause screen. Section 8.4.
 	_controller._pause()
 	await _wait(4)
-	await _capture("07_paused")
+	await _capture("11_paused")
 	_controller._resume()
 
-	# 8. The portal cast ring part way through the four seconds. Section 8.5.
+	# 12. The portal cast ring part way through the four seconds. Section 8.5.
 	_cargo.heal(_cargo.data.max_health)
 	_jump(8880.0)
 	await _wait(90)
-	await _capture("08_portal_cast")
+	await _capture("12_portal_cast")
 
-	# 9. The result screen. Section 37.
+	# 13. The result screen. Section 37.
 	while _controller.state != GameController.State.RESULT:
 		await get_tree().process_frame
 	await _wait(4)
-	await _capture("09_result")
+	await _capture("13_result")
 
 
 func _jump(route_offset: float) -> void:
 	_cargo.motor.jump_to(route_offset)
 	_cargo.route_hint = -1
 	_camera.snap_to_target()
+
+
+## Put the pointer at a screen position, so the range aids of section 14.4 draw.
+func _point_at(screen_point: Vector2) -> void:
+	Input.warp_mouse(screen_point)
+
+
+func _nearest_enemy() -> Enemy:
+	var best: Enemy = null
+	var best_distance := INF
+	for enemy in _spawner.get_living():
+		var distance := enemy.global_position.distance_to(_cargo.global_position)
+		if distance < best_distance:
+			best_distance = distance
+			best = enemy
+	return best
 
 
 func _wait(frames: int) -> void:

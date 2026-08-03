@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3]
+[gd_scene load_steps=22 format=3]
 
 [ext_resource type="Script" path="res://main/game_controller.gd" id="1_controller"]
 [ext_resource type="Texture2D" path="res://assets/textures/paper_grain_1024.png" id="12_grain"]
@@ -12,6 +12,16 @@
 [ext_resource type="Script" path="res://ui/result_screen.gd" id="9_result"]
 [ext_resource type="Script" path="res://ui/debug_overlay.gd" id="10_debug"]
 [ext_resource type="Script" path="res://main/telemetry_recorder.gd" id="11_recorder"]
+[ext_resource type="Script" path="res://world/defenders/squad.gd" id="13_squad"]
+[ext_resource type="PackedScene" path="res://world/defenders/defender.tscn" id="14_defender"]
+[ext_resource type="Resource" path="res://data/defender_tuning.tres" id="15_tuning"]
+[ext_resource type="Script" path="res://world/enemies/enemy_spawner.gd" id="16_spawner"]
+[ext_resource type="PackedScene" path="res://world/enemies/enemy_short_range.tscn" id="17_enemy_short"]
+[ext_resource type="Resource" path="res://data/enemy_schedule.tres" id="18_schedule"]
+[ext_resource type="Resource" path="res://data/enemies/enemy_short_range.tres" id="19_enemy_short_data"]
+[ext_resource type="Resource" path="res://data/enemies/enemy_long_range.tres" id="20_enemy_long_data"]
+[ext_resource type="Script" path="res://world/wizard/wizard.gd" id="21_wizard"]
+[ext_resource type="PackedScene" path="res://world/wizard/arc_bolt.tscn" id="22_arc_bolt"]
 
 [node name="Main" type="Node2D"]
 
@@ -28,6 +38,33 @@
 [node name="ProjectileContainer" type="Node2D" parent="World"]
 
 [node name="EffectContainer" type="Node2D" parent="World"]
+
+[node name="Squad" type="Node" parent="World"]
+script = ExtResource("13_squad")
+container_path = NodePath("../DefenderContainer")
+cargo_path = NodePath("../CargoUnit")
+map_path = NodePath("../Map")
+spawner_path = NodePath("../EnemySpawner")
+defender_scene = ExtResource("14_defender")
+tuning = ExtResource("15_tuning")
+
+[node name="EnemySpawner" type="Node" parent="World"]
+script = ExtResource("16_spawner")
+container_path = NodePath("../EnemyContainer")
+cargo_path = NodePath("../CargoUnit")
+map_path = NodePath("../Map")
+squad_path = NodePath("../Squad")
+schedule = ExtResource("18_schedule")
+short_range_scene = ExtResource("17_enemy_short")
+short_range_data = ExtResource("19_enemy_short_data")
+long_range_data = ExtResource("20_enemy_long_data")
+
+[node name="Wizard" type="Node2D" parent="World"]
+script = ExtResource("21_wizard")
+cargo_path = NodePath("../CargoUnit")
+projectile_container_path = NodePath("../ProjectileContainer")
+enemy_spawner_path = NodePath("../EnemySpawner")
+arc_bolt_scene = ExtResource("22_arc_bolt")
 
 [node name="CameraRig" type="Camera2D" parent="World"]
 script = ExtResource("4_camera")
@@ -48,6 +85,8 @@ script = ExtResource("6_hud")
 controller_path = NodePath("../../GameController")
 cargo_path = NodePath("../../World/CargoUnit")
 map_path = NodePath("../../World/Map")
+squad_path = NodePath("../../World/Squad")
+wizard_path = NodePath("../../World/Wizard")
 
 [node name="ProfileSelect" type="Control" parent="UserInterface"]
 script = ExtResource("7_profile")
@@ -64,6 +103,9 @@ controller_path = NodePath("../../GameController")
 cargo_path = NodePath("../../World/CargoUnit")
 map_path = NodePath("../../World/Map")
 camera_path = NodePath("../../World/CameraRig")
+squad_path = NodePath("../../World/Squad")
+spawner_path = NodePath("../../World/EnemySpawner")
+wizard_path = NodePath("../../World/Wizard")
 start_visible = false
 
 [node name="GameController" type="Node" parent="."]
@@ -72,6 +114,9 @@ world_path = NodePath("../World")
 map_path = NodePath("../World/Map")
 cargo_path = NodePath("../World/CargoUnit")
 camera_path = NodePath("../World/CameraRig")
+squad_path = NodePath("../World/Squad")
+spawner_path = NodePath("../World/EnemySpawner")
+wizard_path = NodePath("../World/Wizard")
 profile_select_path = NodePath("../UserInterface/ProfileSelect")
 instructions_path = NodePath("../UserInterface/Instructions")
 hud_path = NodePath("../UserInterface/Hud")

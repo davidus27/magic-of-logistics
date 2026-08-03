@@ -24,6 +24,11 @@ enum Kind {
 ## The player can hold the left mouse button for repeated casts. Section 14.5.
 @export var allow_hold_repeat: bool = false
 
+## False until the milestone that adds this spell lands. The wizard shows an
+## unimplemented spell as unavailable instead of accepting a cast that does
+## nothing, in the same way the selection screen handles a control profile.
+@export var implemented: bool = false
+
 @export_group("Projectile")
 @export var damage: int = 18
 @export var projectile_speed: float = 700.0

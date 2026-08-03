@@ -20,6 +20,12 @@ extends Resource
 @export var attack_radius: float = 420.0
 ## Leash radius of the Attack state. Section 15.7.
 @export var attack_leash: float = 480.0
+## Melee reach, measured from the defender body to the target surface.
+##
+## The specification gives an attack range for the short-range enemy in section
+## 25.1 but none for a defender. This is a little longer than that 28 pixels, so
+## a defender that closes on an enemy strikes first.
+@export var attack_range: float = 34.0
 
 @export_group("Timing")
 ## Attack damage applies once each second. Section 15.2.
@@ -33,6 +39,10 @@ extends Resource
 @export_group("Repair")
 ## The defender looks for a barrier this far in front of the cargo. Section 15.8.
 @export var barrier_search_distance: float = 180.0
+## Distance behind the cargo centre of the rear cargo work points. Section 15.8.
+@export var repair_work_distance: float = 96.0
+## Sideways spacing between neighbouring rear work points.
+@export var repair_work_spacing: float = 30.0
 
 @export_group("Movement")
 ## A small separation force prevents exact visual overlap. Section 15.3.

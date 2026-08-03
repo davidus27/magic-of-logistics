@@ -9,6 +9,9 @@ extends Control
 @export var cargo_path: NodePath
 @export var map_path: NodePath
 @export var camera_path: NodePath
+@export var squad_path: NodePath
+@export var spawner_path: NodePath
+@export var wizard_path: NodePath
 
 @export var start_visible: bool = false
 
@@ -16,6 +19,9 @@ var controller: GameController
 var cargo: CargoUnit
 var map: Map
 var camera: CameraRig
+var squad: Squad
+var spawner: EnemySpawner
+var wizard: Wizard
 
 var _text: Label = null
 
@@ -29,6 +35,9 @@ func _ready() -> void:
 	cargo = NodeRef.get_required(self, cargo_path, "cargo")
 	map = NodeRef.get_required(self, map_path, "map")
 	camera = NodeRef.get_required(self, camera_path, "camera")
+	squad = NodeRef.get_required(self, squad_path, "squad")
+	spawner = NodeRef.get_required(self, spawner_path, "enemy spawner")
+	wizard = NodeRef.get_required(self, wizard_path, "wizard")
 
 	var panel := InkUi.panel()
 	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -39,7 +48,7 @@ func _ready() -> void:
 	panel.offset_left = -292.0
 	panel.offset_right = -12.0
 	panel.offset_top = 12.0
-	panel.offset_bottom = 300.0
+	panel.offset_bottom = 372.0
 
 	_text = InkUi.label("", InkUi.FONT_SIZE_SMALL)
 	panel.add_child(_text)
@@ -68,4 +77,25 @@ func _process(_delta: float) -> void:
 		"distance       %.0f" % cargo.distance_travelled,
 		"zoom           %.2f" % (camera.zoom.x if camera else 0.0),
 		"threat         %d" % int(controller.threat),
+		"enemies        %d" % spawner.living_count(),
+		"mana           %.0f" % wizard.mana,
+		"spell          %s" % _spell_name(),
+		"defenders      %s" % _defender_summary(),
 	])
+
+
+func _spell_name() -> String:
+	var spell := wizard.current_spell()
+	return spell.display_name if spell != null else "-"
+
+
+func _defender_summary() -> String:
+	var lines := PackedStringArray()
+	for defender in squad.get_defenders():
+		lines.append("%s %d %s%s" % [
+			defender.data.portrait_mark,
+			defender.health,
+			defender.state_id(),
+			"*" if defender.selected else "",
+		])
+	return "\n               ".join(lines)

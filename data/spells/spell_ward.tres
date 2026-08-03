@@ -16,3 +16,4 @@ effect_radius = 110.0
 duration = 4.0
 projectile_damage_reduction = 0.8
 enemy_slow_factor = 0.2
+implemented = false
