@@ -11,6 +11,7 @@ extends Node
 
 const MAIN_SCENE := "res://main/main.tscn"
 const States := preload("res://world/defenders/defender_states.gd")
+const EnemyStates := preload("res://world/enemies/enemy_states.gd")
 
 var _main: Node = null
 var _controller: GameController = null
@@ -42,6 +43,12 @@ func _ready() -> void:
 
 	_controller.begin_default_session()
 	await _frames(2)
+
+	# The new combat pieces first, while all four defenders are alive and the
+	# field is otherwise empty. Both spawn enemies, so both clean up after
+	# themselves before the destructive checks below run.
+	await _check_long_range()
+	await _check_reinforcements()
 
 	await _check_orders()
 	await _check_downed_and_dead()
@@ -81,6 +88,87 @@ func _check_orders() -> void:
 		_expect(defender.state_id() == States.DEFEND,
 			"%s is in %s after a Defend order to all" % [defender.data.id, defender.state_id()])
 	_notes.append("orders reach the selection and no one else")
+
+
+## The long-range enemy stands off at its preferred range, fires a bolt, and the
+## bolt lands. Section 25.2. Placed straight above the cargo, clear of the four
+## formation slots, so its line to the wagon is open.
+func _check_long_range() -> void:
+	var world := _main.get_node("World")
+	var container := world.get_node("EnemyContainer") as Node2D
+	var projectiles := world.get_node("ProjectileContainer") as Node2D
+	var scene := load("res://world/enemies/enemy_long_range.tscn") as PackedScene
+	var data := load("res://data/enemies/enemy_long_range.tres") as EnemyData
+
+	var enemy: Enemy = scene.instantiate()
+	container.add_child(enemy)
+	enemy.global_position = _cargo.global_position + Vector2.UP * data.preferred_range
+	enemy.setup(data, _cargo, _squad)
+	enemy.set_ranged_fire(projectiles, load("res://world/enemies/enemy_bolt.tscn"))
+
+	var before := _party_health()
+	var saw_fire := false
+	var saw_bolt := false
+	for _i in int(2.5 * 60.0):
+		await get_tree().process_frame
+		if is_instance_valid(enemy) and enemy.machine.current_id() == EnemyStates.FIRE:
+			saw_fire = true
+		for child in projectiles.get_children():
+			if child is EnemyBolt:
+				saw_bolt = true
+
+	_expect(saw_fire, "the long-range enemy never reached its Fire state")
+	_expect(saw_bolt, "the long-range enemy never fired a bolt")
+	_expect(_party_health() < before,
+		"a long-range bolt landed no damage, party health held at %d" % before)
+	_notes.append("long-range enemy stood off, fired, and its bolt landed")
+
+	if is_instance_valid(enemy):
+		enemy.queue_free()
+	await _frames(2)
+
+
+## The threat system sends a reinforcement group when the value passes an
+## interval, behind the cargo and off the visible screen. Section 27.
+func _check_reinforcements() -> void:
+	var schedule := _spawner.schedule
+	var before := _spawner.living_count()
+
+	var made := _spawner.update_threat(schedule.reinforcement_threat_interval + 0.5)
+	await _frames(2)
+	_expect(made >= 1, "threat passing the interval created no reinforcement group")
+
+	var living := _spawner.get_living()
+	var added := living.size() - before
+	_expect(added >= schedule.reinforcement_size(),
+		"a reinforcement group added %d enemies, expected %d" % [added, schedule.reinforcement_size()])
+
+	# Every fresh enemy must be outside the visible screen. Section 27.
+	var camera := _main.get_node("World/CameraRig") as Camera2D
+	var view_size := get_viewport().get_visible_rect().size / camera.zoom
+	var screen := Rect2(camera.global_position - view_size * 0.5, view_size)
+	var offscreen := true
+	var fresh: Array[Enemy] = []
+	for index in range(before, living.size()):
+		fresh.append(living[index])
+		if screen.has_point(living[index].global_position):
+			offscreen = false
+	_expect(offscreen, "a reinforcement enemy spawned inside the visible screen")
+	_notes.append("threat reinforcement group of %d spawned off screen behind the cargo" % added)
+
+	# Clear them so they do not walk in and attack during the later checks.
+	for enemy in fresh:
+		enemy.queue_free()
+	await _frames(2)
+
+
+## Total health of the cargo unit and the four defenders, for a hit test that
+## does not care which of them a bolt found.
+func _party_health() -> int:
+	var total := _cargo.health
+	for defender in _squad.get_defenders():
+		total += defender.health
+	return total
 
 
 ## Zero health starts a 15 second downed timer, and the timer ends in Dead.
@@ -130,7 +218,7 @@ func _check_revive() -> void:
 	_notes.append("revive works on a downed defender and not on a dead one")
 
 
-## Cargo repair works at Stop or Slow speed and not above it. Section 15.8.
+## Cargo repair works at Stop speed and not above it. Section 15.8.
 func _check_repair() -> void:
 	var motor := _cargo.motor as AutoPathMotor
 	_cargo.apply_damage(40)

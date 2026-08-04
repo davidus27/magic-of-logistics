@@ -7,9 +7,35 @@ in the same commit as the work it describes.
 |---|---|
 | Engine | Godot 4.7.1, GDScript, statically typed |
 | Last completed milestone | **Milestone 2 — the first combat loop**, verified 2026-08-03 |
-| Current work | none in progress; milestone 3 is not yet cut |
+| Current work | Phase A balance pass landed (below); milestone 3 is not yet cut |
 | Commit gates | 🟢 `smoke_run` exit 0 · 🟢 `behaviour_checks` exit 0 |
-| Last verified run | 2026-08-03: portal reached in 112.7 s at Normal, cargo 68/100, 27 of 27 enemies killed |
+| Last verified run | 2026-08-04: portal reached in 112.7 s at Normal, cargo 44/100, 27 of 27 enemies killed |
+
+---
+
+## Phase A: dynamism tuning
+
+A small balance pass ahead of milestone 3, closing two "free" actions the passive
+smoke run exposed. Not new content — the plumbing and priority ordering were
+already correct, so this only moved numbers that already existed.
+
+- **Short-range enemy speed 82 to 100** (`data/enemies/enemy_short_range.tres`,
+  §25.1). At 82 the enemy was slower than cargo Normal (90), so a rear enemy that
+  fell behind could never catch back up — a free escape with no decision behind
+  it. At 100 it out-paces Normal but still cannot catch Fast (130), so Fast stays
+  a costly but real escape valve.
+- **Cargo repair: Stop-only, not Stop-or-Slow** (`Defender.cargo_repair_available()`,
+  §15.8). Repair while still rolling at Slow made healing free during ordinary
+  driving. It is now a deliberate full halt, matching the docstring and the
+  `behaviour_checks._check_repair()` assertions, which only ever exercised Stop
+  and Fast.
+
+Both gates stayed green with the changes in place — `behaviour_checks` was
+unaffected (it never asserted Slow-speed repair), and `smoke_run`'s passive,
+one-order, cast-at-whatever-is-nearest play survived with more of the intended
+tension: lowest cargo health fell from 68/100 to 44/100 on the same held-Normal
+run, with the same 112.7 s duration and 27 of 27 enemies still killed. No
+fallback tuning (e.g. nudging speed down to 95) was needed.
 
 ---
 
@@ -121,9 +147,11 @@ barriers at 100 work points each add roughly 35 s. Re-measure at M3 and then dec
 whether the route should be longer or the floor lower.
 
 **A passive player survives.** The smoke run plays badly on purpose — one order, one
-speed, cast at whatever is nearest — and still finishes with the cargo at 68 health.
+speed, cast at whatever is nearest — and still finishes, now with the cargo at 44
+health after the Phase A speed and repair changes above (was 68 before them).
 Right for a first-time tester, but it leaves little room for the long-range enemy,
-the reinforcements of §27 and the barriers. Revisit after M3 rather than tuning now.
+the reinforcements of §27 and the barriers. Revisit again after M3 rather than
+tuning further now.
 
 **Mud is visually heavy.** The tiled fill reads clearly, which is what §12.2 asks
 for, but it dominates the paper-and-ink page more than the rest of the palette does.

@@ -129,13 +129,13 @@ The defender applies its repair rate to the barrier work value.
 
 The defender repairs the cargo unit when no barrier needs work.
 
-Cargo repair works only at Stop or Slow speed.
+Cargo repair works only at Stop speed.
 
 The defender moves to a rear cargo work point.
 
 The defender applies its repair rate to cargo health.
 
-The defender waits at the rear slot during Normal or Fast speed.
+The defender waits at the rear slot during Slow, Normal or Fast speed.
 
 The defender uses Defend behavior when no repair work is available.
 

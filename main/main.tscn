@@ -19,6 +19,8 @@
 [ext_resource type="Resource" path="res://data/enemy_schedule.tres" id="18_schedule"]
 [ext_resource type="Resource" path="res://data/enemies/enemy_short_range.tres" id="19_enemy_short_data"]
 [ext_resource type="Resource" path="res://data/enemies/enemy_long_range.tres" id="20_enemy_long_data"]
+[ext_resource type="PackedScene" path="res://world/enemies/enemy_long_range.tscn" id="23_enemy_long"]
+[ext_resource type="PackedScene" path="res://world/enemies/enemy_bolt.tscn" id="24_enemy_bolt"]
 [ext_resource type="Script" path="res://world/wizard/wizard.gd" id="21_wizard"]
 [ext_resource type="PackedScene" path="res://world/wizard/arc_bolt.tscn" id="22_arc_bolt"]
 
@@ -53,8 +55,11 @@ container_path = NodePath("../EnemyContainer")
 cargo_path = NodePath("../CargoUnit")
 map_path = NodePath("../Map")
 squad_path = NodePath("../Squad")
+projectile_container_path = NodePath("../ProjectileContainer")
 schedule = ExtResource("18_schedule")
 short_range_scene = ExtResource("17_enemy_short")
+long_range_scene = ExtResource("23_enemy_long")
+enemy_bolt_scene = ExtResource("24_enemy_bolt")
 short_range_data = ExtResource("19_enemy_short_data")
 long_range_data = ExtResource("20_enemy_long_data")
 

@@ -14,19 +14,24 @@ extends Node
 ## function.
 
 signal group_spawned(index: int, count: int)
+## A threat reinforcement group of section 27, separate from the scheduled
+## trigger groups so the head-up display and the tools can tell the two apart.
+signal reinforcements_spawned(count: int)
 
 ## Wired as NodePath rather than as node exports. See [NodeRef] for why.
 @export var container_path: NodePath
 @export var cargo_path: NodePath
 @export var map_path: NodePath
 @export var squad_path: NodePath
+## Long-range bolts are parented here, alongside the wizard's, so a bolt outlives
+## the enemy that fired it. Section 25.2.
+@export var projectile_container_path: NodePath
 
 @export var schedule: EnemyScheduleData
 @export var short_range_scene: PackedScene
-## Assigned when the long-range enemy of section 25.2 lands. Until then the
-## long-range half of each group is reported as deferred rather than dropped in
-## silence.
 @export var long_range_scene: PackedScene
+## The projectile the long-range enemy fires. Section 25.2.
+@export var enemy_bolt_scene: PackedScene
 
 @export var short_range_data: EnemyData
 @export var long_range_data: EnemyData
@@ -35,10 +40,14 @@ var container: Node2D
 var cargo: CargoUnit
 var map: Map
 var squad: Squad
+var projectiles: Node2D
 
 var _fired: PackedByteArray = PackedByteArray()
 var _living: Array[Enemy] = []
 var _deferred_long_range: int = 0
+## Reinforcement groups already created this run. Section 27 creates one each
+## time the threat value passes another multiple of its interval.
+var _reinforcements_sent: int = 0
 
 
 func _ready() -> void:
@@ -46,6 +55,7 @@ func _ready() -> void:
 	cargo = NodeRef.get_required(self, cargo_path, "cargo")
 	map = NodeRef.get_required(self, map_path, "map")
 	squad = NodeRef.get_required(self, squad_path, "squad")
+	projectiles = NodeRef.get_required(self, projectile_container_path, "projectile container")
 
 
 ## Clear the field and arm every trigger. Safe to call again for a second run.
@@ -59,6 +69,7 @@ func build() -> void:
 		container.remove_child(child)
 
 	_deferred_long_range = 0
+	_reinforcements_sent = 0
 	_fired.resize(map.route.trigger_offsets.size())
 	_fired.fill(0)
 
@@ -141,12 +152,21 @@ func _spawn_group(index: int, route_offset: float) -> void:
 
 
 func _spawn_one(scene: PackedScene, data: EnemyData, route_offset: float) -> bool:
+	return _spawn_at(scene, data, _spawn_position(route_offset))
+
+
+## Create one enemy at a world point. Both the scheduled groups and the threat
+## reinforcements route through here, so a long-range enemy is armed with its
+## projectile the same way wherever it comes from. Section 25.2.
+func _spawn_at(scene: PackedScene, data: EnemyData, point: Vector2) -> bool:
 	if scene == null or data == null:
 		return false
 	var enemy: Enemy = scene.instantiate()
 	container.add_child(enemy)
-	enemy.global_position = _spawn_position(route_offset)
+	enemy.global_position = point
 	enemy.setup(data, cargo, squad)
+	if data.kind == EnemyData.Kind.LONG_RANGE:
+		enemy.set_ranged_fire(projectiles, enemy_bolt_scene)
 	_living.append(enemy)
 	return true
 
@@ -160,9 +180,101 @@ func _spawn_position(route_offset: float) -> Vector2:
 	var placement := map.sample_route(minf(route_offset + ahead, map.route_length))
 	var forward := Vector2.RIGHT.rotated(placement.get_rotation())
 	var side := Vector2(-forward.y, forward.x)
-	var point := placement.get_origin() + side * lateral
-	# Keep the spawn on the navigation mesh whatever the route data says, so an
-	# enemy never appears somewhere it cannot walk out of. Section 34.
+	return _navmesh_point(placement.get_origin() + side * lateral)
+
+
+# --- Threat reinforcements, section 27 ----------------------------------------
+
+
+## Create the reinforcement groups the threat value has earned but not yet been
+## given. The controller calls this every run tick with the running threat.
+## Returns how many groups were created this call. Section 27.
+func update_threat(threat: float) -> int:
+	if schedule == null or schedule.reinforcement_threat_interval <= 0.0:
+		return 0
+	var due := int(floor(threat / schedule.reinforcement_threat_interval))
+	var made := 0
+	while _reinforcements_sent < due:
+		_reinforcements_sent += 1
+		if spawn_reinforcements():
+			made += 1
+	return made
+
+
+## One reinforcement group: two short-range and one long-range enemy, behind and
+## beside the cargo unit and off the visible screen. Section 27.
+func spawn_reinforcements() -> bool:
+	if cargo == null or schedule == null:
+		return false
+	var origin := _reinforcement_origin()
+	var total := schedule.reinforcement_size()
+	var spawned := 0
+	var slot := 0
+	for _i in schedule.reinforcement_short_range:
+		if _spawn_at(short_range_scene, short_range_data, _reinforcement_point(origin, slot, total)):
+			spawned += 1
+		slot += 1
+	for _i in schedule.reinforcement_long_range:
+		if _spawn_at(long_range_scene, long_range_data, _reinforcement_point(origin, slot, total)):
+			spawned += 1
+		slot += 1
+	print("[Enemies] reinforcement group %d: %d enemies behind the cargo (threat interval %d)" % [
+		_reinforcements_sent, spawned, int(schedule.reinforcement_threat_interval),
+	])
+	reinforcements_spawned.emit(spawned)
+	return spawned > 0
+
+
+func reinforcements_sent() -> int:
+	return _reinforcements_sent
+
+
+## The centre of a reinforcement group: behind and a little to one side of the
+## cargo, walked out until it clears the screen. Section 27.
+func _reinforcement_origin() -> Vector2:
+	var heading := Vector2.RIGHT.rotated(cargo.rotation)
+	var side := Vector2(-heading.y, heading.x)
+	var direction := (-heading + side * 0.35).normalized()
+	var camera := _camera()
+	var centre := camera.global_position if camera != null else cargo.global_position
+	var radius := _screen_radius(camera)
+	# The camera leads ahead of the cargo, so a point behind the cargo is already
+	# most of the way off screen; step out until it clears the screen circle.
+	var point := cargo.global_position
+	var guard := 0
+	while point.distance_to(centre) < radius and guard < 48:
+		point += direction * 48.0
+		guard += 1
+	return point
+
+
+## A group member's point, spaced sideways from the group centre and snapped to
+## the navigation mesh so it can walk out. Sections 27 and 34.
+func _reinforcement_point(origin: Vector2, slot: int, total: int) -> Vector2:
+	var heading := Vector2.RIGHT.rotated(cargo.rotation)
+	var side := Vector2(-heading.y, heading.x)
+	var lateral := (float(slot) - float(total - 1) * 0.5) * schedule.reinforcement_spacing
+	return _navmesh_point(origin + side * lateral)
+
+
+## Half the visible diagonal in world units plus the off-screen margin, so a
+## point farther than this from the camera centre is off screen on every side.
+func _screen_radius(camera: Camera2D) -> float:
+	var view := container.get_viewport()
+	var size := view.get_visible_rect().size if view != null else Vector2(1280.0, 720.0)
+	var zoom := camera.zoom if camera != null else Vector2.ONE
+	var extent := Vector2(size.x / zoom.x, size.y / zoom.y) * 0.5
+	return extent.length() + schedule.reinforcement_screen_margin
+
+
+func _camera() -> Camera2D:
+	var view := container.get_viewport()
+	return view.get_camera_2d() if view != null else null
+
+
+## Nearest point on the navigation mesh, so a spawn is never somewhere a unit
+## cannot walk out of. Section 34.
+func _navmesh_point(point: Vector2) -> Vector2:
 	var navigation_map := container.get_world_2d().navigation_map
 	return NavigationServer2D.map_get_closest_point(navigation_map, point)
 

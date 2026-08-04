@@ -3,9 +3,11 @@ extends UnitBody
 ## An attacker. Specification section 25.
 ##
 ## One script serves both enemy types. The behaviour they share is all of it
-## except how far away the enemy stops and what it does there, and section 25 is
-## explicit that both move toward the cargo unit and change target on a fixed
-## period. The long-range variant of section 25.2 arrives with its projectile.
+## except how far away the enemy stops and what it does there. The short-range
+## enemy of section 25.1 closes to melee and strikes; the long-range enemy of
+## section 25.2 stands off at its preferred range from the cargo and fires a
+## projectile. Which pair of states a body carries is chosen from its kind, so a
+## short-range enemy never carries the firing states and the reverse.
 
 const States := preload("res://world/enemies/enemy_states.gd")
 
@@ -25,8 +27,13 @@ const DEAD_MARK := preload("res://assets/world/dead_paper_mark.svg")
 var cargo: CargoUnit = null
 var squad: Squad = null
 
+## Where a long-range enemy sends its projectiles, and the scene it makes them
+## from. Both stay null on a short-range enemy, which never fires. Section 25.2.
+var projectiles: Node2D = null
+var bolt_scene: PackedScene = null
+
 ## What this enemy is moving at or hitting. The cargo unit, or a defender that
-## blocks its route. Section 25.1.
+## blocks its route or has closed on a long-range enemy. Sections 25.1 and 25.2.
 var target: Node2D = null
 
 var _attack_cooldown: float = 0.0
@@ -38,9 +45,15 @@ func _ready() -> void:
 	collision_layer = Layers.ENEMY
 	collision_mask = Layers.UNIT_MASK
 
-	machine.add_state(States.Approach.new())
-	machine.add_state(States.Strike.new())
 	machine.add_state(States.Dead.new())
+	# Each kind carries only its own states, so a forgotten branch cannot leave a
+	# short-range enemy standing off or a long-range enemy walking into melee.
+	if _is_long_range():
+		machine.add_state(States.Standoff.new())
+		machine.add_state(States.Fire.new())
+	else:
+		machine.add_state(States.Approach.new())
+		machine.add_state(States.Strike.new())
 
 
 func setup(enemy_data: EnemyData, world_cargo: CargoUnit, world_squad: Squad) -> void:
@@ -65,7 +78,19 @@ func setup(enemy_data: EnemyData, world_cargo: CargoUnit, world_squad: Squad) ->
 		frames.append(load(path))
 	ink.set_frames(frames)
 
-	machine.start(States.APPROACH)
+	machine.start(States.STANDOFF if _is_long_range() else States.APPROACH)
+
+
+## Where a long-range enemy puts its projectiles. The spawner sets this after
+## the body is in the tree, so a bolt is parented alongside the wizard's rather
+## than to the enemy that fired it and dying with it. Section 25.2.
+func set_ranged_fire(projectile_container: Node2D, enemy_bolt_scene: PackedScene) -> void:
+	projectiles = projectile_container
+	bolt_scene = enemy_bolt_scene
+
+
+func _is_long_range() -> bool:
+	return data != null and data.kind == EnemyData.Kind.LONG_RANGE
 
 
 func _physics_process(delta: float) -> void:
@@ -93,10 +118,64 @@ func choose_target() -> Node2D:
 	return blocker if blocker != null else cargo
 
 
-## True when this enemy is hitting the cargo unit. Reads as target priority 2 in
-## the defender target list of section 15.7.
+## True when this enemy is hitting the cargo unit, in melee or with a bolt. Reads
+## as target priority 2 in the defender target list of section 15.7.
 func is_attacking_cargo() -> bool:
-	return target is CargoUnit and machine.current_id() == States.STRIKE
+	if not target is CargoUnit:
+		return false
+	var id := machine.current_id()
+	return id == States.STRIKE or id == States.FIRE
+
+
+# --- Long range, section 25.2 -------------------------------------------------
+
+
+## The point on the ring of [member EnemyData.preferred_range] around the cargo,
+## on the line from the cargo to this enemy. The Standoff state steers at it.
+func standoff_point() -> Vector2:
+	var to_self := global_position - cargo.global_position
+	var direction := to_self.normalized() if to_self.length_squared() > 0.01 else Vector2.RIGHT
+	return cargo.global_position + direction * data.preferred_range
+
+
+## True while the enemy is close enough to fire and not so close it should kite
+## back out. The lower bound stops a bolt-thrower firing point blank; the upper
+## bound is the maximum range of section 25.2.
+func in_firing_band() -> bool:
+	var distance := global_position.distance_to(cargo.global_position)
+	return distance <= data.maximum_range and distance >= data.preferred_range * 0.6
+
+
+## What a long-range enemy fires at: the nearest defender within its aggro
+## radius, or the cargo unit when none is that close. Section 25.2.
+func choose_ranged_target() -> Node2D:
+	var best: Defender = null
+	var best_distance := data.defender_aggro_radius
+	if squad != null:
+		for defender in squad.get_living():
+			var distance := global_position.distance_to(defender.global_position)
+			if distance <= best_distance:
+				best_distance = distance
+				best = defender
+	return best if best != null else cargo
+
+
+## Loose one projectile at the target. A unit cannot attack during its attack
+## cooldown. Sections 25.2 and 29.
+func fire_at(victim: Node2D) -> void:
+	if not can_attack() or not CombatTarget.is_valid(victim):
+		return
+	if bolt_scene == null or projectiles == null:
+		# The build cannot make a bolt. Stand disarmed rather than melee, so the
+		# missing piece is visible rather than faked. Section 8 of the invariants.
+		return
+	_attack_cooldown = data.attack_interval
+	var bolt: EnemyBolt = bolt_scene.instantiate()
+	projectiles.add_child(bolt)
+	bolt.launch(
+		global_position, victim.global_position,
+		data.projectile_speed, float(data.attack_damage), data.maximum_range,
+	)
 
 
 ## The defender in the way, if any.

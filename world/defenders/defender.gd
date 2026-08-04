@@ -328,11 +328,11 @@ func barrier_ahead() -> Barrier:
 
 
 ## True when the cargo unit can be repaired now. Cargo repair works only at Stop
-## or Slow speed. Section 15.8.
+## speed. Section 15.8.
 func cargo_repair_available() -> bool:
 	if cargo == null or cargo.health >= cargo.data.max_health:
 		return false
-	return cargo.get_speed_level() <= CargoData.SpeedLevel.SLOW
+	return cargo.get_speed_level() <= CargoData.SpeedLevel.STOP
 
 
 # --- Downed and dead ----------------------------------------------------------

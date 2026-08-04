@@ -165,7 +165,12 @@ func begin_default_session() -> void:
 
 func _advance_run(delta: float) -> void:
 	run_seconds += delta
+	# The threat value rises one point a second and stops during pause, because
+	# pause is not a run state and this runs only in the run states. Section 27.
 	threat += delta
+	# Each time it passes another interval the spawner sends reinforcements in
+	# behind the cargo, so a slow run turns dangerous. Section 27.
+	spawner.update_threat(threat)
 	run_time_changed.emit(run_seconds)
 	threat_changed.emit(threat)
 

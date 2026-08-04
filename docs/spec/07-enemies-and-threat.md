@@ -20,7 +20,7 @@ The short-range enemy has these values:
 | Property | Value |
 |---|---:|
 | Health | 32 |
-| Speed | 82 pixels per second |
+| Speed | 100 pixels per second |
 | Attack damage | 8 |
 | Attack interval | 1.00 second |
 | Attack range | 28 pixels |

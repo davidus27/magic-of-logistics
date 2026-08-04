@@ -37,6 +37,12 @@ const MAX_RUN_SECONDS := 360.0
 
 ## Seconds between the scripted Arc Bolt casts.
 const CAST_PERIOD := 0.6
+## Seconds between the scripted defender order decisions.
+const ORDER_PERIOD := 1.5
+## Attack when at least this many enemies are alive, otherwise Defend. Below it
+## the squad guards the wagon; at or above it the squad sorties to clear the
+## field, which is the designed counter to the long-range standoff of §25.2.
+const ATTACK_THRESHOLD := 2
 
 var _main: Node = null
 var _controller: GameController = null
@@ -52,12 +58,15 @@ var _terrain_events: Array[String] = []
 var _elapsed: float = 0.0
 var _cast_timer: float = 0.0
 var _spawned_total: int = 0
+var _reinforcement_total: int = 0
 var _peak_enemies: int = 0
 var _groups_fired: int = 0
 var _furthest: float = 0.0
 var _formation_time: float = 0.0
 var _in_leash_time: float = 0.0
 var _successful_casts: int = 0
+var _order_timer: float = 0.0
+var _attacking: bool = false
 var _defender_states_seen: Dictionary = {}
 ## Lowest cargo health and lowest defender health-to-maximum ratio seen this
 ## run. Both stay at their starting value only if no enemy ever landed a hit.
@@ -93,6 +102,7 @@ func _ready() -> void:
 
 	_cargo.terrain_changed.connect(_on_terrain_changed)
 	_spawner.group_spawned.connect(_on_group_spawned)
+	_spawner.reinforcements_spawned.connect(_on_reinforcements_spawned)
 
 	_controller.begin_default_session()
 
@@ -117,6 +127,7 @@ func _process(delta: float) -> void:
 		return
 	_elapsed += delta
 	_peak_enemies = maxi(_peak_enemies, _spawner.living_count())
+	_manage_orders(delta)
 	_fire_arc_bolt(delta)
 	_sample_formation(delta)
 	_track_health()
@@ -164,7 +175,31 @@ func _track_health() -> void:
 		_min_defender_ratio = minf(_min_defender_ratio, float(defender.health) / float(defender.max_health))
 
 
-## Cast Arc Bolt at the nearest enemy. Section 14.5.
+## Send the squad out to fight when enemies gather and pull it back to guard the
+## wagon when the field is clear. Sections 15.7 and 17. A single standing Defend
+## order never lets the defenders reach the long-range enemies standing off at
+## their preferred range, which is the counter section 15.7 gives them.
+func _manage_orders(delta: float) -> void:
+	_order_timer -= delta
+	if _order_timer > 0.0:
+		return
+	_order_timer = ORDER_PERIOD
+
+	var want_attack := _spawner.living_count() >= ATTACK_THRESHOLD
+	if want_attack == _attacking:
+		return
+	_attacking = want_attack
+	_squad.select_all_living()
+	_squad.order(States.ATTACK if want_attack else States.DEFEND)
+
+
+## Cast Arc Bolt at the most dangerous enemy in range. Section 14.5.
+##
+## A first-time tester still aims at what is hurting the wagon rather than only
+## at what is nearest: an enemy firing or striking the cargo first, then a
+## long-range plinker standing off, then the nearest of the rest. Targeting
+## nothing but the nearest lets the long-range enemy of section 25.2 shoot the
+## cargo unopposed, which is a worse player than the one section 40 must support.
 func _fire_arc_bolt(delta: float) -> void:
 	if _controller.state != GameController.State.RUN:
 		return
@@ -173,14 +208,22 @@ func _fire_arc_bolt(delta: float) -> void:
 		return
 	_cast_timer = CAST_PERIOD
 
-	var nearest: Enemy = null
-	var best := _wizard.current_spell().cast_range
+	var cast_range := _wizard.current_spell().cast_range
+	var chosen: Enemy = null
+	var best_score := -INF
 	for enemy in _spawner.get_living():
 		var distance := enemy.global_position.distance_to(_wizard.global_position)
-		if distance < best:
-			best = distance
-			nearest = enemy
-	if nearest != null and _wizard.try_cast(nearest.global_position):
+		if distance > cast_range:
+			continue
+		var score := -distance
+		if enemy.is_attacking_cargo():
+			score += 4000.0
+		elif enemy.data.kind == EnemyData.Kind.LONG_RANGE:
+			score += 2000.0
+		if score > best_score:
+			best_score = score
+			chosen = enemy
+	if chosen != null and _wizard.try_cast(chosen.global_position):
 		_successful_casts += 1
 
 
@@ -271,8 +314,22 @@ func _check_combat() -> void:
 	if _spawned_total <= 0:
 		_fail("no enemies were spawned")
 
-	# Both enemy types can attack the cargo unit. Section 40. Only the
-	# short-range type exists in this build, so only its damage is required.
+	# Both enemy types now exist, so the long-range half of the four groups that
+	# call for it must actually be created rather than deferred. Sections 25.2
+	# and 40.
+	_notes.append("long-range deferred %d, threat reinforcement enemies %d" % [
+		_spawner.deferred_long_range(), _reinforcement_total,
+	])
+	if _spawner.deferred_long_range() > 0:
+		_fail("%d long-range enemies were deferred; the long-range scene is not wired" % [
+			_spawner.deferred_long_range(),
+		])
+	# The threat value rises one point a second, so a run past 45 seconds must
+	# have earned at least one reinforcement group. Section 27.
+	if _controller.run_seconds > 45.0 and _reinforcement_total <= 0:
+		_fail("run reached %.0fs of threat but no reinforcements spawned" % _controller.run_seconds)
+
+	# Both enemy types can attack the cargo unit. Section 40.
 	_notes.append("lowest cargo health %d of %d, lowest defender health ratio %.0f%%" % [
 		_min_cargo_health, _cargo.data.initial_health, _min_defender_ratio * 100.0,
 	])
@@ -314,6 +371,13 @@ func _check_combat() -> void:
 
 func _on_group_spawned(_index: int, count: int) -> void:
 	_groups_fired += 1
+	_spawned_total += count
+
+
+## Reinforcements are counted into the spawn total so the killed tally stays a
+## true difference against the living count. Section 27.
+func _on_reinforcements_spawned(count: int) -> void:
+	_reinforcement_total += count
 	_spawned_total += count
 
 
