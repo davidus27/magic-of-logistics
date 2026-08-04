@@ -36,8 +36,8 @@ The first enemy trigger starts after 15 seconds of normal cargo movement.
 The first 15 seconds form a control practice area.
 
 > **Build note.** The route is gently winding with four sweeping bends. The minimum
-> turn radius of 421 px asks 8.8 deg/s of the 80 deg/s available in §13.1, so
-> profiles P3 and P4 keep a wide margin.
+> turn radius of 421 px asks 8.8 deg/s of the 80 deg/s available in §13.1, so a
+> future manual cargo motor keeps a wide margin.
 
 ## 12. Terrain
 
@@ -59,7 +59,8 @@ A clear gray fill shows the mud area.
 
 ### 12.3 Off-road terrain
 
-Off-road terrain applies only to the free steering profile.
+Off-road terrain applies only when the active cargo motor allows the cargo unit
+to leave the road.
 
 Off-road terrain uses a cargo speed factor of 0.45.
 

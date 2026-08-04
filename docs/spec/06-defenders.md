@@ -1,4 +1,4 @@
-# Defenders — §15–18
+# Defenders — §15–17
 
 **Built, uncommitted.** `world/defenders/defender.gd`, `defender_states.gd` and
 `squad.gd` put **all four** defenders on the field — step 7 arrived early with step
@@ -107,10 +107,9 @@ The Attack state uses a 480-pixel leash radius.
 
 The defender uses this target priority:
 
-1. A direct target from the player
-2. An enemy that attacks the cargo unit
-3. The nearest long-range enemy
-4. The nearest short-range enemy
+1. An enemy that attacks the cargo unit
+2. The nearest long-range enemy
+3. The nearest short-range enemy
 
 The defender checks for a new target every 0.25 seconds.
 
@@ -187,7 +186,7 @@ conflict with wizard control.
 
 ## 17. Defender control method A: Role orders
 
-Used by profiles P1, P3 and P4. **Milestone 2.**
+**Milestone 2.**
 
 This method tests simple state control.
 
@@ -206,27 +205,3 @@ The defenders use automatic target selection.
 The player cannot set a direct enemy target in this method.
 
 The user interface shows one order button for each role.
-
-## 18. Defender control method B: Direct target orders
-
-Used by profile P2. **Not implemented** — §41 step 11.
-
-This method tests a Dota-style target control.
-
-The player selects defenders before an order.
-
-The player right-clicks an enemy to give an Attack Target order.
-
-The selected defenders attack that enemy.
-
-The selected defenders return after the target dies or leaves the leash radius.
-
-The player presses `X` to give a Defend Cargo order.
-
-The player presses `C` to give a Repair Cargo order.
-
-A right-click on empty ground has no effect.
-
-A right-click on the cargo unit gives a Defend Cargo order.
-
-This method does not permit direct movement orders.

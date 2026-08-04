@@ -142,7 +142,6 @@ func _build_orders() -> void:
 	row.mouse_filter = Control.MOUSE_FILTER_PASS
 	_place(row, Vector2(0.5, 1.0), Rect2(-158.0, -76.0, 316.0, 58.0))
 
-	# The control labels change for the active defender method. Section 30.4.
 	for entry in _order_entries():
 		var button := InkUi.button(entry[0], InkUi.FONT_SIZE_SMALL)
 		button.custom_minimum_size = Vector2(100.0, 50.0)
@@ -152,19 +151,8 @@ func _build_orders() -> void:
 		_order_buttons.append(button)
 
 
-## The three order controls for the active defender control method.
-## Sections 17, 18 and 30.4.
+## The three role-order controls. Section 17 and 30.4.
 func _order_entries() -> Array:
-	RunContext.ensure_configured()
-	if RunContext.profile.defender_mode == ControlProfileData.DefenderMode.DIRECT_TARGET:
-		# Section 18. The Attack Target order is a right-click on an enemy, so
-		# its control is a reminder rather than a button that can issue it.
-		return [
-			["Attack target\nright click", States.ATTACK],
-			["Defend cargo\nX", States.DEFEND],
-			["Repair cargo\nC", States.REPAIR],
-		]
-	# Section 17.
 	return [
 		["Attack\nZ", States.ATTACK],
 		["Defend\nX", States.DEFEND],

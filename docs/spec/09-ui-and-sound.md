@@ -1,11 +1,11 @@
 # User interface and sound — §30–31
 
 Implemented by `ui/hud.gd`, `ui/ink_ui.gd` (the shared builder), `ui/instructions.gd`,
-`ui/profile_select.gd`, `ui/result_screen.gd`, `ui/debug_overlay.gd`, and
+`ui/start_screen.gd`, `ui/outcome_banner.gd`, `ui/debug_overlay.gd`, and
 `autoload/sound_bank.gd`.
 
-**Screens are built in code, not authored scenes.** One builder keeps five screens
-consistent, and they will churn while control profiles are compared.
+**Screens are built in code, not authored scenes.** One builder keeps the five
+screens consistent as they churn during development.
 
 **Partially implemented.** The top regions have been live since milestone 1. The
 bottom regions were reserved as empty containers so a later milestone could drop in
@@ -44,8 +44,6 @@ A downed portrait shows the remaining downed time.
 
 The bottom-center area shows defender order controls.
 
-The control labels change for the active defender method.
-
 ### 30.5 Bottom-right area — reserved, empty
 
 The bottom-right area shows three spell controls.
@@ -55,10 +53,6 @@ Each control shows mana cost and cooldown.
 A mana bar appears above the spell controls.
 
 ### 30.6 World feedback — not implemented
-
-A line connects a defender to its direct target.
-
-The line appears only for a direct target order.
 
 A dashed circle shows the active defender leash radius after an order.
 

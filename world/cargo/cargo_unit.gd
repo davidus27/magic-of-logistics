@@ -23,7 +23,7 @@ var motor: CargoMotor = null
 var health: int = 100
 
 ## Terrain state. Refreshed from the terrain sensor, and from the distance to the
-## route centre line when the profile lets the cargo leave the road.
+## route centre line when the motor lets the cargo leave the road.
 var terrain_name: String = "Road"
 var terrain_key: String = "road"
 var terrain_factor: float = TerrainZone.ROAD_CARGO_FACTOR
@@ -33,7 +33,7 @@ var terrain_turn_factor: float = 1.0
 ## screen and after the run ends.
 var simulating: bool = false
 
-## Total distance moved this run, for the telemetry file. Section 36.
+## Total distance moved this run.
 var distance_travelled: float = 0.0
 
 ## Last nearest route sample, handed back to [method Map.nearest_sample_index] so
@@ -83,12 +83,10 @@ func _ready() -> void:
 	_last_position = global_position
 
 
-## Attach the motor for the selected control profile and place the cargo at the
-## start of the route.
+## Attach the motor and place the cargo at the start of the route.
 func setup(world_map: Map, cargo_motor: CargoMotor) -> void:
 	map = world_map
-	_can_leave_road = RunContext.profile != null \
-		and RunContext.profile.cargo_mode == ControlProfileData.CargoMode.FREE_MANUAL
+	_can_leave_road = cargo_motor.can_leave_road()
 
 	if motor != null:
 		motor.queue_free()
@@ -130,7 +128,6 @@ func apply_damage(amount: int) -> void:
 		return
 	var final_damage := maxi(1, amount)
 	health = maxi(0, health - final_damage)
-	Telemetry.count("damage_to_cargo", final_damage)
 	# Cargo damage uses one paper tear sound. Section 31.
 	SoundBank.play(SoundBank.CARGO_DAMAGE)
 	_flash()
@@ -169,7 +166,6 @@ func repair(amount: float) -> void:
 	_repair_carry -= float(whole)
 	var applied := mini(whole, data.max_health - health)
 	heal(applied)
-	Telemetry.accumulate("cargo_repair_amount", float(applied))
 
 
 func get_speed_level() -> int:
@@ -254,7 +250,7 @@ func _refresh_terrain() -> void:
 
 	if slowest != null:
 		next_name = slowest.display_name
-		next_key = slowest.telemetry_key()
+		next_key = slowest.terrain_key()
 		next_factor = slowest.cargo_factor
 		next_turn = slowest.turn_factor
 	elif _off_road:

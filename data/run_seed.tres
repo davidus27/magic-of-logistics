@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="RunSeedData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/data/run_seed_data.gd" id="1_seed"]
+
+[resource]
+script = ExtResource("1_seed")
+id = 1
+display_name = "Run seed"
+seed_value = 10111

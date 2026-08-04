@@ -36,10 +36,9 @@ On this machine the binary is
 Route length 9000 px, the four defenders starting in Follow inside their slot band,
 the run completing, terrain events in order `Mud, Road, Mud, Road`, time on mud at
 the ×0.60 factor, all six enemy groups firing, enemies both landing attacks and
-dying, some defender reaching the Defend state, Arc Bolt being cast, the selection
-and order counts being recorded, the squad staying inside the attack leash, and the
-full telemetry key set. **Adding a telemetry field means updating
-`tools/smoke_run.gd` too**, or the key-set assertion fails.
+dying (tracked as the lowest cargo and defender health seen, since there is no
+telemetry counter to read), some defender reaching the Defend state, Arc Bolt being
+cast, and the squad staying inside the attack leash.
 
 It asserts the duration band this build can actually produce, which is not yet the
 three-minute floor of §7 — see [docs/status.md](mdc:docs/status.md) for why that is
@@ -51,13 +50,7 @@ The paths a successful run never takes: an order reaching the selection and nobo
 else, the 15-second downed timer ending in Dead with no collision shape, revive
 working on a downed defender and refusing a dead one, cargo repair at Stop and not
 at Fast, casts rejected for range, mana and being unimplemented, and cargo
-destruction opening the result screen with `end_reason = cargo_destroyed`.
-
-## Telemetry output
-
-`user://telemetry`, which on macOS is
-`~/Library/Application Support/Godot/app_userdata/MagicLogisticsInit`. One JSON per
-run, named `run_<date>_P<profile>_seed<n>.json`, 35 keys.
+destruction ending the run in `State.FAILURE` with `end_reason = cargo_destroyed`.
 
 ## Standard of proof
 

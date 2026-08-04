@@ -2,9 +2,8 @@ class_name StateMachine
 extends Node
 ## Explicit finite state machine for one unit. Specification section 33.
 ##
-## The machine emits [signal state_changed] after each change, which is how the
-## telemetry recorder counts defender state changes without any unit knowing that
-## telemetry exists.
+## The machine emits [signal state_changed] after each change, so other systems
+## can observe transitions without the unit knowing who is listening.
 ##
 ## A state may ask for another change from inside its own enter or update. That
 ## is queued rather than recursed, so exit and enter always run in pairs and the

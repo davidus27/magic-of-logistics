@@ -7,7 +7,7 @@ extends RefCounted
 ## state ends when the simulation says it ends and never when a visual finishes.
 
 ## Identifier of this state. It is the key the machine is asked to change to, and
-## the name shown on a defender portrait and written to the telemetry record.
+## the name shown on a defender portrait.
 var id: StringName = &""
 
 var machine: StateMachine = null

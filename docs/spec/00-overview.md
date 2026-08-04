@@ -8,20 +8,16 @@ Engine: Godot 4.x. Language style: ASD-STE100-based simplified technical English
 
 ## 1. Purpose
 
-This proof of concept tests the main battlefield controls.
+This is the Fantasy Convoy MVP proof of concept.
 
-The test must show how one player controls three systems at the same time.
+The build shows how one player controls three systems at the same time.
 
 The three systems are the cargo unit, the defenders, and the wizard.
 
-The proof of concept does not test contracts, salaries, upgrades, or campaign
+The proof of concept does not include contracts, salaries, upgrades, or campaign
 progression.
 
-The proof of concept must use one fixed battlefield.
-
-The project must support different control profiles on the same battlefield.
-
-The test results must show which control profile is clear, difficult, and fun.
+The proof of concept uses one fixed battlefield.
 
 ## 2. Main design decision
 
@@ -57,11 +53,6 @@ The proof of concept contains these systems:
 - Two barriers
 - One final portal
 - Three wizard spells
-- Two defender control methods
-- Three cargo control methods
-- Four test profiles
-- One result screen
-- One telemetry file
 
 ## 4. Items outside the MVP scope
 
@@ -102,11 +93,6 @@ A defender can attack enemies, protect the cargo unit, and do repair work.
 An **order** is a player command for one or more selected defenders.
 
 An order changes the active defender state.
-
-### 5.4 Control profile
-
-A **control profile** is one fixed combination of cargo control and defender
-control.
 
 ### 5.5 Engagement radius
 
@@ -155,7 +141,7 @@ A run must not continue for more than eight minutes.
 
 The game must end the run after eight minutes.
 
-This time limit prevents invalid test sessions.
+This time limit keeps a run from continuing indefinitely.
 
 > **Build note.** The three-minute floor is not reachable until both barriers are in
 > the route. See the open findings in [`../status.md`](../status.md).
@@ -164,8 +150,8 @@ This time limit prevents invalid test sessions.
 
 This specification uses necessary game terms as technical nouns.
 
-Examples include cargo unit, control profile, engagement radius, state machine, and
-telemetry.
+Examples include cargo unit, defender, engagement radius, leash radius, and state
+machine.
 
 The text uses short descriptive sentences and direct procedural instructions.
 

@@ -1,4 +1,4 @@
-[gd_scene load_steps=22 format=3]
+[gd_scene load_steps=21 format=3]
 
 [ext_resource type="Script" path="res://main/game_controller.gd" id="1_controller"]
 [ext_resource type="Texture2D" path="res://assets/textures/paper_grain_1024.png" id="12_grain"]
@@ -7,11 +7,10 @@
 [ext_resource type="Script" path="res://world/camera_rig.gd" id="4_camera"]
 [ext_resource type="Script" path="res://ui/paper_grain.gd" id="5_grain"]
 [ext_resource type="Script" path="res://ui/hud.gd" id="6_hud"]
-[ext_resource type="Script" path="res://ui/profile_select.gd" id="7_profile"]
+[ext_resource type="Script" path="res://ui/start_screen.gd" id="7_start"]
 [ext_resource type="Script" path="res://ui/instructions.gd" id="8_instructions"]
-[ext_resource type="Script" path="res://ui/result_screen.gd" id="9_result"]
+[ext_resource type="Script" path="res://ui/outcome_banner.gd" id="9_outcome"]
 [ext_resource type="Script" path="res://ui/debug_overlay.gd" id="10_debug"]
-[ext_resource type="Script" path="res://main/telemetry_recorder.gd" id="11_recorder"]
 [ext_resource type="Script" path="res://world/defenders/squad.gd" id="13_squad"]
 [ext_resource type="PackedScene" path="res://world/defenders/defender.tscn" id="14_defender"]
 [ext_resource type="Resource" path="res://data/defender_tuning.tres" id="15_tuning"]
@@ -88,14 +87,15 @@ map_path = NodePath("../../World/Map")
 squad_path = NodePath("../../World/Squad")
 wizard_path = NodePath("../../World/Wizard")
 
-[node name="ProfileSelect" type="Control" parent="UserInterface"]
-script = ExtResource("7_profile")
+[node name="StartScreen" type="Control" parent="UserInterface"]
+script = ExtResource("7_start")
 
 [node name="Instructions" type="Control" parent="UserInterface"]
 script = ExtResource("8_instructions")
 
-[node name="ResultScreen" type="Control" parent="UserInterface"]
-script = ExtResource("9_result")
+[node name="OutcomeBanner" type="Control" parent="UserInterface"]
+script = ExtResource("9_outcome")
+controller_path = NodePath("../../GameController")
 
 [node name="DebugOverlay" type="Control" parent="UserInterface"]
 script = ExtResource("10_debug")
@@ -117,12 +117,7 @@ camera_path = NodePath("../World/CameraRig")
 squad_path = NodePath("../World/Squad")
 spawner_path = NodePath("../World/EnemySpawner")
 wizard_path = NodePath("../World/Wizard")
-profile_select_path = NodePath("../UserInterface/ProfileSelect")
+start_screen_path = NodePath("../UserInterface/StartScreen")
 instructions_path = NodePath("../UserInterface/Instructions")
 hud_path = NodePath("../UserInterface/Hud")
-result_screen_path = NodePath("../UserInterface/ResultScreen")
-
-[node name="TelemetryRecorder" type="Node" parent="."]
-script = ExtResource("11_recorder")
-controller_path = NodePath("../GameController")
-cargo_path = NodePath("../World/CargoUnit")
+outcome_banner_path = NodePath("../UserInterface/OutcomeBanner")

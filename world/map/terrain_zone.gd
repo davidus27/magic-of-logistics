@@ -60,8 +60,8 @@ func setup_mud(polygon: PackedVector2Array) -> void:
 		_fill.color = Color(InkPalette.GRAY_MEDIUM, 0.20)
 
 
-## Key used in the time_on_terrain table of the telemetry file. Section 36.
-func telemetry_key() -> String:
+## Short identifier for this terrain kind, used by the cargo terrain label.
+func terrain_key() -> String:
 	match kind:
 		Kind.MUD:
 			return "mud"

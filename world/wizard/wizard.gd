@@ -173,16 +173,14 @@ func select_spell(index: int) -> void:
 	if index == selected_index:
 		return
 	selected_index = index
-	Telemetry.count("spell_selections")
 	_apply_cursor()
 	spell_selected.emit(index)
 
 
 ## Cast the selected spell at a world point. Sections 14.4 and 14.5.
 ##
-## Returns true when a spell was cast. A rejected cast is counted, because
-## section 36 asks for the number of invalid casts: it measures how often the
-## player misjudged range, mana or cooldown.
+## Returns true when a spell was cast, false when it was rejected for cooldown,
+## mana or range.
 func try_cast(world_point: Vector2) -> bool:
 	if not active:
 		return false
@@ -214,8 +212,6 @@ func try_cast(world_point: Vector2) -> bool:
 
 	mana -= float(spell.mana_cost)
 	_cooldowns[selected_index] = spell.cooldown
-	Telemetry.count("spell_casts")
-	Telemetry.count("mana_spent", spell.mana_cost)
 	# A spell cast uses one ink stroke sound. Section 31.
 	SoundBank.play(SoundBank.SPELL_CAST)
 	mana_changed.emit(mana, MANA_MAX)
@@ -235,7 +231,6 @@ func _cast_arc_bolt(spell: SpellData, world_point: Vector2) -> void:
 
 
 func _reject() -> void:
-	Telemetry.count("invalid_spell_casts")
 	_reject_seconds = 0.35
 
 

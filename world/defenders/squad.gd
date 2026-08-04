@@ -4,9 +4,7 @@ extends Node
 ## Specification sections 15.1, 16, 17 and 18.
 ##
 ## Selection and orders live here rather than on a defender, because both are
-## about the group: `Q` selects everything alive, `X` orders everything selected,
-## and the telemetry counts of section 36 are counts of player actions, not of
-## defenders affected.
+## about the group: `Q` selects everything alive, `X` orders everything selected.
 ##
 ## Section 16 forbids selecting a defender with a world click, so that the left
 ## mouse button can always cast a spell. Nothing here reads a mouse position.
@@ -216,21 +214,16 @@ func select_all_living() -> void:
 
 
 ## Give every selected defender a role order. Section 17.
-##
-## One press is one order in the telemetry record, whatever the size of the
-## selection. Section 39 measures orders as player actions.
 func order(state_id: StringName) -> void:
 	var selected := get_selected()
 	if selected.is_empty():
 		return
 	for defender in selected:
 		defender.give_order(state_id)
-	Telemetry.count("defender_orders")
 	# A defender order uses one paper tap. Section 31.
 	SoundBank.play(SoundBank.DEFENDER_ORDER)
 
 
 func _after_selection() -> void:
-	Telemetry.count("defender_selections")
 	SoundBank.play(SoundBank.UI_CONFIRM)
 	selection_changed.emit()

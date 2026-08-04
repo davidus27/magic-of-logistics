@@ -49,7 +49,6 @@ func apply_work(amount: float) -> void:
 	if is_open() or amount <= 0.0:
 		return
 	_work_points = maxf(0.0, _work_points - amount)
-	Telemetry.accumulate("barrier_work_amount", amount)
 	work_changed.emit(_work_points, work_points_max)
 	if is_open():
 		_open()

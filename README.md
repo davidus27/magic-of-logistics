@@ -5,13 +5,12 @@ once: the cargo unit, the defenders, and the wizard.
 
 Godot 4.7. GDScript, statically typed.
 
-**Milestone 2 (the first combat loop) is done.** Profile P1 is a game you can lose:
-select P1 and a seed, drive the 9,000 pixel route while six enemy groups attack it,
-command four defenders, cast Arc Bolt, and either reach the portal or watch the
-cargo health reach zero.
+**Milestone 2 (the first combat loop) is done.** Press Start and drive the 9,000
+pixel route while six enemy groups attack it, command four defenders, cast Arc
+Bolt, and either reach the portal or watch the cargo health reach zero.
 
-**Not in this build:** the long-range enemy, Mend and Ward, barriers, and profiles
-P2 to P4. Each is disabled visibly rather than silently.
+**Not in this build:** the long-range enemy, Mend and Ward, and barriers. Each is
+disabled visibly rather than silently.
 **[`docs/status.md`](docs/status.md)** is the file to read before doing anything
 here — what is built, what is next, and the five places the specification needed a
 decision.
@@ -56,9 +55,6 @@ Godot --fixed-fps 60 --resolution 1280x720 --path . res://tools/screenshot_run.t
 python3 tools/road_calc.py --target 9000 --wavelength 2800
 ```
 
-Telemetry lands in `user://telemetry`, which on macOS is
-`~/Library/Application Support/Godot/app_userdata/MagicLogisticsInit`.
-
 ## How it fits together
 
 ```text
@@ -71,8 +67,7 @@ main/main.tscn            the scene tree of section 32
   World/Wizard            mana, spell choice, casting, and the range aids
   World/CameraRig         follows a point ahead of the cargo, per section 9
   UserInterface           screens and the head-up display, built in code
-  TelemetryRecorder       samples the per frame values of section 36
-autoload/                 InkClock, SoundBank, Telemetry, RunContext
+autoload/                 InkClock, SoundBank, RunContext
 data/                     every balance value from the specification tables
 docs/                     the specification, split by system, plus status
 tools/                    smoke_run, behaviour_checks, screenshot_run, road_calc.py
@@ -87,11 +82,11 @@ follows. `tools/road_calc.py` reproduces Godot's curve baking, so the length and
 turn demand it prints are the ones the game gets.
 
 **Cargo movement belongs to the motor, not the cargo.** `AutoPathMotor` rides the
-route centre line and writes the transform directly; the manual motors of milestone
-5 will steer and use `move_and_slide()`. Keeping that inside the motor is why
-`CargoUnit` never branches on the control profile.
+route centre line and writes the transform directly. Keeping movement inside the
+motor is why `CargoUnit` never branches on which motor is active — it asks the
+motor's `can_leave_road()` instead.
 
-**Balance values live in resources.** Section 32.5 requires it. All nine resource
+**Balance values live in resources.** Section 32.5 requires it. All seven resource
 types exist already, filled from the specification tables, including the ones for
 systems that do not exist yet, so the remaining milestones are behaviour only.
 
@@ -102,7 +97,6 @@ gets a unit that stands still, so a forgotten branch stops a unit rather than
 letting it drift on last frame's velocity.
 
 **Anything not in the build is disabled, never hidden and never faked.**
-`ControlProfileData.implemented` greys out profiles P2 to P4,
 `SpellData.implemented` greys out Mend and Ward, and `EnemySpawner` logs the
 long-range enemies it could not create instead of quietly spawning a smaller
 group. A tester should always be able to see the shape of the finished game.

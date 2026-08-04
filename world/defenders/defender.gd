@@ -142,7 +142,6 @@ func _physics_process(delta: float) -> void:
 	_attack_cooldown = maxf(0.0, _attack_cooldown - delta)
 	_retarget_cooldown = maxf(0.0, _retarget_cooldown - delta)
 	super(delta)
-	_record_position_time(delta)
 
 
 # --- Orders -------------------------------------------------------------------
@@ -366,10 +365,6 @@ func _on_zero_health() -> void:
 	machine.change_to(States.DOWNED)
 
 
-func _on_damaged(final_damage: int) -> void:
-	Telemetry.count("damage_to_defenders", final_damage)
-
-
 func _zone_factor(zone: TerrainZone) -> float:
 	return zone.defender_factor
 
@@ -391,8 +386,6 @@ func state_label() -> String:
 
 
 func _on_state_changed(_from: StringName, to: StringName) -> void:
-	# The telemetry recorder stores each defender state change. Section 33.
-	Telemetry.count_state_change(to)
 	state_changed.emit(self, to)
 
 
@@ -406,15 +399,6 @@ func _show_order_mark(order: StringName) -> void:
 		return
 	_order_mark.set_frames([texture] as Array[Texture2D])
 	_order_mark.visible = true
-
-
-func _record_position_time(delta: float) -> void:
-	if not is_alive():
-		return
-	if distance_to_cargo() > tuning.defend_radius:
-		Telemetry.accumulate("defender_time_outside_defense_radius", delta)
-	if target == null and velocity.length() < 1.0:
-		Telemetry.accumulate("defender_idle_time", delta)
 
 
 ## Show or hide the ring that counts down the downed timer. Section 15.10.

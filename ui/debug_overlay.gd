@@ -66,7 +66,6 @@ func _process(_delta: float) -> void:
 	_text.text = "\n".join([
 		"fps            %d" % Engine.get_frames_per_second(),
 		"state          %s" % controller.state_name(),
-		"profile        %s" % (RunContext.profile.id if RunContext.profile else "-"),
 		"seed           %d" % (RunContext.seed_data.seed_value if RunContext.seed_data else 0),
 		"route length   %.0f" % map.route_length,
 		"route offset   %.0f" % cargo.get_route_offset(),

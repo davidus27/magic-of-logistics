@@ -43,5 +43,5 @@ Godot --headless --check-only --script <file>
 ```
 
 Autoloads are **not** registered under `--check-only`, so every reference to
-`InkClock`, `SoundBank`, `Telemetry` or `RunContext` reports as undefined. Filter
-those four out; anything else it reports is real.
+`InkClock`, `SoundBank` or `RunContext` reports as undefined. Filter those three
+out; anything else it reports is real.

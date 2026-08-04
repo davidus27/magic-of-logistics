@@ -22,8 +22,8 @@ calls `set_anchors_and_offsets_preset()`.
 
 The failure mode is asymmetric, which is what makes it expensive:
 
-- A `ScrollContainer` **clips**, so the screen goes blank and you notice at once. This is how it was caught, on the result screen.
-- A plain `Control` **does not clip**, so it happily draws its contents while every anchor inside collapses onto the origin. The profile select screen looked correct while being wrong.
+- A `ScrollContainer` **clips**, so the screen goes blank and you notice at once. This is how it was caught, on one of the early screen builds.
+- A plain `Control` **does not clip**, so it happily draws its contents while every anchor inside collapses onto the origin. The start screen looked correct while being wrong.
 
 ## `modulate` multiplies, so black art cannot be tinted lighter
 
@@ -91,6 +91,6 @@ crossed that mesh to reach the cargo and the blocked-unit fallback of §34 fired
 
 ## Tooling limits
 
-- `Godot --headless --check-only --script <file>` **does not register autoloads**, so every reference to `InkClock`, `Telemetry`, `RunContext` or `SoundBank` reports as undefined. Filter those out to use it as a lint. Note that this also cascades: a script that merely *depends* on one of those reports `Failed to compile depended scripts` with no clue why, so read the unfiltered output before believing it. Seven of the 53 scripts report the cascade and none of them is broken.
+- `Godot --headless --check-only --script <file>` **does not register autoloads**, so every reference to `InkClock`, `RunContext` or `SoundBank` reports as undefined. Filter those out to use it as a lint. Note that this also cascades: a script that merely *depends* on one of those reports `Failed to compile depended scripts` with no clue why, so read the unfiltered output before believing it. Seven of the 53 scripts report the cascade and none of them is broken.
 - `--write-movie` **crashes under `--headless`**; it needs a real rendering device. `tools/screenshot_run.tscn` runs windowed and saves the viewport instead.
 - `tools/road_calc.py` reproduces Godot's curve baking, so the length and turn demand it prints are the ones the game actually gets. Re-run it after changing the route shape.

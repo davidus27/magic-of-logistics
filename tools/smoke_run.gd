@@ -1,8 +1,9 @@
 extends Node
 ## Headless check that a whole run works end to end.
 ##
-## Loads the real Main scene, starts the baseline profile with the first seed,
-## plays it, and asserts that the cargo reaches the final portal. Run it with:
+## Loads the real Main scene, starts the default session with the fixed run
+## seed, plays it, and asserts that the cargo reaches the final portal. Run it
+## with:
 ##
 ##     Godot --headless --fixed-fps 60 res://tools/smoke_run.tscn
 ##
@@ -16,6 +17,7 @@ extends Node
 ## finish, which is what section 40 asks the build to support.
 
 const MAIN_SCENE := "res://main/main.tscn"
+const States := preload("res://world/defenders/defender_states.gd")
 
 ## Route length the map data is meant to produce. Section 11.
 const EXPECTED_ROUTE_LENGTH := 9000.0
@@ -55,6 +57,12 @@ var _groups_fired: int = 0
 var _furthest: float = 0.0
 var _formation_time: float = 0.0
 var _in_leash_time: float = 0.0
+var _successful_casts: int = 0
+var _defender_states_seen: Dictionary = {}
+## Lowest cargo health and lowest defender health-to-maximum ratio seen this
+## run. Both stay at their starting value only if no enemy ever landed a hit.
+var _min_cargo_health: int = 999999
+var _min_defender_ratio: float = 1.0
 var _finished: bool = false
 
 
@@ -94,7 +102,7 @@ func _ready() -> void:
 
 	var motor := _cargo.motor as AutoPathMotor
 	if motor == null:
-		_fail("profile P1 did not produce an AutoPathMotor")
+		_fail("the default session did not produce an AutoPathMotor")
 		_report()
 		return
 	motor.set_speed_level(CargoData.SpeedLevel.NORMAL)
@@ -111,16 +119,17 @@ func _process(delta: float) -> void:
 	_peak_enemies = maxi(_peak_enemies, _spawner.living_count())
 	_fire_arc_bolt(delta)
 	_sample_formation(delta)
+	_track_health()
 
-	if _controller.state == GameController.State.RESULT:
+	if _controller.state == GameController.State.SUCCESS \
+			or _controller.state == GameController.State.FAILURE:
 		_check_outcome()
 		_check_combat()
-		_check_telemetry_file()
 		_report()
 		return
 
 	if _elapsed > GIVE_UP_SECONDS:
-		_fail("run did not reach a result within %.0f simulated seconds (state %s, offset %.0f of %.0f)" % [
+		_fail("run did not reach an outcome within %.0f simulated seconds (state %s, offset %.0f of %.0f)" % [
 			GIVE_UP_SECONDS, _controller.state_name(), _cargo.get_route_offset(), _map.route_length,
 		])
 		_report()
@@ -136,11 +145,23 @@ func _sample_formation(delta: float) -> void:
 	if _controller.state != GameController.State.RUN:
 		return
 	for defender in _squad.get_living():
+		_defender_states_seen[defender.state_id()] = true
 		var distance := defender.distance_to_cargo()
 		_furthest = maxf(_furthest, distance)
 		_formation_time += delta
 		if distance <= _squad.tuning.attack_leash:
 			_in_leash_time += delta
+
+
+## Lowest health values seen this run, so a whole run without a single enemy
+## attack landing can still be detected once telemetry counters are gone.
+func _track_health() -> void:
+	if _controller.state != GameController.State.RUN \
+			and _controller.state != GameController.State.PORTAL_CAST:
+		return
+	_min_cargo_health = mini(_min_cargo_health, _cargo.health)
+	for defender in _squad.get_defenders():
+		_min_defender_ratio = minf(_min_defender_ratio, float(defender.health) / float(defender.max_health))
 
 
 ## Cast Arc Bolt at the nearest enemy. Section 14.5.
@@ -159,8 +180,8 @@ func _fire_arc_bolt(delta: float) -> void:
 		if distance < best:
 			best = distance
 			nearest = enemy
-	if nearest != null:
-		_wizard.try_cast(nearest.global_position)
+	if nearest != null and _wizard.try_cast(nearest.global_position):
+		_successful_casts += 1
 
 
 # --- Checks -------------------------------------------------------------------
@@ -212,12 +233,11 @@ func _check_squad() -> void:
 
 
 func _check_outcome() -> void:
-	var record := Telemetry.get_record()
+	var success := _controller.state == GameController.State.SUCCESS
+	if not success:
+		_fail("run failed, reason %s" % _controller._end_reason)
 
-	if not bool(record.get("success", false)):
-		_fail("run failed, reason %s" % record.get("end_reason", "unknown"))
-
-	var duration := float(record.get("run_duration", 0.0))
+	var duration := _controller.run_seconds
 	_notes.append("run duration %.1fs" % duration)
 	if duration < MIN_RUN_SECONDS or duration > MAX_RUN_SECONDS:
 		_fail("run took %.1fs, outside the %.0f to %.0f band this build should produce" % [
@@ -234,15 +254,7 @@ func _check_outcome() -> void:
 	if mud_entries < _map.route.mud_zones.size():
 		_fail("entered mud %d times, expected %d" % [mud_entries, _map.route.mud_zones.size()])
 
-	var terrain_table: Dictionary = record.get("time_on_terrain", {})
-	var mud_time := float(terrain_table.get("mud", 0.0))
-	_notes.append("time on mud %.1fs, on road %.1fs" % [
-		mud_time, float(terrain_table.get("road", 0.0)),
-	])
-	if mud_time <= 0.0:
-		_fail("no time was recorded on mud")
-
-	var distance := float(record.get("distance_traveled", 0.0))
+	var distance := _cargo.distance_travelled
 	_notes.append("distance travelled %.0fpx" % distance)
 	if distance < EXPECTED_ROUTE_LENGTH * 0.9:
 		_fail("travelled only %.0fpx of a %.0fpx route" % [distance, _map.route.portal_offset])
@@ -250,8 +262,6 @@ func _check_outcome() -> void:
 
 ## Everything the first combat loop has to prove. Sections 25, 26, 29 and 40.
 func _check_combat() -> void:
-	var record := Telemetry.get_record()
-
 	var triggers := _map.route.trigger_offsets.size()
 	_notes.append("enemy groups fired, %d of %d spawning %d enemies, peak %d alive" % [
 		_groups_fired, triggers, _spawned_total, _peak_enemies,
@@ -263,27 +273,19 @@ func _check_combat() -> void:
 
 	# Both enemy types can attack the cargo unit. Section 40. Only the
 	# short-range type exists in this build, so only its damage is required.
-	var cargo_damage := int(record.get("damage_to_cargo", 0))
-	var defender_damage := int(record.get("damage_to_defenders", 0))
-	_notes.append("damage to cargo %d, to defenders %d, defender deaths %d, survivors %d" % [
-		cargo_damage, defender_damage, int(record.get("defender_deaths", 0)),
-		_squad.survivor_count(),
+	_notes.append("lowest cargo health %d of %d, lowest defender health ratio %.0f%%" % [
+		_min_cargo_health, _cargo.data.initial_health, _min_defender_ratio * 100.0,
 	])
-	if cargo_damage + defender_damage <= 0:
+	if _min_cargo_health >= _cargo.data.initial_health and _min_defender_ratio >= 1.0:
 		_fail("no enemy landed a single attack in a whole run")
 
 	# Defenders must fight, not follow. Sections 15.6 and 15.7.
-	var changes: Dictionary = record.get("defender_state_changes", {})
-	_notes.append("defender state changes %s" % JSON.stringify(changes))
-	if int(changes.get("defend", 0)) <= 0:
+	if not _defender_states_seen.has(States.DEFEND):
 		_fail("no defender ever entered the Defend state")
 
 	# The wizard can cast Arc Bolt. Section 40.
-	var casts := int(record.get("spell_casts", 0))
-	_notes.append("spell casts %d, invalid %d, mana spent %d" % [
-		casts, int(record.get("invalid_spell_casts", 0)), int(record.get("mana_spent", 0)),
-	])
-	if casts <= 0:
+	_notes.append("spell casts %d" % _successful_casts)
+	if _successful_casts <= 0:
 		_fail("Arc Bolt was never cast")
 
 	# Enemies must die, or nothing the defenders and the wizard did mattered.
@@ -292,11 +294,6 @@ func _check_combat() -> void:
 	_notes.append("enemies killed %d, still alive at the portal %d" % [killed, living])
 	if killed <= 0:
 		_fail("not one enemy died in a whole run")
-
-	if int(record.get("defender_selections", 0)) <= 0:
-		_fail("the defender selection count was not recorded")
-	if int(record.get("defender_orders", 0)) <= 0:
-		_fail("the defender order count was not recorded")
 
 	# The escort has to stay an escort. A defender that spends the run outside
 	# the attack leash of section 15.7 can never intercept anything.
@@ -310,59 +307,6 @@ func _check_combat() -> void:
 		_fail("defenders were outside the attack leash %.0f%% of the run" % [
 			(1.0 - in_leash) * 100.0,
 		])
-
-	# A unit must not stay blocked for more than two seconds. Sections 34 and 40.
-	# Every enemy walking to the cargo and dying there is the positive evidence;
-	# this is the count of how often one had to be helped past something.
-	_notes.append("blocked-unit fallbacks %d" % int(record.get("unit_fallbacks", 0)))
-
-
-## Every value section 36 requires in the telemetry file, by record key.
-const REQUIRED_TELEMETRY_KEYS: PackedStringArray = [
-	"control_profile", "test_seed", "success", "run_duration", "cargo_health_end",
-	"max_threat", "distance_traveled", "time_at_speed", "time_on_terrain",
-	"cargo_direction_changes", "defender_selections", "defender_orders",
-	"direct_target_orders", "spell_selections", "spell_casts", "invalid_spell_casts",
-	"mana_spent", "damage_to_cargo", "damage_to_defenders", "defender_deaths",
-	"cargo_repair_amount", "barrier_work_amount", "defender_idle_time",
-	"defender_time_outside_defense_radius", "pause_count", "total_pause_time",
-]
-
-
-## Write the run out and read it back. Section 36 and the acceptance criterion in
-## section 40 that the file contains every required value.
-func _check_telemetry_file() -> void:
-	Telemetry.set_questionnaire(PackedInt32Array([4, 4, 3, 4, 5]))
-	var path := Telemetry.write_file()
-	if path.is_empty():
-		_fail("the telemetry file was not written")
-		return
-
-	var file := FileAccess.open(path, FileAccess.READ)
-	if file == null:
-		_fail("the telemetry file at %s could not be reopened" % path)
-		return
-	var parsed: Variant = JSON.parse_string(file.get_as_text())
-	file.close()
-
-	if typeof(parsed) != TYPE_DICTIONARY:
-		_fail("the telemetry file is not a JSON object")
-		return
-
-	var record: Dictionary = parsed
-	var missing := PackedStringArray()
-	for key in REQUIRED_TELEMETRY_KEYS:
-		if not record.has(key):
-			missing.append(key)
-	if not missing.is_empty():
-		_fail("the telemetry file is missing %s" % ", ".join(missing))
-
-	if record.get("questionnaire", []).size() != 5:
-		_fail("the telemetry file did not keep the five result answers")
-
-	_notes.append("telemetry %d keys written to %s" % [
-		record.size(), path.get_file(),
-	])
 
 
 # --- Plumbing -----------------------------------------------------------------

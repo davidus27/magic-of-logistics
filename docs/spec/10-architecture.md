@@ -1,7 +1,7 @@
 # Architecture — §32–35
 
-Scene design, state machines, navigation and test seeds. Read this before adding a
-new unit type or a new resource.
+Scene design, state machines, navigation and the run seed. Read this before adding
+a new unit type or a new resource.
 
 ## 32. Godot scene design
 
@@ -24,8 +24,7 @@ Main.tscn
 |  |- ProjectileContainer
 |  |- EffectContainer
 |  `- Camera2D
-|- UserInterface
-`- TelemetryRecorder
+`- UserInterface
 ```
 
 Every scene reference goes through a `NodePath` export resolved by
@@ -74,10 +73,9 @@ Use these resource types:
 | `EnemyData` | `scripts/data/enemy_data.gd` | `data/enemies/` ×2 |
 | `SpellData` | `scripts/data/spell_data.gd` | `data/spells/` ×3 |
 | `CargoData` | `scripts/data/cargo_data.gd` | `data/cargo_data.tres` |
-| `ControlProfileData` | `scripts/data/control_profile_data.gd` | `data/profiles/` ×4 |
-| `TestSeedData` | `scripts/data/test_seed_data.gd` | `data/seeds/` ×3 |
+| `RunSeedData` | `scripts/data/run_seed_data.gd` | `data/run_seed.tres` |
 
-Two more exist beyond the required six: `MapRouteData`
+Two more exist beyond the required five: `MapRouteData`
 (`data/map_route.tres`, the control points the whole map is generated from) and
 `DefenderTuning` (`data/defender_tuning.tres`, the shared radii of §15).
 
@@ -92,8 +90,6 @@ Each defender and enemy uses an explicit finite state machine.
 Each state has enter, update, and exit functions.
 
 The state machine sends a signal after each state change.
-
-The telemetry recorder stores each defender state change.
 
 **The state logic must not depend on animation completion.** The simulation
 controls the state logic.
@@ -120,14 +116,12 @@ The fallback position must stay inside the navigation area.
 > from 39. Owned by milestone 2 — see [`../engine-notes.md`](../engine-notes.md) for
 > what caused them and [`../status.md`](../status.md) for the plan.
 
-## 35. Test seed rules
+## 35. Run seed rules
 
-A test seed controls enemy spawn positions.
+A fixed run seed controls enemy spawn positions.
 
 The seed does not change enemy statistics.
 
-The player can select seed 1, seed 2, or seed 3.
+Every run uses the same seed, so enemy spawns are reproducible from run to run.
 
-Each control profile must use the same seed sequence.
-
-The result screen must show the selected seed.
+The debug overlay shows the active seed.

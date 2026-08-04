@@ -19,7 +19,6 @@ config/icon="res://icon.svg"
 
 InkClock="*res://autoload/ink_clock.gd"
 SoundBank="*res://autoload/sound_bank.gd"
-Telemetry="*res://autoload/telemetry.gd"
 RunContext="*res://autoload/run_context.gd"
 
 [display]

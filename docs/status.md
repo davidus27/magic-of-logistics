@@ -13,42 +13,17 @@ in the same commit as the work it describes.
 
 ---
 
-## Implementation order
+## Roadmap
 
-The 18 steps of [`spec/12-profiles-and-testing.md`](spec/12-profiles-and-testing.md)
-§41, which is the authority on build order.
+Milestones 1 and 2 are closed; their reports are below. The control-profile
+experiment and its test apparatus are gone, and with them the milestones that only
+existed to build and evaluate profiles P2 to P4 — the two milestones below are what
+is left of build order once that scope is removed.
 
-| # | §41 step | Status | Milestone |
-|---:|---|---|---|
-| 1 | Build the map, road, cargo unit, and final portal | ✅ done | M1 |
-| 2 | Add automatic cargo movement | ✅ done | M1 |
-| 3 | Add one short-range enemy | ✅ done — all six groups, seeded | M2 |
-| 4 | Add one defender with Defend and Attack states | ✅ done — all seven states of §15.4 | M2 |
-| 5 | Add cargo health and run failure | ✅ done — failure path asserted | M2 |
-| 6 | Add Arc Bolt | ✅ done — 45 casts in the smoke run, rejections asserted | M2 |
-| 7 | Add all four defenders | ✅ done — arrived with step 4 | M2 |
-| 8 | Add Repair state and one barrier | 🟡 **half done** — the Repair state works against the cargo; barriers still disabled | M3 |
-| 9 | Add the long-range enemy | ⬜ spawner logs `N long-range deferred` in four of six groups | M3 |
-| 10 | Add Mend and Ward | ⬜ selectable = false, shown "not in this build" | M3 |
-| 11 | Add direct target orders | ⬜ profile P2 | M4 |
-| 12 | Add road-limited cargo movement | ⬜ profile P3 | M4 |
-| 13 | Add free cargo movement | ⬜ profile P4 | M4 |
-| 14 | Add user interface feedback | 🟡 §30.1–30.5 done; §30.6 world feedback absent | M5 |
-| 15 | Add the threat system | ⬜ the value counts up; no reinforcement spawns | M5 |
-| 16 | Add telemetry and the result screen | ✅ done, now 35 keys | M1 |
-| 17 | Add the second barrier and final balance values | ⬜ | M5 |
-| 18 | Run the four profile tests | ⬜ | M6 |
-
-**The remaining milestones have been re-cut**, because step 7 landed inside M2 and
-left the original M3 empty:
-
-- **M3** — finish the combat systems: barriers with the Repair state (step 8), the
-  long-range enemy (9), Mend and Ward (10).
-- **M4** — the other three control profiles: direct target orders (11) and both
-  manual cargo motors (12, 13).
-- **M5** — §30.6 world feedback, the threat reinforcements (15), the second
-  barrier and final balance (17).
-- **M6** — run the four profile tests (18).
+| Milestone | Scope |
+|---|---|
+| **M3 — combat completion** | Barriers with the Repair state, the long-range enemy, Mend and Ward |
+| **M4 — feedback and threat** | §30.6 world feedback, the threat reinforcements, the second barrier, final balance values |
 
 ---
 
@@ -97,15 +72,15 @@ Not bugs. Do not "fix" these without checking the milestone that owns them.
 | Long-range enemy — deferred explicitly by the spawner, and logged | M3 |
 | Barriers — generated but disabled by `MapRouteData.enable_barriers` | M3 |
 | Mend and Ward — `SpellData.implemented = false`, cannot be selected | M3 |
-| Direct target orders, profile P2 | M4 |
-| Manual cargo steering, profiles P3 and P4 | M4 |
-| §30.6 world feedback — target lines, leash circles, return arrows | M5 |
-| Threat reinforcement spawns | M5 |
+| §30.6 world feedback — target lines, leash circles, return arrows | M4 |
+| Threat reinforcement spawns | M4 |
+| Second barrier and final balance values | M4 |
 
-Profiles P2–P4 render as **disabled** on the selection screen rather than silently
-running P1, driven by `ControlProfileData.implemented` in `data/profiles/`. Spells
-use the same pattern through `SpellData.implemented`. Flip a flag only when the
-thing works end to end.
+Mend and Ward render as **disabled** rather than silently substituting Arc Bolt,
+driven by `SpellData.implemented`. `EnemySpawner` uses the same disable-visibly
+pattern for the long-range enemy it cannot yet create — it logs what it deferred
+instead of quietly spawning a smaller group. Flip a flag only when the thing works
+end to end.
 
 ---
 
@@ -150,19 +125,9 @@ speed, cast at whatever is nearest — and still finishes with the cargo at 68 h
 Right for a first-time tester, but it leaves little room for the long-range enemy,
 the reinforcements of §27 and the barriers. Revisit after M3 rather than tuning now.
 
-**Combat outcomes are not bit-reproducible between runs of the same seed.** §35
-requires the seed to fix enemy *spawn positions*, and it does — the spawner draws
-only from `RunContext.rng`. But the navigation server resolves avoidance across
-threads, so two runs of seed 1 ended with 0 and 1 defender deaths. Treat a single
-run as a sample when comparing profiles under §38.
-
 **Mud is visually heavy.** The tiled fill reads clearly, which is what §12.2 asks
 for, but it dominates the paper-and-ink page more than the rest of the palette does.
 One `modulate` value in `TerrainZone.setup_mud`.
-
-**Telemetry is now 35 keys.** The key set must stay stable across profile runs — if
-a field only exists for some profiles, record it as zero rather than omitting it
-(§36).
 
 ---
 
@@ -189,16 +154,12 @@ observed sticking.
 
 §40. The MVP is complete when every line is true.
 
-- [ ] All four control profiles work on the same map — P1 only
-- [x] The player can change the control profile before a run
 - [x] The cargo unit can reach the final portal — under attack, verified each run
 - [ ] Both enemy types can attack the cargo unit — short-range only, M3
 - [ ] Defenders can attack, defend, and repair — all three work; repair has no barrier to work on until M3
 - [ ] The wizard can cast all three spells — Arc Bolt only, M3
 - [x] The final portal can complete a run
 - [x] Cargo destruction can fail a run
-- [x] The result screen shows test data
-- [x] The telemetry file contains all required values
 - [x] No unit stays blocked for more than two seconds — 0 fallbacks in a full run, and every enemy reached the cargo
 - [x] The game keeps at least 60 frames per second on the test computer
 - [ ] All important orders have visual and sound feedback — orders, casts and damage have both; §30.6 world feedback is missing

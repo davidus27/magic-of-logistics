@@ -1,11 +1,10 @@
 class_name CargoMotor
 extends Node
-## Base for the cargo control methods of specification sections 19, 20 and 21.
+## Base for the cargo control method of specification section 19.
 ##
-## The motor owns how the cargo moves. Method A rides the route centre line and
-## writes the transform directly; methods B and C steer and use move_and_slide().
+## The motor owns how the cargo moves, including whether it can leave the road.
 ## Keeping that decision inside the motor is why [CargoUnit] itself never has to
-## branch on the control profile.
+## branch on the active motor.
 
 var cargo: CargoUnit = null
 var map: Map = null
@@ -32,6 +31,12 @@ func jump_to(_route_offset: float) -> void:
 ## Advance the cargo by one physics step.
 func step(_delta: float) -> void:
 	pass
+
+
+## Whether the cargo can leave the road under this motor. The base motor rides
+## the route centre line and never does.
+func can_leave_road() -> bool:
+	return false
 
 
 ## Current speed level, or Stop for the motors that have no levels.

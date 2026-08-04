@@ -7,7 +7,7 @@ extends RefCounted
 ## across seven files would hide that.
 ##
 ## The identifiers below are the whole public surface. [Defender.give_order]
-## takes one, a portrait shows one, and the telemetry record counts them.
+## takes one and a portrait shows one.
 
 const FOLLOW := &"follow"
 const DEFEND := &"defend"
@@ -239,7 +239,6 @@ class Dead:
 
 	func enter() -> void:
 		var unit := defender()
-		Telemetry.count("defender_deaths")
 		unit.mark_dead()
 		unit.show_dead_mark()
 

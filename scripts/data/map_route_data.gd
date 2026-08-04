@@ -40,3 +40,6 @@ extends Resource
 ## Barriers need the Repair state to open, so the route is not completable with
 ## barriers before that exists.
 @export var enable_barriers: bool = false
+## Off. The MVP has one cargo motor and it never leaves the road, so the walls
+## would only ever collide with nothing.
+@export var enable_road_walls: bool = false

@@ -43,3 +43,7 @@ sample_step = 40.0
 ; Barriers need the Repair state to open. Until that exists, spawning them would
 ; make the route impossible to finish.
 enable_barriers = false
+
+; The MVP has one cargo motor and it never leaves the road, so the walls would
+; only ever collide with nothing.
+enable_road_walls = false

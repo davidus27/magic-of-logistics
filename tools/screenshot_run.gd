@@ -57,12 +57,12 @@ func _ready() -> void:
 
 
 func _run_shots() -> void:
-	# 1. Control profile selection. Section 8.1.
+	# 1. Start screen. Section 8.1.
 	await _wait(10)
-	await _capture("01_profile_select")
+	await _capture("01_start_screen")
 
 	RunContext.ensure_configured()
-	_controller.begin_session(RunContext.profile, RunContext.seed_data)
+	_controller.begin_session()
 
 	# 2. Instruction screen. Section 8.2.
 	await _wait(4)
@@ -134,11 +134,11 @@ func _run_shots() -> void:
 	await _wait(90)
 	await _capture("12_portal_cast")
 
-	# 13. The result screen. Section 37.
-	while _controller.state != GameController.State.RESULT:
+	# 13. The outcome banner. Section 8.6 and 8.7.
+	while _controller.state != GameController.State.SUCCESS:
 		await get_tree().process_frame
 	await _wait(4)
-	await _capture("13_result")
+	await _capture("13_outcome")
 
 
 ## Drive to a route offset the way the game does, so the escort keeps up.

@@ -102,14 +102,12 @@ func _check_downed_and_dead() -> void:
 	_expect(_squad.survivor_count() == 3,
 		"%d survivors after one defender went down, expected 3" % _squad.survivor_count())
 
-	var before_deaths := int(Telemetry.get_record().get("defender_deaths", 0))
 	await _seconds(tuning.downed_seconds + 0.5)
 
 	_expect(victim.is_dead(), "the downed timer ended in %s, expected dead" % victim.state_id())
 	_expect(victim.is_dead_mark(), "a dead defender still has its collision shape")
-	var after_deaths := int(Telemetry.get_record().get("defender_deaths", 0))
-	_expect(after_deaths == before_deaths + 1,
-		"the death was counted %d times" % (after_deaths - before_deaths))
+	_expect(_squad.survivor_count() == 3,
+		"%d survivors after one defender died, expected 3" % _squad.survivor_count())
 	_notes.append("downed for %.0fs, then dead with no collision shape" % tuning.downed_seconds)
 
 
@@ -151,25 +149,21 @@ func _check_repair() -> void:
 	await _seconds(6.0)
 	_expect(_cargo.health > wounded,
 		"no cargo repair at Stop speed after 6 seconds, still %d" % _cargo.health)
-	var recorded := float(Telemetry.get_record().get("cargo_repair_amount", 0.0))
-	_expect(recorded > 0.0, "cargo repair was not recorded in the telemetry")
 	_notes.append("repair added %d health at Stop and none at Fast" % (_cargo.health - wounded))
 
 
 ## The wizard rejects a cast it cannot pay for or reach. Section 14.4.
 func _check_spell_limits() -> void:
-	var before := int(Telemetry.get_record().get("invalid_spell_casts", 0))
 	var spell := _wizard.current_spell()
 
 	# Out of range.
-	_wizard.try_cast(_wizard.global_position + Vector2.RIGHT * (spell.cast_range + 50.0))
+	_expect(not _wizard.try_cast(_wizard.global_position + Vector2.RIGHT * (spell.cast_range + 50.0)),
+		"a cast beyond spell range was accepted")
+
 	# Out of mana.
 	_wizard.mana = 0.0
-	_wizard.try_cast(_wizard.global_position + Vector2.RIGHT * 40.0)
-
-	var after := int(Telemetry.get_record().get("invalid_spell_casts", 0))
-	_expect(after == before + 2,
-		"%d invalid casts counted, expected 2" % (after - before))
+	_expect(not _wizard.try_cast(_wizard.global_position + Vector2.RIGHT * 40.0),
+		"a cast without enough mana was accepted")
 
 	# Mend and Ward are not in this build and must not become selectable.
 	_wizard.select_spell(1)
@@ -182,13 +176,11 @@ func _check_spell_limits() -> void:
 func _check_failure() -> void:
 	_cargo.apply_damage(_cargo.health)
 	await _frames(3)
-	_expect(_controller.state == GameController.State.RESULT,
+	_expect(_controller.state == GameController.State.FAILURE,
 		"cargo destruction left the game in %s" % _controller.state_name())
-	var record := Telemetry.get_record()
-	_expect(not bool(record.get("success", true)), "a destroyed cargo recorded a success")
-	_expect(String(record.get("end_reason", "")) == "cargo_destroyed",
-		"the end reason was '%s'" % record.get("end_reason", ""))
-	_notes.append("cargo destruction fails the run and opens the result screen")
+	_expect(_controller._end_reason == "cargo_destroyed",
+		"the end reason was '%s'" % _controller._end_reason)
+	_notes.append("cargo destruction fails the run and shows the outcome banner")
 
 
 # --- Plumbing -----------------------------------------------------------------

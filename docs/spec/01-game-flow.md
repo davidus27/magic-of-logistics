@@ -7,22 +7,19 @@ The game controller runs while the game is paused.
 
 The proof of concept has these game states:
 
-1. Control profile selection
+1. Start screen
 2. Instruction screen
 3. Active run
 4. Pause state
 5. Portal cast
 6. Success state
 7. Failure state
-8. Result screen
 
-### 8.1 Control profile selection
+### 8.1 Start screen
 
-The player selects one control profile before the run.
+The screen shows the game title and a short objective.
 
-The screen shows a short description of each profile.
-
-The player can also select a fixed test seed.
+The player presses `Start` to begin a run.
 
 ### 8.2 Instruction screen
 
@@ -64,7 +61,9 @@ The player succeeds when the portal cast reaches four seconds.
 
 The game stops all simulation.
 
-The game opens the result screen.
+The game shows the outcome banner.
+
+The player presses `Enter` to return to the start screen.
 
 ### 8.7 Failure state
 
@@ -72,7 +71,9 @@ The player fails when the cargo health becomes zero.
 
 The game stops all simulation.
 
-The game opens the result screen.
+The game shows the outcome banner.
+
+The player presses `Enter` to return to the start screen.
 
 ## 9. Camera
 

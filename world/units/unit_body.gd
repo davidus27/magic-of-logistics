@@ -295,10 +295,6 @@ func _track_blocked(delta: float, speed: float) -> void:
 
 ## Step aside to a position that is inside the navigation area. Section 34.
 func _choose_fallback() -> void:
-	# Counted so a run can show whether section 34 is being met. The rule is that
-	# no unit stays blocked for more than two seconds, and a count that climbs is
-	# the only cheap signal that units are getting stuck often enough to matter.
-	Telemetry.count("unit_fallbacks")
 	_fallback_angle += FALLBACK_TURN
 	var probe := global_position + Vector2.RIGHT.rotated(_fallback_angle) * FALLBACK_RADIUS
 	var navigation_map := get_world_2d().navigation_map
