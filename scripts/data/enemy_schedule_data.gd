@@ -11,9 +11,10 @@ extends Resource
 
 @export_group("Spawn placement", "spawn_")
 ## An enemy appears this far in front of the trigger point, along the route.
-## Far enough to be seen coming, near enough to reach the cargo unit.
-@export var spawn_ahead_min: float = 200.0
-@export var spawn_ahead_max: float = 640.0
+## Past the long-range maximum of section 25.2, with a few seconds of closing
+## time at Normal cargo speed so the group can be seen and answered.
+@export var spawn_ahead_min: float = 560.0
+@export var spawn_ahead_max: float = 960.0
 ## Largest sideways offset from the route centre line.
 ##
 ## Must stay inside the navigation area, which reaches

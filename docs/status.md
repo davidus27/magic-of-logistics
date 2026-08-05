@@ -37,6 +37,12 @@ tension: lowest cargo health fell from 68/100 to 44/100 on the same held-Normal
 run, with the same 112.7 s duration and 27 of 27 enemies still killed. No
 fallback tuning (e.g. nudging speed down to 95) was needed.
 
+**Spawn ahead 200–640 → 560–960** (`data/enemy_schedule.tres`). Trigger groups
+used to appear almost on top of the cargo: at Normal against a short-range enemy
+walking in, a 200 px gap closed in about a second, and the floor sat inside the
+long-range maximum of 360 (§25.2). The new band clears that range and leaves
+roughly three to five seconds of closing time so a group can be seen and answered.
+
 ---
 
 ## Roadmap
