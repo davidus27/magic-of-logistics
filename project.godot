@@ -19,7 +19,6 @@ config/icon="res://icon.svg"
 
 InkClock="*res://autoload/ink_clock.gd"
 SoundBank="*res://autoload/sound_bank.gd"
-Telemetry="*res://autoload/telemetry.gd"
 RunContext="*res://autoload/run_context.gd"
 
 [display]
@@ -148,4 +147,5 @@ debug_overlay={
 [rendering]
 
 rendering_device/driver.windows="d3d12"
+textures/vram_compression/import_etc2_astc=true
 environment/defaults/default_clear_color=Color(0.952941, 0.937255, 0.894118, 1)

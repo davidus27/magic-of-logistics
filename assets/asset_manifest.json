@@ -495,7 +495,7 @@
     {
       "file": "world/tintable/cargo_body_a.svg",
       "category": "world",
-      "purpose": "Cargo unit body, top-down, hand-drawn frame A",
+      "purpose": "Cargo wagon body with rear axle, bed and cabin, top-down frame A",
       "dimensions": [
         132,
         96
@@ -507,7 +507,7 @@
     {
       "file": "world/tintable/cargo_body_b.svg",
       "category": "world",
-      "purpose": "Cargo unit body, top-down, hand-drawn frame B",
+      "purpose": "Cargo wagon body with rear axle, bed and cabin, top-down frame B",
       "dimensions": [
         132,
         96
@@ -519,9 +519,9 @@
     {
       "file": "world/tintable/cargo_rider_a.svg",
       "category": "world",
-      "purpose": "Cargo rider circle with heading tick, hand-drawn frame A",
+      "purpose": "Cargo rider circle with heading chevron, hand-drawn frame A",
       "dimensions": [
-        30,
+        36,
         24
       ],
       "anchor": "center",
@@ -531,10 +531,34 @@
     {
       "file": "world/tintable/cargo_rider_b.svg",
       "category": "world",
-      "purpose": "Cargo rider circle with heading tick, hand-drawn frame B",
+      "purpose": "Cargo rider circle with heading chevron, hand-drawn frame B",
       "dimensions": [
-        30,
+        36,
         24
+      ],
+      "anchor": "center",
+      "source": "hand-authored",
+      "tint": "white source, tinted at runtime"
+    },
+    {
+      "file": "world/tintable/cargo_wizard_a.svg",
+      "category": "world",
+      "purpose": "Wizard on the cargo bed: hat triangle, body and staff, frame A",
+      "dimensions": [
+        44,
+        40
+      ],
+      "anchor": "center",
+      "source": "hand-authored",
+      "tint": "white source, tinted at runtime"
+    },
+    {
+      "file": "world/tintable/cargo_wizard_b.svg",
+      "category": "world",
+      "purpose": "Wizard on the cargo bed: hat triangle, body and staff, frame B",
+      "dimensions": [
+        44,
+        40
       ],
       "anchor": "center",
       "source": "hand-authored",
@@ -625,9 +649,9 @@
       "anchor": "center"
     },
     {
-      "file": "spells/mend_cursor.svg",
+      "file": "spells/heal_cursor.svg",
       "category": "spell",
-      "purpose": "Mend cursor and target symbol",
+      "purpose": "Heal cursor and target symbol",
       "dimensions": [
         256,
         256
@@ -635,9 +659,9 @@
       "anchor": "center"
     },
     {
-      "file": "spells/mend_cursor.png",
+      "file": "spells/heal_cursor.png",
       "category": "spell",
-      "purpose": "Mend cursor and target symbol raster export",
+      "purpose": "Heal cursor and target symbol raster export",
       "dimensions": [
         256,
         256
@@ -645,9 +669,9 @@
       "anchor": "center"
     },
     {
-      "file": "spells/mend_effect.svg",
+      "file": "spells/heal_effect.svg",
       "category": "spell",
-      "purpose": "Mend healing effect",
+      "purpose": "Heal healing effect",
       "dimensions": [
         256,
         256
@@ -655,9 +679,9 @@
       "anchor": "center"
     },
     {
-      "file": "spells/mend_effect.png",
+      "file": "spells/heal_effect.png",
       "category": "spell",
-      "purpose": "Mend healing effect raster export",
+      "purpose": "Heal healing effect raster export",
       "dimensions": [
         256,
         256
@@ -665,9 +689,9 @@
       "anchor": "center"
     },
     {
-      "file": "spells/mend_revive.svg",
+      "file": "spells/heal_revive.svg",
       "category": "spell",
-      "purpose": "Mend revive feedback",
+      "purpose": "Heal revive feedback",
       "dimensions": [
         256,
         256
@@ -675,9 +699,9 @@
       "anchor": "center"
     },
     {
-      "file": "spells/mend_revive.png",
+      "file": "spells/heal_revive.png",
       "category": "spell",
-      "purpose": "Mend revive feedback raster export",
+      "purpose": "Heal revive feedback raster export",
       "dimensions": [
         256,
         256
@@ -685,9 +709,9 @@
       "anchor": "center"
     },
     {
-      "file": "spells/ward_area_a.svg",
+      "file": "spells/shield_area_a.svg",
       "category": "spell",
-      "purpose": "Ward area frame A",
+      "purpose": "Shield area frame A",
       "dimensions": [
         256,
         256
@@ -695,9 +719,9 @@
       "anchor": "center"
     },
     {
-      "file": "spells/ward_area_a.png",
+      "file": "spells/shield_area_a.png",
       "category": "spell",
-      "purpose": "Ward area frame A raster export",
+      "purpose": "Shield area frame A raster export",
       "dimensions": [
         256,
         256
@@ -705,9 +729,9 @@
       "anchor": "center"
     },
     {
-      "file": "spells/ward_area_b.svg",
+      "file": "spells/shield_area_b.svg",
       "category": "spell",
-      "purpose": "Ward area frame B",
+      "purpose": "Shield area frame B",
       "dimensions": [
         256,
         256
@@ -715,9 +739,9 @@
       "anchor": "center"
     },
     {
-      "file": "spells/ward_area_b.png",
+      "file": "spells/shield_area_b.png",
       "category": "spell",
-      "purpose": "Ward area frame B raster export",
+      "purpose": "Shield area frame B raster export",
       "dimensions": [
         256,
         256
@@ -1245,9 +1269,9 @@
       "anchor": "center"
     },
     {
-      "file": "ui/icons/spell_mend.svg",
+      "file": "ui/icons/spell_heal.svg",
       "category": "ui_icon",
-      "purpose": "Mend spell icon",
+      "purpose": "Heal spell icon",
       "dimensions": [
         256,
         256
@@ -1255,9 +1279,9 @@
       "anchor": "center"
     },
     {
-      "file": "ui/icons/spell_mend.png",
+      "file": "ui/icons/spell_heal.png",
       "category": "ui_icon",
-      "purpose": "Mend spell icon raster export",
+      "purpose": "Heal spell icon raster export",
       "dimensions": [
         96,
         96
@@ -1265,9 +1289,9 @@
       "anchor": "center"
     },
     {
-      "file": "ui/icons/spell_ward.svg",
+      "file": "ui/icons/spell_shield.svg",
       "category": "ui_icon",
-      "purpose": "Ward spell icon",
+      "purpose": "Shield spell icon",
       "dimensions": [
         256,
         256
@@ -1275,9 +1299,9 @@
       "anchor": "center"
     },
     {
-      "file": "ui/icons/spell_ward.png",
+      "file": "ui/icons/spell_shield.png",
       "category": "ui_icon",
-      "purpose": "Ward spell icon raster export",
+      "purpose": "Shield spell icon raster export",
       "dimensions": [
         96,
         96
@@ -1425,9 +1449,9 @@
       "anchor": "top-left"
     },
     {
-      "file": "ui/buttons/spell_mend.svg",
+      "file": "ui/buttons/spell_heal.svg",
       "category": "ui_button",
-      "purpose": "Mend spell control button",
+      "purpose": "Heal spell control button",
       "dimensions": [
         240,
         88
@@ -1435,9 +1459,9 @@
       "anchor": "top-left"
     },
     {
-      "file": "ui/buttons/spell_mend.png",
+      "file": "ui/buttons/spell_heal.png",
       "category": "ui_button",
-      "purpose": "Mend spell control button raster export",
+      "purpose": "Heal spell control button raster export",
       "dimensions": [
         240,
         88
@@ -1445,9 +1469,9 @@
       "anchor": "top-left"
     },
     {
-      "file": "ui/buttons/spell_ward.svg",
+      "file": "ui/buttons/spell_shield.svg",
       "category": "ui_button",
-      "purpose": "Ward spell control button",
+      "purpose": "Shield spell control button",
       "dimensions": [
         240,
         88
@@ -1455,9 +1479,9 @@
       "anchor": "top-left"
     },
     {
-      "file": "ui/buttons/spell_ward.png",
+      "file": "ui/buttons/spell_shield.png",
       "category": "ui_button",
-      "purpose": "Ward spell control button raster export",
+      "purpose": "Shield spell control button raster export",
       "dimensions": [
         240,
         88

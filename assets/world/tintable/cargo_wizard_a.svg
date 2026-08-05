@@ -1,0 +1,13 @@
+<!-- Wizard on the cargo: triangle inside the cargo rectangle. Specification 10.4.
+     Body circle, forward hat, staff held to the side. Drawn facing +X. -->
+<svg xmlns="http://www.w3.org/2000/svg" width="44" height="40" viewBox="0 0 44 40">
+  <g fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Robe / body -->
+    <circle cx="16" cy="22" r="9"/>
+    <!-- Pointed hat, tip toward forward -->
+    <path d="M 18,13 L 36,22 L 18,31 Z"/>
+    <!-- Staff across the port side -->
+    <path d="M 6,6 L 30,6"/>
+    <circle cx="30" cy="6" r="2.5"/>
+  </g>
+</svg>

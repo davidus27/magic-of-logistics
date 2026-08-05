@@ -40,6 +40,10 @@ portal_radius = 70.0
 
 sample_step = 40.0
 
-; Barriers need the Repair state to open. Until that exists, spawning them would
-; make the route impossible to finish.
-enable_barriers = false
+; Barriers need the Repair state to open them; that state exists now, so the
+; route stays finishable with barriers spawned.
+enable_barriers = true
+
+; The MVP has one cargo motor and it never leaves the road, so the walls would
+; only ever collide with nothing.
+enable_road_walls = false

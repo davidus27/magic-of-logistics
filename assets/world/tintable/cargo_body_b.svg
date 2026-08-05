@@ -1,9 +1,18 @@
 <!-- Cargo unit body, line frame B. Frame A with each vertex moved 1-2px. -->
 <svg xmlns="http://www.w3.org/2000/svg" width="132" height="96" viewBox="0 0 132 96">
   <g fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M 5,15 L 127,17 L 125,81 L 7,79 Z"/>
-    <path d="M 97,17 L 95,79"/>
-    <circle cx="45" cy="15" r="11.5"/>
-    <circle cx="43" cy="81" r="12.5"/>
+    <path d="M 6,18 L 110,17 L 125,30 L 127,66 L 106,81 L 7,78 Z"/>
+    <path d="M 15,27 L 91,28 L 89,71 L 17,69 Z"/>
+    <path d="M 95,21 L 93,75"/>
+    <path d="M 17,33 L 89,29"/>
+    <path d="M 19,65 L 87,69"/>
+    <path d="M 21,37 L 39,38 L 37,60 L 23,57 Z"/>
+    <path d="M 21,47 L 39,49"/>
+    <path d="M 41,17 L 39,79"/>
+    <circle cx="41" cy="15" r="11.5"/>
+    <circle cx="41" cy="15" r="3.2"/>
+    <circle cx="39" cy="81" r="12.5"/>
+    <circle cx="39" cy="81" r="2.8"/>
+    <path d="M 125,47 L 130,49"/>
   </g>
 </svg>

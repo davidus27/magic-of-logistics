@@ -56,6 +56,27 @@ func set_ink(color: Color) -> void:
 	ink_color = color
 
 
+## Replace the line frames after [method _ready].
+##
+## Needed for art chosen at run time rather than in a scene: the four defender
+## roles share one scene, and a dead unit swaps to the paper mark of sections
+## 15.11 and 29. Also re-applies [member extra_scale], because the replacement
+## art is rarely drawn at the size of the art it replaces.
+func set_frames(new_frames: Array[Texture2D]) -> void:
+	frames = new_frames
+	_apply_scale()
+	if frames.is_empty():
+		texture = null
+		return
+	_show_frame(InkClock.frame)
+
+	var connected := InkClock.frame_changed.is_connected(_show_frame)
+	if frames.size() > 1 and not connected:
+		InkClock.frame_changed.connect(_show_frame)
+	elif frames.size() <= 1 and connected:
+		InkClock.frame_changed.disconnect(_show_frame)
+
+
 func _apply_scale() -> void:
 	var factor := extra_scale
 	if supersample > 0.0:

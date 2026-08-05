@@ -369,10 +369,7 @@ func _build_road_lines() -> void:
 
 func _build_road_walls() -> void:
 	_clear(_road_walls)
-	RunContext.ensure_configured()
-	if not RunContext.profile.use_road_walls:
-		# Control method C removes the road walls so the cargo can leave the
-		# road. Section 21.
+	if not route.enable_road_walls:
 		return
 	var half := route.road_width * 0.5
 	_road_walls.add_child(_make_static_wall("LeftWall", _edge_points(half), Layers.ROAD_WALL))
@@ -452,6 +449,7 @@ func _build_barriers() -> void:
 		# from the travel direction lays it across the road.
 		barrier.rotation = placement.get_rotation() + PI * 0.5
 		barrier.road_width = route.road_width
+		barrier.route_offset = offset
 		barrier.opened.connect(_on_barrier_opened)
 
 

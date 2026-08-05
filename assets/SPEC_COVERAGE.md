@@ -7,7 +7,7 @@
 | Selection symbols | World selection ring, selected portrait borders, order icons |
 | Terrain feedback | Road, mud, off-road tiles and terrain icon |
 | Cargo damage feedback | Flash is code-driven; crack marks 1 and 2 are included |
-| Wizard spells | Arc Bolt projectile/impact, Mend cursor/effect/revive, Ward area |
+| Wizard spells | Arc Bolt projectile/impact, Heal cursor/effect/revive, Shield area |
 | Defender feedback | Target marker/line, leash radius, Return arrow, health/downed widgets |
 | HUD | Icons, portraits, order buttons, spell buttons, mana bar, four HUD mockups |
 | Game states | Profile, four instructions, pause, portal cast, success, failure, result |

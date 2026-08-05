@@ -1,0 +1,63 @@
+---
+description: How to run, test and screenshot the game - use when verifying a change or asked whether something works
+alwaysApply: false
+---
+
+# Running and verifying
+
+> Both commit gates pass as of milestone 2, 2026-08-03. If one fails, you probably
+> broke it — but read [docs/status.md](mdc:docs/status.md) before deciding, and never
+> "fix" the game to satisfy an assertion you have not first shown to be right.
+
+```sh
+# Play.
+Godot --path .
+
+# Commit gate 1: plays a whole run badly on purpose and asserts the result.
+Godot --headless --fixed-fps 60 --path . res://tools/smoke_run.tscn
+
+# Commit gate 2: drives the states a successful run never reaches - downed, dead,
+# revive, repair at each speed, rejected casts, and the failure path.
+Godot --headless --fixed-fps 60 --path . res://tools/behaviour_checks.tscn
+
+# Screenshots of 13 game states, into user://screenshots.
+# Must run windowed - saving a viewport image needs a real rendering device.
+Godot --fixed-fps 60 --resolution 1280x720 --path . res://tools/screenshot_run.tscn
+
+# Regenerate route control points after changing the road shape.
+python3 tools/road_calc.py --target 9000 --wavelength 2800
+```
+
+On this machine the binary is
+`/Applications/Godot.app/Contents/MacOS/Godot`.
+
+## What the smoke test asserts
+
+Route length 9000 px, the four defenders starting in Follow inside their slot band,
+the run completing, terrain events in order `Mud, Road, Mud, Road`, time on mud at
+the ×0.60 factor, all six enemy groups firing, enemies both landing attacks and
+dying (tracked as the lowest cargo and defender health seen, since there is no
+telemetry counter to read), some defender reaching the Defend state, Arc Bolt being
+cast, and the squad staying inside the attack leash.
+
+It asserts the duration band this build can actually produce, which is not yet the
+three-minute floor of §7 — see [docs/status.md](mdc:docs/status.md) for why that is
+correct rather than a bug.
+
+## What behaviour_checks asserts
+
+The paths a successful run never takes: an order reaching the selection and nobody
+else, the 15-second downed timer ending in Dead with no collision shape, revive
+working on a downed defender and refusing a dead one, cargo repair at Stop and not
+at Fast, casts rejected for range, mana and being unimplemented, and cargo
+destruction ending the run in `State.FAILURE` with `end_reason = cargo_destroyed`.
+
+## Standard of proof
+
+An assertion is not a playtest. This project exists to evaluate **control feel**, so
+"the smoke test passes" is not evidence that a control change is good. When a change
+touches how the game feels, say so and ask for a play session rather than reporting
+it as verified.
+
+Report outcomes plainly: if the smoke test fails, paste the output. If you did not
+run it, say you did not run it.

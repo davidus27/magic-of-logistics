@@ -1,7 +1,7 @@
 <!-- Rider prop, line frame B. -->
-<svg xmlns="http://www.w3.org/2000/svg" width="30" height="24" viewBox="0 0 30 24">
+<svg xmlns="http://www.w3.org/2000/svg" width="36" height="24" viewBox="0 0 36 24">
   <g fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-    <circle cx="11.5" cy="11.5" r="8.5"/>
-    <path d="M 20,12.5 L 27,11.5"/>
+    <circle cx="12.5" cy="11.5" r="8.5"/>
+    <path d="M 21.5,6.5 L 32.5,12.5 L 21.5,17.5"/>
   </g>
 </svg>

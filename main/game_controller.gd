@@ -12,14 +12,13 @@ signal run_time_changed(seconds: float)
 signal threat_changed(threat: float)
 
 enum State {
-	PROFILE_SELECT,
+	START,
 	INSTRUCTIONS,
 	RUN,
 	PAUSE,
 	PORTAL_CAST,
 	SUCCESS,
 	FAILURE,
-	RESULT,
 }
 
 ## The cast takes four seconds. Section 8.5.
@@ -32,21 +31,27 @@ const RUN_TIME_LIMIT := 480.0
 @export var map_path: NodePath
 @export var cargo_path: NodePath
 @export var camera_path: NodePath
-@export var profile_select_path: NodePath
+@export var squad_path: NodePath
+@export var spawner_path: NodePath
+@export var wizard_path: NodePath
+@export var start_screen_path: NodePath
 @export var instructions_path: NodePath
 @export var hud_path: NodePath
-@export var result_screen_path: NodePath
+@export var outcome_banner_path: NodePath
 
 var world: Node2D
 var map: Map
 var cargo: CargoUnit
 var camera: CameraRig
-var profile_select: Control
+var squad: Squad
+var spawner: EnemySpawner
+var wizard: Wizard
+var start_screen: Control
 var instructions: Control
 var hud: Control
-var result_screen: Control
+var outcome_banner: Control
 
-var state: State = State.PROFILE_SELECT
+var state: State = State.START
 var run_seconds: float = 0.0
 ## Increases by one each second and stops during pause. Section 27.
 var threat: float = 0.0
@@ -63,18 +68,21 @@ func _ready() -> void:
 	map = NodeRef.get_required(self, map_path, "map")
 	cargo = NodeRef.get_required(self, cargo_path, "cargo")
 	camera = NodeRef.get_required(self, camera_path, "camera")
-	profile_select = NodeRef.get_required(self, profile_select_path, "profile select")
+	squad = NodeRef.get_required(self, squad_path, "squad")
+	spawner = NodeRef.get_required(self, spawner_path, "enemy spawner")
+	wizard = NodeRef.get_required(self, wizard_path, "wizard")
+	start_screen = NodeRef.get_required(self, start_screen_path, "start screen")
 	instructions = NodeRef.get_required(self, instructions_path, "instructions")
 	hud = NodeRef.get_required(self, hud_path, "hud")
-	result_screen = NodeRef.get_required(self, result_screen_path, "result screen")
+	outcome_banner = NodeRef.get_required(self, outcome_banner_path, "outcome banner")
 
-	if map == null or cargo == null or profile_select == null:
+	if map == null or cargo == null or start_screen == null:
 		push_error("GameController is missing required nodes and will not run.")
 		return
 
 	cargo.destroyed.connect(_on_cargo_destroyed)
-	profile_select.profile_confirmed.connect(_on_profile_confirmed)
-	_enter(State.PROFILE_SELECT)
+	start_screen.start_pressed.connect(_on_start_pressed)
+	_enter(State.START)
 
 
 func _process(delta: float) -> void:
@@ -83,7 +91,7 @@ func _process(delta: float) -> void:
 			_advance_run(delta)
 			_check_portal()
 			if run_seconds >= RUN_TIME_LIMIT:
-				# The time limit prevents invalid test sessions. Section 7.
+				# The time limit prevents a run from continuing indefinitely. Section 7.
 				_fail("time_limit")
 		State.PORTAL_CAST:
 			_advance_run(delta)
@@ -109,23 +117,28 @@ func _unhandled_input(event: InputEvent) -> void:
 			start_run()
 		elif state == State.PAUSE:
 			_resume()
+		elif state == State.SUCCESS or state == State.FAILURE:
+			_enter(State.START)
 		else:
 			return
 		get_viewport().set_input_as_handled()
 
 
-## Build the world for a profile and seed and show the instruction screen.
+## Build the world for a run and show the instruction screen.
 ## Section 8.1 and 8.2.
-func begin_session(profile: ControlProfileData, seed_data: TestSeedData) -> void:
-	RunContext.configure(profile, seed_data)
-
-	# The profile decides whether the road walls exist, so the map has to be
-	# built after the selection and not in its own _ready.
+func begin_session() -> void:
 	map.build()
 
-	cargo.setup(map, _make_motor(profile))
+	cargo.setup(map, AutoPathMotor.new())
 	camera.target = cargo
 	camera.snap_to_target()
+
+	# Order matters. The spawner clears the field before the squad places
+	# defenders around a cargo unit that is already at the start of the route,
+	# and the wizard reads nothing from either.
+	spawner.build()
+	squad.build()
+	wizard.build()
 
 	run_seconds = 0.0
 	threat = 0.0
@@ -142,30 +155,22 @@ func start_run() -> void:
 		_enter(State.RUN)
 
 
-## Start a run immediately with the baseline profile. Used by the headless smoke
-## test, which has no screens to click.
+## Start a run immediately. Used by the headless smoke test, which has no
+## screens to click.
 func begin_default_session() -> void:
 	RunContext.ensure_configured()
-	begin_session(RunContext.profile, RunContext.seed_data)
+	begin_session()
 	_enter(State.RUN)
-
-
-func _make_motor(profile: ControlProfileData) -> CargoMotor:
-	match profile.cargo_mode:
-		ControlProfileData.CargoMode.AUTO_PATH:
-			return AutoPathMotor.new()
-		_:
-			# Control methods B and C land with profiles P3 and P4. The selection
-			# screen shows those profiles as disabled until then, so reaching this
-			# branch means a profile resource was marked implemented too early.
-			push_error("Cargo mode %d has no motor yet. Falling back to method A." % profile.cargo_mode)
-			return AutoPathMotor.new()
 
 
 func _advance_run(delta: float) -> void:
 	run_seconds += delta
+	# The threat value rises one point a second and stops during pause, because
+	# pause is not a run state and this runs only in the run states. Section 27.
 	threat += delta
-	Telemetry.set_max("max_threat", threat)
+	# Each time it passes another interval the spawner sends reinforcements in
+	# behind the cargo, so a slow run turns dangerous. Section 27.
+	spawner.update_threat(threat)
 	run_time_changed.emit(run_seconds)
 	threat_changed.emit(threat)
 
@@ -177,12 +182,10 @@ func _check_portal() -> void:
 
 
 func _pause() -> void:
-	Telemetry.count("pause_count")
 	_enter(State.PAUSE)
 
 
 func _resume() -> void:
-	Telemetry.accumulate("total_pause_time", _pause_seconds)
 	_pause_seconds = 0.0
 	_enter(State.RUN)
 
@@ -190,31 +193,22 @@ func _resume() -> void:
 func _succeed() -> void:
 	_end_reason = "portal"
 	_enter(State.SUCCESS)
-	_finish(true)
 
 
 func _fail(reason: String) -> void:
 	_end_reason = reason
 	_enter(State.FAILURE)
-	_finish(false)
 
 
 func _on_cargo_destroyed() -> void:
-	if state == State.SUCCESS or state == State.FAILURE or state == State.RESULT:
+	if state == State.SUCCESS or state == State.FAILURE:
 		return
 	# The player fails the run when the cargo health becomes zero. Section 6.
 	_fail("cargo_destroyed")
 
 
-func _finish(success: bool) -> void:
-	Telemetry.set_value("end_reason", _end_reason)
-	Telemetry.end_run(success, run_seconds, cargo.health)
-	result_screen.show_results(success, run_seconds, cargo.health, threat)
-	_enter(State.RESULT)
-
-
-func _on_profile_confirmed(profile: ControlProfileData, seed_data: TestSeedData) -> void:
-	begin_session(profile, seed_data)
+func _on_start_pressed() -> void:
+	begin_session()
 
 
 func _enter(next_state: State) -> void:
@@ -225,6 +219,9 @@ func _enter(next_state: State) -> void:
 	var simulating := state == State.RUN or state == State.PORTAL_CAST
 	get_tree().paused = not simulating
 	cargo.simulating = simulating
+	# Enemies can attack during the cast, so the wizard keeps working through it.
+	# Section 8.5.
+	wizard.active = simulating
 
 	if state == State.PORTAL_CAST:
 		# The cargo unit stops during the cast. Section 8.5.
@@ -232,16 +229,16 @@ func _enter(next_state: State) -> void:
 	elif state == State.RUN:
 		cargo.set_motor_locked(false)
 
-	# The map is generated when a profile is chosen, so before that the world
+	# The map is generated when a session begins, so before that the world
 	# holds an unbuilt map and a cargo unit stacked at the origin. Hide it rather
-	# than show that through the selection screen.
+	# than show that through the start screen.
 	if world != null:
-		world.visible = state != State.PROFILE_SELECT
+		world.visible = state != State.START
 
-	profile_select.visible = state == State.PROFILE_SELECT
+	start_screen.visible = state == State.START
 	instructions.visible = state == State.INSTRUCTIONS or state == State.PAUSE
-	result_screen.visible = state == State.RESULT
-	hud.visible = state not in [State.PROFILE_SELECT, State.RESULT]
+	outcome_banner.visible = state == State.SUCCESS or state == State.FAILURE
+	hud.visible = state not in [State.START, State.SUCCESS, State.FAILURE]
 
 	if state == State.PAUSE:
 		instructions.show_as_pause()

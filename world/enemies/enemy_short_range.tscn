@@ -1,0 +1,39 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://world/enemies/enemy.gd" id="1_enemy"]
+[ext_resource type="Resource" path="res://data/enemies/enemy_short_range.tres" id="2_data"]
+[ext_resource type="Script" path="res://scripts/ink_sprite.gd" id="3_ink"]
+[ext_resource type="Script" path="res://world/units/unit_health_bar.gd" id="4_bar"]
+[ext_resource type="Texture2D" path="res://assets/world/enemy_short_a.svg" id="5_body_a"]
+[ext_resource type="Texture2D" path="res://assets/world/enemy_short_b.svg" id="6_body_b"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_body"]
+radius = 11.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_sensor"]
+radius = 6.0
+
+[node name="EnemyShortRange" type="CharacterBody2D"]
+motion_mode = 1
+script = ExtResource("1_enemy")
+data = ExtResource("2_data")
+body_radius = 11.0
+
+[node name="Collision" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_body")
+
+[node name="Agent" type="NavigationAgent2D" parent="."]
+
+[node name="Ink" type="Sprite2D" parent="."]
+script = ExtResource("3_ink")
+frames = Array[Texture2D]([ExtResource("5_body_a"), ExtResource("6_body_b")])
+supersample = 2.0
+extra_scale = 0.2
+
+[node name="HealthBar" type="Node2D" parent="."]
+script = ExtResource("4_bar")
+
+[node name="TerrainSensor" type="Area2D" parent="."]
+
+[node name="Collision" type="CollisionShape2D" parent="TerrainSensor"]
+shape = SubResource("CircleShape2D_sensor")

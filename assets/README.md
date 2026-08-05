@@ -8,8 +8,8 @@ Every asset the game loads lives here. Most of it is a pack that converts the vi
 - Static transparent paper grain overlays at 512 and 1024 pixels.
 - Road, mud, and off-road terrain tiles.
 - Two hand-drawn frames for important world objects.
-- Wizard, four defender variants, two enemy types, portal, damage, and death marks. Cargo, rider and barrier come from `world/tintable/` instead; see below.
-- Arc Bolt, Mend, and Ward effects.
+- Wizard, four defender variants, two enemy types, portal, damage, and death marks. Cargo body, rider, wizard and barrier come from `world/tintable/` instead; see below.
+- Arc Bolt, Heal, and Shield effects.
 - Selection, target, leash, return, health, and barrier feedback.
 - HUD icons, defender portraits, order buttons, spell buttons, profile badges, and mana widgets.
 - Mockups for all major game states and all four control profiles.
@@ -24,7 +24,7 @@ Every asset the game loads lives here. Most of it is a pack that converts the vi
 - Medium gray: `#77736C`.
 - Static paper grain: up to 8 percent opacity.
 - Important world objects: alternate frame `_a` and `_b` every 0.15 seconds.
-- Cargo: rectangle, two wheel circles, rider circle, wizard triangle.
+- Cargo: top-down wagon (rectangle, two wheel circles), rider at the front, wizard on the bed.
 - Defender: circle with shield mark.
 - Short-range enemy: filled black circle.
 - Long-range enemy: hollow triangle.
@@ -50,15 +50,16 @@ The four role-specific defender variants preserve the required circle-and-shield
 
 ## Hand-authored tintable art
 
-[`world/tintable/`](world/tintable) holds the only six assets not from the pack. They exist because the pack draws these three objects for a side-on view, which does not survive a top-down camera that rotates the object through every heading.
+[`world/tintable/`](world/tintable) holds the only eight assets not from the pack. They exist because the pack draws these objects for a side-on view, which does not survive a top-down camera that rotates the object through every heading.
 
 | Asset | Why it is here |
 |---|---|
 | `cargo_body_a/b` | The pack drew a wagon in side view, with both wheels below the body. The cargo turns through every heading on a winding road, so the wheels have to straddle the long edges instead. |
-| `cargo_rider_a/b` | The pack rider was a head on a stalk above the body, which only reads from the side. This one is a circle with a direction tick, per sections 10.4 and 13.4. |
+| `cargo_rider_a/b` | The pack rider was a head on a stalk above the body, which only reads from the side. This one is a top-down circle with a heading chevron, per sections 10.4 and 13.4. |
+| `cargo_wizard_a/b` | The pack wizard triangle is upright on a 256 canvas and needs a runtime rotation. This one is drawn facing forward at wagon size, with a body circle and staff so it reads as a wizard on the bed. |
 | `barrier_a/b` | The pack barrier was a single cross symbol. A barrier blocks the full 420 pixel road width of section 28, so this one spans it. |
 
-The pack's superseded versions (`cargo_unit_a/b`, `rider_prop`, `barrier_closed_a/b`, `barrier_open`) have been deleted. Do not restore them, and do not add an asset to `world/tintable/` that the pack already covers.
+The pack's superseded versions (`cargo_unit_a/b`, `rider_prop`, `barrier_closed_a/b`, `barrier_open`) have been deleted. Do not restore them, and do not add an asset to `world/tintable/` that the pack already covers — except where the pack silhouette only works from the side, which is why the cargo set lives here.
 
 ### Two colour conventions, on purpose
 

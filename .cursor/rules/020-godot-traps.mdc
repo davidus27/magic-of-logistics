@@ -1,0 +1,56 @@
+---
+description: Godot engine behaviours in scenes, Controls and navigation that silently produce wrong results
+globs: **/*.tscn,ui/**/*.gd,world/map/**/*.gd
+alwaysApply: false
+---
+
+# Engine traps
+
+Each of these has already burned time on this project. Full write-up in
+[docs/engine-notes.md](mdc:docs/engine-notes.md).
+
+## A node-typed `@export` never resolves in a hand-authored `.tscn`
+
+`map = NodePath("../World/Map")` leaves the property **null**. The Godot editor
+stores extra state that a text-authored scene does not have.
+
+Use a `NodePath` export resolved through `scripts/node_ref.gd`, which names the node
+and the field when a path is bad. The editor still shows a node picker.
+
+## `Control.set_anchors_preset()` does not size a control
+
+It sets anchors, then adjusts offsets so the rectangle does not move — and a fresh
+control has a **zero-sized** rectangle. Use `InkUi.fill_parent()`, which calls
+`set_anchors_and_offsets_preset()`.
+
+The failure is asymmetric, which is why it survives review:
+
+- `ScrollContainer` **clips** → screen goes blank, you notice immediately.
+- Plain `Control` **does not clip** → it draws its contents while every anchor inside collapses onto the origin. Looks fine, is wrong.
+
+## `modulate` multiplies — black art cannot be tinted lighter
+
+- Art from `assets/` is drawn in final ink colours and takes **no tint**.
+- Hand-authored art (`cargo_body`, `cargo_rider`, `barrier`) is drawn in **white** and tinted at runtime.
+
+The white-plus-tint convention is what lets one file serve both the damage flash
+(§13.2) and the light grey dead marks (§15.11). `InkSprite` supports both;
+`assets/README.md` records which file is which.
+
+## Convex decomposition fails on a repeated vertex
+
+A zone offset that is a round number can land exactly on a route sample offset,
+giving the polygon a duplicate vertex and a zero-length edge. `Map._band_polygon`
+compares strictly. Expect this for any new zone authored at a round offset.
+
+## The navigation bake is sensitive to outline density
+
+Offsetting all 227 road samples by 570 px put many outline vertices in one
+rasterisation cell → **39 edge-merge errors**. Offsetting a decimated 200 px spine
+and snapping the outline to whole pixels brought it to **3 warnings**, which remain
+and are owned by milestone 2.
+
+## Screenshots must run windowed
+
+`--write-movie` crashes under `--headless`; saving a viewport image needs a real
+rendering device. `tools/screenshot_run.tscn` runs windowed on purpose.

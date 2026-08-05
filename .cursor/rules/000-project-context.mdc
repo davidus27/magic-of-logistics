@@ -1,0 +1,64 @@
+---
+description: Core map of the Fantasy Convoy MVP - layout, invariants, and where to read more
+alwaysApply: true
+---
+
+# Fantasy Convoy MVP
+
+Godot 4.7, GDScript, statically typed. A proof of concept build testing whether one
+player can control three systems at once: the cargo unit, the defenders, and the
+wizard. Not a full game — scope discipline matters more than features.
+
+## Layout
+
+```
+main/main.tscn       the scene tree of spec §32
+  GameController     the seven game states of §8; runs while paused
+  World/Map          generates the whole battlefield from one resource
+  World/CargoUnit    health and terrain; movement belongs to its motor
+  World/Squad        the four defenders: formation, selection, orders, §15–17
+  World/EnemySpawner the six trigger areas of §26, seeded from the fixed run seed
+  World/Wizard       mana, spell choice, casting, and the range aids of §14
+  World/CameraRig    follows a point ahead of the cargo, §9
+  UserInterface      five screens and the head-up display, built in code
+autoload/            InkClock, SoundBank, RunContext
+scripts/             shared: fsm/, data/ resource classes, combat_target, ink_sprite, layers, node_ref
+world/               map/, cargo/, units/, defenders/, enemies/, wizard/, camera_rig
+ui/                  hud, ink_ui builder, portraits, spell buttons, mana bar, screens
+data/                every balance value from the spec tables, as .tres resources
+tools/               smoke_run, behaviour_checks, screenshot_run, road_calc.py
+docs/                the split specification and status
+```
+
+## Invariants — do not break these
+
+1. **Balance values live in `data/*.tres`, never in scripts** (§32.5). The resource is what the game reads. Changing a number means editing the `.tres`.
+2. **The map is generated, never placed.** `Map.build()` derives roads, walls, navmesh, mud, barriers and portal from `data/map_route.tres`. Never hand-place world geometry.
+3. **Cargo movement belongs to the motor, not `CargoUnit`.** `CargoUnit` must never branch on which motor is active — it asks the motor's `can_leave_road()` instead.
+4. **Scene references use `NodePath` exports through `scripts/node_ref.gd`.** A node-typed `@export` silently stays null in a hand-authored `.tscn`.
+5. **The ink line effect must never touch a collision shape.** `InkSprite` changes the texture and nothing else.
+6. **Never select a defender by world click** (§16) — it conflicts with wizard casting.
+7. **A unit asks to move; it does not move itself.** A defender or enemy state calls `move_toward()` or `hold_still()` once per physics step and `UnitBody` decides what that means. A state that asks for nothing gets a unit that stands still.
+8. **What is not in the build is disabled, never hidden and never faked.** `SpellData.implemented` and the spawner logging the long-range enemies it could not create. A tester should always see the shape of the finished game.
+9. Spec section numbers in code comments are load-bearing. Keep them accurate.
+
+## Read before acting
+
+- **[docs/status.md](mdc:docs/status.md)** — what is done, what is next, what is deliberately missing. Read this first, every time.
+- **[docs/README.md](mdc:docs/README.md)** — maps every spec § to its file. Open only the system you need; the spec is split for that reason.
+- **[docs/engine-notes.md](mdc:docs/engine-notes.md)** — Godot traps that look like working code when wrong.
+
+Do not read `fantasy_convoy_mvp_specification.md` — it no longer exists. Its content
+is in `docs/spec/`.
+
+## Verify
+
+```sh
+Godot --headless --fixed-fps 60 --path . res://tools/smoke_run.tscn
+Godot --headless --fixed-fps 60 --path . res://tools/behaviour_checks.tscn
+```
+
+Two commit gates. Both exit non-zero on failure, and both pass as of milestone 2.
+`smoke_run` plays a whole run; `behaviour_checks` drives the states a successful run
+never reaches. Run both after any change to a unit, the map, or the game state
+machine.

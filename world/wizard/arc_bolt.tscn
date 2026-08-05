@@ -1,0 +1,21 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://world/wizard/arc_bolt.gd" id="1_bolt"]
+[ext_resource type="Script" path="res://scripts/ink_sprite.gd" id="2_ink"]
+[ext_resource type="Texture2D" path="res://assets/spells/arc_bolt_projectile_a.svg" id="3_frame_a"]
+[ext_resource type="Texture2D" path="res://assets/spells/arc_bolt_projectile_b.svg" id="4_frame_b"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_hit"]
+radius = 7.0
+
+[node name="ArcBolt" type="Area2D"]
+script = ExtResource("1_bolt")
+
+[node name="Collision" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_hit")
+
+[node name="Ink" type="Sprite2D" parent="."]
+script = ExtResource("2_ink")
+frames = Array[Texture2D]([ExtResource("3_frame_a"), ExtResource("4_frame_b")])
+supersample = 2.0
+extra_scale = 0.11

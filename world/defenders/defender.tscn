@@ -1,0 +1,61 @@
+[gd_scene load_steps=10 format=3]
+
+[ext_resource type="Script" path="res://world/defenders/defender.gd" id="1_defender"]
+[ext_resource type="Resource" path="res://data/defender_tuning.tres" id="2_tuning"]
+[ext_resource type="Script" path="res://scripts/ink_sprite.gd" id="3_ink"]
+[ext_resource type="Script" path="res://world/units/unit_health_bar.gd" id="4_bar"]
+[ext_resource type="Texture2D" path="res://assets/world/defender_generic_a.svg" id="5_body_a"]
+[ext_resource type="Texture2D" path="res://assets/world/defender_generic_b.svg" id="6_body_b"]
+[ext_resource type="Texture2D" path="res://assets/feedback/selection_double_circle.svg" id="7_selection"]
+[ext_resource type="Texture2D" path="res://assets/feedback/order_attack.svg" id="8_order"]
+[ext_resource type="Texture2D" path="res://assets/feedback/downed_timer_ring.svg" id="9_downed"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_body"]
+radius = 13.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_sensor"]
+radius = 6.0
+
+[node name="Defender" type="CharacterBody2D"]
+motion_mode = 1
+script = ExtResource("1_defender")
+tuning = ExtResource("2_tuning")
+body_radius = 13.0
+
+[node name="Collision" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_body")
+
+[node name="Agent" type="NavigationAgent2D" parent="."]
+
+[node name="Ink" type="Sprite2D" parent="."]
+script = ExtResource("3_ink")
+frames = Array[Texture2D]([ExtResource("5_body_a"), ExtResource("6_body_b")])
+supersample = 2.0
+extra_scale = 0.26
+
+[node name="SelectionRing" type="Sprite2D" parent="."]
+script = ExtResource("3_ink")
+frames = Array[Texture2D]([ExtResource("7_selection")])
+supersample = 2.0
+extra_scale = 0.25
+
+[node name="OrderMark" type="Sprite2D" parent="."]
+position = Vector2(0, -30)
+script = ExtResource("3_ink")
+frames = Array[Texture2D]([ExtResource("8_order")])
+supersample = 2.0
+extra_scale = 0.14
+
+[node name="DownedRing" type="Sprite2D" parent="."]
+script = ExtResource("3_ink")
+frames = Array[Texture2D]([ExtResource("9_downed")])
+supersample = 2.0
+extra_scale = 0.24
+
+[node name="HealthBar" type="Node2D" parent="."]
+script = ExtResource("4_bar")
+
+[node name="TerrainSensor" type="Area2D" parent="."]
+
+[node name="Collision" type="CollisionShape2D" parent="TerrainSensor"]
+shape = SubResource("CircleShape2D_sensor")

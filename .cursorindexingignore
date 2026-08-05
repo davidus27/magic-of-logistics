@@ -1,0 +1,15 @@
+# Excluded from the codebase index only. These stay readable when a file is
+# named or @-mentioned explicitly - they just stop polluting semantic search.
+
+# 96 SVG art sources. Text, so the indexer will happily embed them, but path
+# markup is never the answer to a question about game behaviour.
+assets/**/*.svg
+icon.svg
+
+# Generated preview sheets and screen mockups.
+assets/previews/
+assets/screens/
+
+# Closed milestone reports. History, not instructions - docs/status.md carries
+# the current state and should be what search surfaces.
+docs/milestones/

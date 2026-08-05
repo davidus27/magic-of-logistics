@@ -1,8 +1,8 @@
 <!-- Rider prop: small circle at the front of the cargo unit. Specification 10.4.
-     The short tick shows the movement direction of section 13.4. -->
-<svg xmlns="http://www.w3.org/2000/svg" width="30" height="24" viewBox="0 0 30 24">
+     Top-down driver with a heading chevron. Section 13.4. -->
+<svg xmlns="http://www.w3.org/2000/svg" width="36" height="24" viewBox="0 0 36 24">
   <g fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-    <circle cx="11" cy="12" r="9"/>
-    <path d="M 21,12 L 27,12"/>
+    <circle cx="12" cy="12" r="9"/>
+    <path d="M 22,7 L 32,12 L 22,17"/>
   </g>
 </svg>

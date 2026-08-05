@@ -7,7 +7,8 @@
 [ext_resource type="Texture2D" path="res://assets/world/tintable/cargo_body_b.svg" id="5_body_b"]
 [ext_resource type="Texture2D" path="res://assets/world/tintable/cargo_rider_a.svg" id="6_rider_a"]
 [ext_resource type="Texture2D" path="res://assets/world/tintable/cargo_rider_b.svg" id="7_rider_b"]
-[ext_resource type="Texture2D" path="res://assets/world/wizard_marker.svg" id="8_wizard"]
+[ext_resource type="Texture2D" path="res://assets/world/tintable/cargo_wizard_a.svg" id="8_wizard_a"]
+[ext_resource type="Texture2D" path="res://assets/world/tintable/cargo_wizard_b.svg" id="8_wizard_b"]
 [ext_resource type="Texture2D" path="res://assets/world/cargo_crack_1.svg" id="9_crack_1"]
 [ext_resource type="Texture2D" path="res://assets/world/cargo_crack_2.svg" id="10_crack_2"]
 
@@ -35,14 +36,14 @@ supersample = 2.0
 ink_color = Color(0.101961, 0.101961, 0.101961, 1)
 
 [node name="Wizard" type="Sprite2D" parent="."]
-rotation = 1.5707963
+position = Vector2(-8, 0)
 script = ExtResource("3_ink")
-frames = Array[Texture2D]([ExtResource("8_wizard")])
+frames = Array[Texture2D]([ExtResource("8_wizard_a"), ExtResource("8_wizard_b")])
 supersample = 2.0
-extra_scale = 0.22
+ink_color = Color(0.101961, 0.101961, 0.101961, 1)
 
 [node name="Rider" type="Sprite2D" parent="."]
-position = Vector2(44, 0)
+position = Vector2(48, 0)
 script = ExtResource("3_ink")
 frames = Array[Texture2D]([ExtResource("6_rider_a"), ExtResource("7_rider_b")])
 supersample = 2.0

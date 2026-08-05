@@ -1,0 +1,50 @@
+---
+description: How balance values and Godot resources work in this project - read before changing any number
+globs: data/**,scripts/data/**
+alwaysApply: false
+---
+
+# Balance data
+
+Spec §32.5 requires that balance values live in Godot resources, **not** in unit
+scripts. The `.tres` is what the game reads.
+
+| Resource class | Script | Instances |
+|---|---|---|
+| `CargoData` | `scripts/data/cargo_data.gd` | `data/cargo_data.tres` |
+| `DefenderData` | `scripts/data/defender_data.gd` | `data/defenders/` ×4 |
+| `EnemyData` | `scripts/data/enemy_data.gd` | `data/enemies/` ×2 |
+| `SpellData` | `scripts/data/spell_data.gd` | `data/spells/` ×3 |
+| `ControlProfileData` | `scripts/data/control_profile_data.gd` | `data/profiles/` ×4 |
+| `TestSeedData` | `scripts/data/test_seed_data.gd` | `data/seeds/` ×3 |
+| `MapRouteData` | `scripts/data/map_route_data.gd` | `data/map_route.tres` |
+| `DefenderTuning` | `scripts/data/defender_tuning.gd` | `data/defender_tuning.tres` |
+
+**Every one of these is already filled from the specification tables**, including the
+resources for systems that have no behaviour yet. That is why the remaining
+milestones are behaviour only — you should almost never need to create a resource,
+only read one.
+
+## Changing a number
+
+The spec table and the `.tres` must agree. When you change one, change the other and
+say which you treated as authoritative. A silent divergence between them is a bug —
+there is already one open, on cargo Fast speed; see
+[docs/status.md](mdc:docs/status.md).
+
+## Two that need care
+
+**`data/map_route.tres`** drives the entire generated map. After changing the route
+shape, re-run the calculator so the length and turn demand you quote are the ones
+Godot actually bakes:
+
+```sh
+python3 tools/road_calc.py --target 9000 --wavelength 2800
+```
+
+Route length is asserted at 9000 px by the smoke test. A round zone offset can also
+break convex decomposition — see [engine traps](mdc:.cursor/rules/020-godot-traps.mdc).
+
+**`data/profiles/*.tres`** carries `ControlProfileData.implemented`, which is what
+greys out P2–P4 on the selection screen instead of silently running P1. Flip a flag
+only when that profile genuinely works end to end.

@@ -48,65 +48,34 @@ func show_as_pause() -> void:
 	_rebuild_controls()
 
 
-## The control list depends on the profile, because each profile uses different
-## cargo and defender methods. Section 24.
 func _rebuild_controls() -> void:
 	for child in _controls.get_children():
 		child.queue_free()
 		_controls.remove_child(child)
 
-	var profile := RunContext.profile
-	if profile == null:
-		return
-
-	_add_group("Cargo", _cargo_controls(profile))
+	_add_group("Cargo", [
+		# Section 19.
+		["W", "Faster: Stop, Slow, Normal, Fast"],
+		["S", "Slower"],
+		["Space", "Stop at once"],
+	])
 	_add_group("Wizard", [
 		["1  2  3", "Choose a spell"],
 		["Left mouse", "Cast the chosen spell"],
 	])
-	_add_group("Defenders", _defender_controls(profile))
+	_add_group("Defenders", [
+		["F1 to F4", "Select one defender"],
+		["Q", "Select all defenders"],
+		["Shift + F key", "Add to the selection"],
+		# Section 17.
+		["Z", "Attack"],
+		["X", "Defend the cargo"],
+		["C", "Repair"],
+	])
 	_add_group("View", [
 		["Mouse wheel", "Zoom"],
 		["Escape", "Pause"],
 	])
-
-
-func _cargo_controls(profile: ControlProfileData) -> Array:
-	match profile.cargo_mode:
-		ControlProfileData.CargoMode.AUTO_PATH:
-			# Section 19.
-			return [
-				["W", "Faster: Stop, Slow, Normal, Fast"],
-				["S", "Slower"],
-				["Space", "Stop at once"],
-			]
-		_:
-			# Sections 20 and 21.
-			return [
-				["W", "Accelerate forward"],
-				["S", "Brake, then reverse"],
-				["A  D", "Turn"],
-				["Space", "Full brake"],
-			]
-
-
-func _defender_controls(profile: ControlProfileData) -> Array:
-	var rows := [
-		["F1 to F4", "Select one defender"],
-		["Q", "Select all defenders"],
-		["Shift + F key", "Add to the selection"],
-	]
-	if profile.defender_mode == ControlProfileData.DefenderMode.ROLE_ORDERS:
-		# Section 17.
-		rows.append(["Z", "Attack"])
-		rows.append(["X", "Defend the cargo"])
-		rows.append(["C", "Repair"])
-	else:
-		# Section 18.
-		rows.append(["Right mouse on an enemy", "Attack that enemy"])
-		rows.append(["X", "Defend the cargo"])
-		rows.append(["C", "Repair the cargo"])
-	return rows
 
 
 func _add_group(heading: String, rows: Array) -> void:

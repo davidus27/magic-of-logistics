@@ -5,9 +5,9 @@ extends Resource
 enum Kind {
 	## Arc Bolt: a projectile toward the pointer. Section 14.5.
 	PROJECTILE,
-	## Mend: restores health to one clicked target. Section 14.6.
+	## Heal: restores health to one clicked target. Section 14.6.
 	HEAL,
-	## Ward: a temporary protection area. Section 14.7.
+	## Shield: a temporary protection area. Section 14.7.
 	AREA,
 }
 
@@ -23,6 +23,11 @@ enum Kind {
 @export var cast_range: float = 500.0
 ## The player can hold the left mouse button for repeated casts. Section 14.5.
 @export var allow_hold_repeat: bool = false
+
+## False until the milestone that adds this spell lands. The wizard shows an
+## unimplemented spell as unavailable instead of accepting a cast that does
+## nothing, in the same way the selection screen handles a control profile.
+@export var implemented: bool = false
 
 @export_group("Projectile")
 @export var damage: int = 18
