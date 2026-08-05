@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=3]
+[gd_scene load_steps=22 format=3]
 
 [ext_resource type="Script" path="res://main/game_controller.gd" id="1_controller"]
 [ext_resource type="Texture2D" path="res://assets/textures/paper_grain_1024.png" id="12_grain"]
@@ -23,6 +23,7 @@
 [ext_resource type="PackedScene" path="res://world/enemies/enemy_bolt.tscn" id="24_enemy_bolt"]
 [ext_resource type="Script" path="res://world/wizard/wizard.gd" id="21_wizard"]
 [ext_resource type="PackedScene" path="res://world/wizard/arc_bolt.tscn" id="22_arc_bolt"]
+[ext_resource type="PackedScene" path="res://world/wizard/ward.tscn" id="25_ward"]
 
 [node name="Main" type="Node2D"]
 
@@ -68,7 +69,10 @@ script = ExtResource("21_wizard")
 cargo_path = NodePath("../CargoUnit")
 projectile_container_path = NodePath("../ProjectileContainer")
 enemy_spawner_path = NodePath("../EnemySpawner")
+squad_path = NodePath("../Squad")
+effect_container_path = NodePath("../EffectContainer")
 arc_bolt_scene = ExtResource("22_arc_bolt")
+ward_scene = ExtResource("25_ward")
 
 [node name="CameraRig" type="Camera2D" parent="World"]
 script = ExtResource("4_camera")

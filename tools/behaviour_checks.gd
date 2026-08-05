@@ -50,6 +50,13 @@ func _ready() -> void:
 	await _check_long_range()
 	await _check_reinforcements()
 
+	# The wizard spells, also while the squad is whole. Mend heals and revives,
+	# Ward slows and shields, and each returns its target to full afterwards.
+	await _check_mend()
+	await _check_ward()
+
+	await _check_barriers()
+
 	await _check_orders()
 	await _check_downed_and_dead()
 	await _check_revive()
@@ -162,6 +169,224 @@ func _check_reinforcements() -> void:
 	await _frames(2)
 
 
+## Mend heals a wounded defender and the cargo unit, and revives a downed one.
+## Section 14.6. Cast through the real [method Wizard.try_cast] so the range,
+## mana and target-pick path is what the game uses.
+func _check_mend() -> void:
+	var mend := _wizard.get_spells()[1]
+	_wizard.select_spell(1)
+	_expect(_wizard.selected_index == 1, "Mend could not be selected once implemented")
+
+	# Heal a wounded but living defender. Mend heals synchronously inside the
+	# cast, so health is read with no physics frame between: a stray bolt in
+	# flight cannot land in the gap and make the amount read wrong.
+	var hurt := _squad.get_defenders()[2]
+	hurt.apply_damage(40)
+	var before := hurt.health
+	_mend_ready()
+	var healed := _wizard.try_cast(hurt.global_position)
+	_expect(healed, "Mend on a wounded defender was refused")
+	_expect(hurt.health == mini(hurt.max_health, before + mend.heal_defender),
+		"Mend took a defender from %d to %d, expected +%d" % [before, hurt.health, mend.heal_defender])
+
+	# Revive a downed defender.
+	var fallen := _squad.get_defenders()[3]
+	fallen.apply_damage(fallen.max_health + fallen.defense)
+	await _frames(2)
+	_expect(fallen.is_downed(), "the fourth defender did not go down for the revive test")
+	_mend_ready()
+	var revived := _wizard.try_cast(fallen.global_position)
+	_expect(revived, "Mend on a downed defender was refused")
+	_expect(fallen.is_alive() and fallen.health == mend.revive_health,
+		"Mend-revive left the defender at %d health in %s" % [fallen.health, fallen.state_id()])
+
+	# Heal the cargo unit.
+	_cargo.apply_damage(30)
+	var cargo_before := _cargo.health
+	_mend_ready()
+	var mended := _wizard.try_cast(_cargo.global_position)
+	_expect(mended, "Mend on the cargo unit was refused")
+	_expect(_cargo.health == mini(_cargo.data.max_health, cargo_before + mend.heal_cargo),
+		"Mend took the cargo from %d to %d, expected +%d" % [
+			cargo_before, _cargo.health, mend.heal_cargo,
+		])
+
+	# Nothing menable under the pointer: no target, and the cast spends nothing.
+	_mend_ready()
+	var mana_before := _wizard.mana
+	var empty := _wizard.try_cast(_wizard.global_position + Vector2.RIGHT * 300.0)
+	_expect(not empty, "Mend cast on empty ground was accepted")
+	_expect(is_equal_approx(_wizard.mana, mana_before),
+		"a refused Mend still spent mana, %.0f to %.0f" % [mana_before, _wizard.mana])
+
+	# Put the squad back to full so the later checks start clean.
+	hurt.heal(hurt.max_health)
+	fallen.heal(fallen.max_health)
+	_notes.append("Mend healed a defender and the cargo, revived a downed defender, refused empty ground")
+
+
+## Ward drops one protection area that slows enemies and softens their bolts
+## inside it, replaces itself on a second cast, and expires. Section 14.7.
+func _check_ward() -> void:
+	var ward := _wizard.get_spells()[2]
+	_wizard.select_spell(2)
+	_expect(_wizard.selected_index == 2, "Ward could not be selected once implemented")
+
+	var effect_container := _main.get_node("World/EffectContainer") as Node2D
+	var at := _wizard.global_position + Vector2.RIGHT * 150.0
+	_ward_ready()
+	var cast := _wizard.try_cast(at)
+	await _frames(2)
+	_expect(cast, "Ward was refused inside its cast range")
+	_expect(Ward.active != null and Ward.active.contains_point(at),
+		"no active Ward covers the cast point after a Ward cast")
+	_expect(effect_container.get_child_count() == 1,
+		"a Ward cast left %d effect nodes, expected 1" % effect_container.get_child_count())
+
+	# A bolt landing inside does far less than one landing outside. Section 14.7.
+	var outside := at + Vector2.RIGHT * (ward.effect_radius + 60.0)
+	var inside_damage := Ward.reduced_damage(at, 100)
+	var outside_damage := Ward.reduced_damage(outside, 100)
+	_expect(inside_damage < outside_damage,
+		"Ward reduced a bolt to %d inside and %d outside" % [inside_damage, outside_damage])
+	_expect(outside_damage == 100, "Ward changed damage outside its area, %d of 100" % outside_damage)
+
+	# An enemy inside the area moves slower; outside it is untouched.
+	_expect(Ward.speed_scale(at) < 1.0, "Ward did not slow an enemy inside its area")
+	_expect(is_equal_approx(Ward.speed_scale(outside), 1.0),
+		"Ward slowed an enemy outside its area, scale %.2f" % Ward.speed_scale(outside))
+
+	# The enemy body reads that slow through its own hook, not only the helper.
+	var probe := _place_probe_enemy(at)
+	await _frames(2)
+	_expect(probe._status_speed_scale() < 1.0,
+		"an enemy body in a Ward did not read the slow, scale %.2f" % probe._status_speed_scale())
+	if is_instance_valid(probe):
+		probe.queue_free()
+
+	# Only one Ward is active at a time: a second cast replaces the first.
+	var first := Ward.active
+	_ward_ready()
+	_wizard.try_cast(_wizard.global_position + Vector2.UP * 150.0)
+	await _frames(2)
+	_expect(Ward.active != null and Ward.active != first,
+		"a second Ward cast did not take over as the active one")
+	_expect(not is_instance_valid(first), "the first Ward survived a second cast")
+
+	# Ward stays active for its duration, then clears itself. Section 14.7.
+	await _seconds(ward.duration + 0.3)
+	_expect(Ward.active == null, "a Ward outlived its duration of %.0fs" % ward.duration)
+	_notes.append("Ward slowed and shielded inside its area, replaced itself, and expired after %.0fs" % ward.duration)
+
+	# Leave the wizard on Arc Bolt with mana and no cooldown for the next checks.
+	_wizard.select_spell(0)
+	_mend_ready()
+
+
+## A closed barrier stops the cargo short of it, Repair opens it and rebakes
+## the navigation mesh, and the cargo then passes through. Section 28.
+func _check_barriers() -> void:
+	var map := _main.get_node("World/Map") as Map
+	var barriers := map.get_barriers()
+	_expect(barriers.size() == 2, "the map has %d barriers, expected 2" % barriers.size())
+	for barrier in barriers:
+		_expect(not barrier.is_open(),
+			"a barrier at route offset %.0f started open" % barrier.route_offset)
+	var first := barriers[0]
+
+	# A closed barrier stops the cargo short of it, not at it. Section 19.
+	var motor := _cargo.motor as AutoPathMotor
+	motor.jump_to(first.route_offset - 300.0)
+
+	# The jump crosses several enemy trigger areas the cargo would otherwise
+	# reach gradually, so the spawner fires all of them here at once (section
+	# 26). They are not part of this check, so they are cleared before they can
+	# attack a cargo that is about to stand still for Repair; left alive, an
+	# unopposed swarm can destroy the cargo and pause the whole tree.
+	await _frames(2)
+	for enemy in _spawner.get_living():
+		enemy.queue_free()
+	await _frames(2)
+
+	motor.set_speed_level(CargoData.SpeedLevel.NORMAL)
+	await _seconds(4.0)
+	var stop_offset := motor.get_route_offset()
+	_expect(stop_offset < first.route_offset,
+		"the cargo reached %.0f, at or past the closed barrier at %.0f" % [
+			stop_offset, first.route_offset,
+		])
+	await _seconds(1.0)
+	_expect(is_equal_approx(motor.get_route_offset(), stop_offset),
+		"the cargo crept from %.1f to %.1f against a closed barrier" % [
+			stop_offset, motor.get_route_offset(),
+		])
+
+	# Repair opens the barrier and disables its collision. Section 28. The
+	# defenders are placed on the cargo's formation slots rather than walked
+	# there, so the check does not spend real time on the approach.
+	for defender in _squad.get_defenders():
+		defender.global_position = _cargo.to_global(_squad.slot_offset(defender.slot_index))
+	_squad.select_all_living()
+	_squad.order(States.REPAIR)
+
+	var opened := false
+	for _i in int(20.0 * 60.0):
+		await get_tree().process_frame
+		if first.is_open():
+			opened = true
+			break
+	_expect(opened, "the barrier under repair never reached is_open()")
+	_expect(first._collision.disabled, "an open barrier still has an enabled collision shape")
+
+	# The navigation mesh is rebaked once the barrier opens: the point it used
+	# to obstruct is inside the traversable area again. Section 34.
+	await _frames(2)
+	var navigation_map := map.get_world_2d().navigation_map
+	var closest := NavigationServer2D.map_get_closest_point(navigation_map, first.global_position)
+	_expect(closest.distance_to(first.global_position) < 5.0,
+		"the navigation mesh still excludes the opened barrier by %.1fpx" % closest.distance_to(first.global_position))
+
+	# The cargo can now advance past the offset that used to stop it. Section 19.
+	await _seconds(3.0)
+	_expect(motor.get_route_offset() > first.route_offset,
+		"the cargo stayed at %.0f, could not pass the opened barrier at %.0f" % [
+			motor.get_route_offset(), first.route_offset,
+		])
+
+	# Stop rather than leave the cargo rolling: the later checks assume a still
+	# field, and a moving cargo would keep crossing enemy trigger offsets with
+	# nobody ordered to defend it.
+	motor.set_speed_level(CargoData.SpeedLevel.STOP)
+	for enemy in _spawner.get_living():
+		enemy.queue_free()
+	await _frames(2)
+	_notes.append("a closed barrier stopped the cargo short, Repair opened it and rebaked navigation, and the cargo passed through")
+
+
+## Reset the wizard so the next scripted cast is not blocked by mana or the
+## cooldown of a spell that was just cast. Not a game action; a test convenience.
+func _mend_ready() -> void:
+	_wizard.mana = Wizard.MANA_MAX
+	_wizard._cooldowns.fill(0.0)
+
+
+func _ward_ready() -> void:
+	_mend_ready()
+
+
+## A short-range enemy dropped straight onto a point, for a check that only needs
+## a body standing there. The caller frees it.
+func _place_probe_enemy(at: Vector2) -> Enemy:
+	var container := _main.get_node("World/EnemyContainer") as Node2D
+	var scene := load("res://world/enemies/enemy_short_range.tscn") as PackedScene
+	var data := load("res://data/enemies/enemy_short_range.tres") as EnemyData
+	var enemy: Enemy = scene.instantiate()
+	container.add_child(enemy)
+	enemy.global_position = at
+	enemy.setup(data, _cargo, _squad)
+	return enemy
+
+
 ## Total health of the cargo unit and the four defenders, for a hit test that
 ## does not care which of them a bolt found.
 func _party_health() -> int:
@@ -242,6 +467,10 @@ func _check_repair() -> void:
 
 ## The wizard rejects a cast it cannot pay for or reach. Section 14.4.
 func _check_spell_limits() -> void:
+	# Arc Bolt with full mana and no cooldown, so a rejection can only come from
+	# the limit under test and not from a spell cast in an earlier check.
+	_wizard.select_spell(0)
+	_mend_ready()
 	var spell := _wizard.current_spell()
 
 	# Out of range.
@@ -252,12 +481,7 @@ func _check_spell_limits() -> void:
 	_wizard.mana = 0.0
 	_expect(not _wizard.try_cast(_wizard.global_position + Vector2.RIGHT * 40.0),
 		"a cast without enough mana was accepted")
-
-	# Mend and Ward are not in this build and must not become selectable.
-	_wizard.select_spell(1)
-	_expect(_wizard.selected_index == 0,
-		"an unimplemented spell was selected (index %d)" % _wizard.selected_index)
-	_notes.append("out of range, out of mana and unimplemented casts are all refused")
+	_notes.append("out of range and out of mana casts are refused")
 
 
 ## The player fails the run when the cargo health becomes zero. Section 6.

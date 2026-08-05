@@ -8,8 +8,8 @@ in the same commit as the work it describes.
 | Engine | Godot 4.7.1, GDScript, statically typed |
 | Last completed milestone | **Milestone 2 — the first combat loop**, verified 2026-08-03 |
 | Current work | Phase A balance pass landed (below); milestone 3 is not yet cut |
-| Commit gates | 🟢 `smoke_run` exit 0 · 🟢 `behaviour_checks` exit 0 |
-| Last verified run | 2026-08-04: portal reached in 112.7 s at Normal, cargo 44/100, 27 of 27 enemies killed |
+| Commit gates | 🔴 `smoke_run` exit 1 (see below) · 🟢 `behaviour_checks` exit 0 |
+| Last verified run | 2026-08-04: portal reached in 112.7 s at Normal, cargo 44/100, 27 of 27 enemies killed — predates the long-range enemy going live |
 
 ---
 
@@ -58,21 +58,25 @@ is left of build order once that scope is removed.
 Everything here has its data resource, its ranking in the target priority list,
 or its disabled-state flag already in place, so all three are behaviour only.
 
-1. **Barriers with the Repair state.** `Barrier` already carries 100 work points,
-   removes its collision shape at zero and rebakes navigation; `Squad`
-   already allocates a work point per defender along the road width; the Repair
-   state already gives barrier work priority over cargo repair. What is missing is
-   flipping `MapRouteData.enable_barriers` and confirming a barrier can actually be
-   opened, that the cargo stops short of a closed one, and that the navigation
-   rebake of §34 leaves nothing stranded.
-2. **The long-range enemy** (§25.2). Needs a scene and a projectile.
-   `EnemySpawner` already counts one in four of the six groups and reports it as
-   deferred, `Defender.priority_target` already ranks it above short-range as
-   §15.7 requires, and `EnemyData` already holds every value.
-3. **Mend and Ward** (§14.6, §14.7). `Wizard` dispatches on `SpellData.kind` and
-   pushes an error on a kind it cannot cast; add the `HEAL` and `AREA` branches
-   and set `implemented = true`. `Defender.revive()` is written and asserted by
-   `behaviour_checks` already, so Mend has a target to call.
+1. **Barriers with the Repair state.** **Done.** `MapRouteData.enable_barriers` is
+   now true, `AutoPathMotor` clamps to the closed barrier's `route_offset` so the
+   cargo stops short instead of driving through, and each barrier shows a
+   `BarrierWorkBar` above it as the Repair state's work points fall. `smoke_run`
+   overrides Attack/Defend with Repair while a closed barrier sits ahead and
+   asserts every barrier opens by the run's end; `behaviour_checks._check_barriers()`
+   drives the stop-short, the open, and the navigation rebake of §34 directly.
+2. **The long-range enemy** (§25.2). **Done**, and wired into `main.tscn` before
+   this session — `EnemySpawner.deferred_long_range()` reads 0 on every run now.
+   `behaviour_checks._check_long_range()` drives one to its Fire state and checks
+   the bolt lands. Nothing before this session ever actually took a long-range
+   hit end to end, though: see the `smoke_run` finding below.
+3. **Mend and Ward** (§14.6, §14.7). **Done.** `Wizard` now carries the `HEAL` and
+   `AREA` branches: Mend heals the cargo unit or the defender under the pointer and
+   revives a downed one, and Ward (`world/wizard/ward.gd`) drops a single protection
+   area that slows the enemies inside it and soaks most of their bolts, leaving
+   short-range melee untouched. Both `.tres` now carry `implemented = true`, so the
+   number keys select them, and `behaviour_checks` casts each through the wizard and
+   asserts the heal, the revive, the projectile-damage cut and the enemy slow.
 
 Then re-measure the §7 run duration, which the barriers should move toward the
 three minute floor for the first time.
@@ -95,16 +99,12 @@ Not bugs. Do not "fix" these without checking the milestone that owns them.
 
 | Missing | Owner |
 |---|---|
-| Long-range enemy — deferred explicitly by the spawner, and logged | M3 |
-| Barriers — generated but disabled by `MapRouteData.enable_barriers` | M3 |
-| Mend and Ward — `SpellData.implemented = false`, cannot be selected | M3 |
 | §30.6 world feedback — target lines, leash circles, return arrows | M4 |
-| Threat reinforcement spawns | M4 |
-| Second barrier and final balance values | M4 |
+| Final combat balance — a passive `smoke_run` now fails to the long-range enemy and the barriers together | M3/M4 |
 
-Mend and Ward render as **disabled** rather than silently substituting Arc Bolt,
-driven by `SpellData.implemented`. `EnemySpawner` uses the same disable-visibly
-pattern for the long-range enemy it cannot yet create — it logs what it deferred
+`SpellData.implemented` still decides whether a spell shows live or disabled; Arc
+Bolt, Mend and Ward now all carry it true. `EnemySpawner` uses the same
+disable-visibly pattern for anything it cannot yet create — it logs what it deferred
 instead of quietly spawning a smaller group. Flip a flag only when the thing works
 end to end.
 
@@ -141,17 +141,32 @@ nowhere the game reads and produced a **failing smoke test on the initial commit
 is now based on a measured Normal-speed run. The milestone 1 report is left as
 written, because it is a historical record.
 
-**The three minute floor of §7 is not reachable yet.** A full Normal-speed run
-with all six enemy groups is 112.7 s. Slow is 180 s of driving by itself; the two
-barriers at 100 work points each add roughly 35 s. Re-measure at M3 and then decide
-whether the route should be longer or the floor lower.
+**🔴 `smoke_run` fails now that the long-range enemy is live, independent of
+barriers.** The scripted run dies to `cargo_destroyed` around 71 to 85 s, well
+short of the portal. Reproduced with `MapRouteData.enable_barriers` forced back to
+`false`, which still fails at 80.5 s with the same reason — so this is not a
+barrier or a `smoke_run` order-priority problem, it is the long-range enemy's real
+damage landing on a passive play style for the first time (`EnemySpawner`
+previously deferred every long-range enemy, so no run before this session ever
+actually took a long-range hit). One real improvement is already in
+`smoke_run._manage_orders()`: it no longer abandons a fight for Repair while
+enemies are still alive, since the barrier's stop is enforced by the cargo motor
+regardless of the squad's order and fighting on costs nothing. That was not enough
+by itself. A passive player surviving all six groups plus the long-range enemy and
+the barriers is a milestone 3 balance question — not something to force green by
+guessing at numbers. Needs a play session before landing a fix.
 
-**A passive player survives.** The smoke run plays badly on purpose — one order, one
-speed, cast at whatever is nearest — and still finishes, now with the cargo at 44
-health after the Phase A speed and repair changes above (was 68 before them).
-Right for a first-time tester, but it leaves little room for the long-range enemy,
-the reinforcements of §27 and the barriers. Revisit again after M3 rather than
-tuning further now.
+**The three minute floor of §7 is not reachable yet.** The last completed run
+(112.7 s) predates the long-range enemy; re-measure once the finding above is
+resolved. Slow is 180 s of driving by itself; the two barriers at 100 work points
+each add roughly 35 s on top of whatever the balanced combat duration turns out
+to be.
+
+**A passive player survives — up to milestone 2's combat.** The smoke run plays
+badly on purpose — one order, one speed, cast at whatever is nearest — and used to
+finish, with the cargo at 44 health after the Phase A speed and repair changes
+above (was 68 before them). Long-range and barriers were both still deferred at
+that point; see the finding above for where passive play now fails.
 
 **Mud is visually heavy.** The tiled fill reads clearly, which is what §12.2 asks
 for, but it dominates the paper-and-ink page more than the rest of the palette does.
@@ -183,9 +198,9 @@ observed sticking.
 §40. The MVP is complete when every line is true.
 
 - [x] The cargo unit can reach the final portal — under attack, verified each run
-- [ ] Both enemy types can attack the cargo unit — short-range only, M3
-- [ ] Defenders can attack, defend, and repair — all three work; repair has no barrier to work on until M3
-- [ ] The wizard can cast all three spells — Arc Bolt only, M3
+- [x] Both enemy types can attack the cargo unit — the long-range enemy's damage is real, per the `smoke_run` finding below
+- [x] Defenders can attack, defend, and repair — all three work; both barriers give repair a target
+- [x] The wizard can cast all three spells — Arc Bolt, Mend and Ward, each cast through the wizard in `behaviour_checks`
 - [x] The final portal can complete a run
 - [x] Cargo destruction can fail a run
 - [x] No unit stays blocked for more than two seconds — 0 fallbacks in a full run, and every enemy reached the cargo

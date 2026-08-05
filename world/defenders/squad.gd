@@ -150,8 +150,10 @@ func barrier_work_point(barrier: Barrier, index: int) -> Vector2:
 	var spacing := barrier.road_width * 0.2
 	var lateral := (float(index) - (count - 1) * 0.5) * spacing
 	# The barrier art lies across the road along its own x axis, so its local y
-	# points along the route. Negative y is the side the cargo comes from.
-	return barrier.to_global(Vector2(lateral, -(Barrier.THICKNESS * 0.5 + 20.0)))
+	# points along the route. [member Barrier.rotation] is the route tangent
+	# plus a quarter turn, which puts local +y opposite the travel direction,
+	# i.e. positive y is the side the cargo comes from.
+	return barrier.to_global(Vector2(lateral, Barrier.THICKNESS * 0.5 + 20.0))
 
 
 # --- Player control -----------------------------------------------------------

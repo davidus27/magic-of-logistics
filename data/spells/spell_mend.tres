@@ -16,4 +16,4 @@ heal_defender = 20
 heal_cargo = 15
 revive_health = 20
 target_pick_radius = 35.0
-implemented = false
+implemented = true

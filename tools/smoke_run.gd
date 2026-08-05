@@ -44,6 +44,12 @@ const ORDER_PERIOD := 1.5
 ## field, which is the designed counter to the long-range standoff of §25.2.
 const ATTACK_THRESHOLD := 2
 
+## Route offset ahead of the cargo, in pixels, at which a closed barrier pulls
+## the squad onto Repair instead of Attack or Defend. Comfortably past
+## DefenderTuning.barrier_search_distance so the squad is already walking to
+## the work points once the cargo motor clamps to a stop short of it. §19, §28.
+const BARRIER_REPAIR_RANGE := 400.0
+
 var _main: Node = null
 var _controller: GameController = null
 var _cargo: CargoUnit = null
@@ -67,6 +73,7 @@ var _in_leash_time: float = 0.0
 var _successful_casts: int = 0
 var _order_timer: float = 0.0
 var _attacking: bool = false
+var _repairing: bool = false
 var _defender_states_seen: Dictionary = {}
 ## Lowest cargo health and lowest defender health-to-maximum ratio seen this
 ## run. Both stay at their starting value only if no enemy ever landed a hit.
@@ -179,11 +186,28 @@ func _track_health() -> void:
 ## wagon when the field is clear. Sections 15.7 and 17. A single standing Defend
 ## order never lets the defenders reach the long-range enemies standing off at
 ## their preferred range, which is the counter section 15.7 gives them.
+##
+## A closed barrier ahead overrides both once the field is clear: the squad has
+## no way through it other than Repair, so a run left on Attack or Defend would
+## stall at the barrier and never reach the portal. Section 28. Repair gives
+## barrier work total priority over combat, so switching to it while enemies are
+## still alive would leave the cargo motor's hard stop at the barrier holding a
+## stationary, undefended target — the cargo unit stops there regardless of the
+## squad's order, so fighting on until the field clears costs nothing.
 func _manage_orders(delta: float) -> void:
 	_order_timer -= delta
 	if _order_timer > 0.0:
 		return
 	_order_timer = ORDER_PERIOD
+
+	if _barrier_ahead() != null and _spawner.living_count() == 0:
+		if not _repairing:
+			_repairing = true
+			_attacking = false
+			_squad.select_all_living()
+			_squad.order(States.REPAIR)
+		return
+	_repairing = false
 
 	var want_attack := _spawner.living_count() >= ATTACK_THRESHOLD
 	if want_attack == _attacking:
@@ -191,6 +215,22 @@ func _manage_orders(delta: float) -> void:
 	_attacking = want_attack
 	_squad.select_all_living()
 	_squad.order(States.ATTACK if want_attack else States.DEFEND)
+
+
+## The nearest closed barrier within [constant BARRIER_REPAIR_RANGE] ahead of
+## the cargo on the route, or null if none blocks the way yet. Section 28.
+func _barrier_ahead() -> Barrier:
+	var reached := _cargo.get_route_offset()
+	var closest: Barrier = null
+	var closest_ahead := BARRIER_REPAIR_RANGE
+	for barrier in _map.get_barriers():
+		if barrier.is_open():
+			continue
+		var ahead := barrier.route_offset - reached
+		if ahead >= 0.0 and ahead <= closest_ahead:
+			closest_ahead = ahead
+			closest = barrier
+	return closest
 
 
 ## Cast Arc Bolt at the most dangerous enemy in range. Section 14.5.
@@ -363,6 +403,19 @@ func _check_combat() -> void:
 	if in_leash < 0.9:
 		_fail("defenders were outside the attack leash %.0f%% of the run" % [
 			(1.0 - in_leash) * 100.0,
+		])
+
+	# Every barrier must have opened, or the cargo could only have reached the
+	# portal by never actually meeting one. Section 28.
+	var barriers := _map.get_barriers()
+	var barriers_open := 0
+	for barrier in barriers:
+		if barrier.is_open():
+			barriers_open += 1
+	_notes.append("barriers opened %d of %d" % [barriers_open, barriers.size()])
+	if barriers_open < barriers.size():
+		_fail("%d of %d barriers were never opened by the Repair order" % [
+			barriers.size() - barriers_open, barriers.size(),
 		])
 
 

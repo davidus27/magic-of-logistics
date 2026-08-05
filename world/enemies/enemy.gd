@@ -245,6 +245,12 @@ func _zone_factor(zone: TerrainZone) -> float:
 	return zone.enemy_factor
 
 
+## Ward slows an enemy standing in its area. A defender never reads this, so the
+## slow reaches only the enemy side. Section 14.7.
+func _status_speed_scale() -> float:
+	return Ward.speed_scale(global_position)
+
+
 func _neighbours() -> Array:
 	return get_parent().get_children()
 

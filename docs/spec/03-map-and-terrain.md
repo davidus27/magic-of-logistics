@@ -98,7 +98,8 @@ Attack defenders cannot reduce barrier work points.
 
 The user interface shows barrier work progress above the barrier.
 
-> **Build note.** Barriers are generated but their collision is disabled until the
-> Repair state can open them, which lands with milestone 4. The full road width
-> matters: the `assets/` pack draws a single cross symbol, so the barrier art here
-> is hand-authored to cover all 420 px.
+> **Build note.** Barriers are enabled: each spawns closed with a `BarrierWorkBar`
+> above it, the Repair state drives its work points to zero, and the barrier then
+> removes its collision shape and rebakes the navigation mesh per §34. The full
+> road width matters: the `assets/` pack draws a single cross symbol, so the
+> barrier art here is hand-authored to cover all 420 px.

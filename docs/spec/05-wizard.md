@@ -1,11 +1,13 @@
 # Wizard and spells — §14
 
-**Partly built, uncommitted.** `world/wizard/wizard.gd` and `arc_bolt.gd` implement
-mana and Arc Bolt (§14.1–14.5), but **no automated run casts a spell**, so this is
-unverified — see [`../status.md`](../status.md). Mend and Ward are not started.
+**Built.** `world/wizard/wizard.gd` implements mana and all three spells: Arc Bolt
+(§14.5) with `arc_bolt.gd`, Mend (§14.6), and Ward (§14.7) with `ward.gd`.
+`behaviour_checks` casts Mend and Ward through the wizard and asserts the heal, the
+revive, the projectile-damage cut and the enemy slow, so the behaviour is verified —
+see [`../status.md`](../status.md).
 
-Balance values already exist in `data/spells/spell_arc_bolt.tres`,
-`spell_mend.tres` and `spell_ward.tres`, so this is behaviour only.
+Balance values live in `data/spells/spell_arc_bolt.tres`, `spell_mend.tres` and
+`spell_ward.tres`; all three carry `implemented = true`.
 
 ## 14. Wizard
 

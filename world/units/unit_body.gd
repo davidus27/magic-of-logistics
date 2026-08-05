@@ -109,7 +109,7 @@ func _physics_process(delta: float) -> void:
 	var speed := 0.0
 	var desired := Vector2.ZERO
 	if _want_move and not _dead:
-		speed = base_speed * terrain_factor * _move_scale
+		speed = base_speed * terrain_factor * _move_scale * _status_speed_scale()
 		desired = _steer(delta, speed)
 
 	_track_blocked(delta, speed)
@@ -211,6 +211,12 @@ func is_dead_mark() -> bool:
 ## Speed factor this unit kind reads from a terrain zone. Section 12.2.
 func _zone_factor(zone: TerrainZone) -> float:
 	return zone.defender_factor
+
+
+## Movement multiplier from a temporary effect such as Ward. One on a unit that
+## no effect touches; an enemy inside a Ward reads its slow here. Section 14.7.
+func _status_speed_scale() -> float:
+	return 1.0
 
 
 ## Called after damage lands, before the zero health check.

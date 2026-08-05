@@ -26,6 +26,7 @@ var _work_points: float = 100.0
 
 @onready var _collision: CollisionShape2D = $Collision
 @onready var _ink: InkSprite = $Ink
+@onready var _work_bar: BarrierWorkBar = $WorkBar
 
 
 func _ready() -> void:
@@ -33,6 +34,7 @@ func _ready() -> void:
 	collision_mask = 0
 	_work_points = work_points_max
 	_resize()
+	_work_bar.hide_bar()
 
 
 func is_open() -> bool:
@@ -50,6 +52,7 @@ func apply_work(amount: float) -> void:
 		return
 	_work_points = maxf(0.0, _work_points - amount)
 	work_changed.emit(_work_points, work_points_max)
+	_work_bar.show_ratio(_work_points / work_points_max)
 	if is_open():
 		_open()
 
@@ -74,6 +77,7 @@ func _open() -> void:
 	# The barrier removes its collision shape. Section 28.
 	_collision.disabled = true
 	_ink.set_ink(InkPalette.LINE_LIGHT)
+	_work_bar.hide_bar()
 	opened.emit()
 
 

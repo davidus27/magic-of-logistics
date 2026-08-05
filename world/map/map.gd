@@ -449,6 +449,7 @@ func _build_barriers() -> void:
 		# from the travel direction lays it across the road.
 		barrier.rotation = placement.get_rotation() + PI * 0.5
 		barrier.road_width = route.road_width
+		barrier.route_offset = offset
 		barrier.opened.connect(_on_barrier_opened)
 
 

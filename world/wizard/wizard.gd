@@ -39,12 +39,21 @@ const SELECT_ACTIONS: PackedStringArray = ["spell_1", "spell_2", "spell_3"]
 @export var cargo_path: NodePath
 @export var projectile_container_path: NodePath
 @export var enemy_spawner_path: NodePath
+## Mend heals the cargo unit or a defender, so the wizard reads the squad to find
+## a target under the pointer. Section 14.6.
+@export var squad_path: NodePath
+## Ward is parented here rather than under the wizard, so it stays put where it
+## was cast instead of riding the cargo. Section 14.7.
+@export var effect_container_path: NodePath
 
 @export var arc_bolt_scene: PackedScene
+@export var ward_scene: PackedScene
 
 var cargo: CargoUnit
 var projectiles: Node2D
 var enemies: EnemySpawner
+var squad: Squad
+var effects: Node2D
 
 var mana: float = MANA_MAX
 ## Index into [constant SPELL_PATHS] of the active spell. The selected spell
@@ -71,6 +80,8 @@ func _ready() -> void:
 	cargo = NodeRef.get_required(self, cargo_path, "cargo")
 	projectiles = NodeRef.get_required(self, projectile_container_path, "projectile container")
 	enemies = NodeRef.get_required(self, enemy_spawner_path, "enemy spawner")
+	squad = NodeRef.get_required(self, squad_path, "squad")
+	effects = NodeRef.get_required(self, effect_container_path, "effect container")
 
 	for path in SPELL_PATHS:
 		var spell: SpellData = load(path)
@@ -88,6 +99,9 @@ func _ready() -> void:
 
 ## Reset for a new run.
 func build() -> void:
+	# A Ward from an earlier run does not carry into this one. Section 14.7.
+	if Ward.active != null and is_instance_valid(Ward.active):
+		Ward.active.dismiss()
 	mana = MANA_MAX
 	_cooldowns.fill(0.0)
 	selected_index = _first_implemented()
@@ -201,14 +215,25 @@ func try_cast(world_point: Vector2) -> bool:
 		_reject()
 		return false
 
+	var cast := false
 	match spell.kind:
 		SpellData.Kind.PROJECTILE:
-			_cast_arc_bolt(spell, world_point)
+			cast = _cast_arc_bolt(spell, world_point)
+		SpellData.Kind.HEAL:
+			cast = _cast_mend(spell, world_point)
+		SpellData.Kind.AREA:
+			cast = _cast_ward(spell, world_point)
 		_:
 			# Only a spell marked implemented can be selected, so reaching this
 			# means a spell resource was marked too early.
 			push_error("Spell kind %d has no cast yet." % spell.kind)
 			return false
+
+	if not cast:
+		# A cast that found nothing to act on, such as Mend with no target under
+		# the pointer, spends no mana and starts no cooldown. Section 14.6.
+		_reject()
+		return false
 
 	mana -= float(spell.mana_cost)
 	_cooldowns[selected_index] = spell.cooldown
@@ -221,13 +246,79 @@ func try_cast(world_point: Vector2) -> bool:
 
 ## Arc Bolt creates one projectile from the wizard to the pointer position.
 ## Section 14.5.
-func _cast_arc_bolt(spell: SpellData, world_point: Vector2) -> void:
+func _cast_arc_bolt(spell: SpellData, world_point: Vector2) -> bool:
 	if arc_bolt_scene == null:
 		push_error("Wizard has no Arc Bolt scene assigned.")
-		return
+		return false
 	var bolt: ArcBolt = arc_bolt_scene.instantiate()
 	projectiles.add_child(bolt)
 	bolt.launch(spell, global_position, world_point)
+	return true
+
+
+## Mend restores health to the cargo unit or one defender under the pointer, and
+## revives a downed defender. Returns false when nothing menable is in reach, so
+## the cast costs nothing. Section 14.6.
+func _cast_mend(spell: SpellData, world_point: Vector2) -> bool:
+	var target := _mend_target(world_point, float(spell.target_pick_radius))
+	if target == null:
+		return false
+	var cargo_target := target as CargoUnit
+	if cargo_target != null:
+		cargo_target.heal(spell.heal_cargo)
+		return true
+	var defender := target as Defender
+	if defender == null:
+		return false
+	if defender.is_downed():
+		# Mend can revive a downed defender, which receives 20 health. Section 14.6.
+		defender.revive(spell.revive_health)
+	else:
+		defender.heal(spell.heal_defender)
+	return true
+
+
+## The nearest thing Mend can act on within [param radius] of the pointer: the
+## cargo unit or a defender that is wounded, or a downed defender to revive.
+## Section 14.6 selects the nearest valid target inside the pick radius.
+func _mend_target(point: Vector2, radius: float) -> Node2D:
+	var best: Node2D = null
+	var best_distance := radius
+
+	if cargo != null and cargo.health > 0 and cargo.health < cargo.data.max_health:
+		var distance := CombatTarget.surface_distance(cargo, point)
+		if distance <= best_distance:
+			best_distance = distance
+			best = cargo
+
+	if squad != null:
+		for defender in squad.get_defenders():
+			# A downed defender is not alive but Mend can still reach it. A full
+			# living defender is not worth a cast, so it is not a valid target.
+			var mendable := defender.is_downed() \
+				or (defender.is_alive() and defender.health < defender.max_health)
+			if not mendable:
+				continue
+			var distance := CombatTarget.surface_distance(defender, point)
+			if distance <= best_distance:
+				best_distance = distance
+				best = defender
+
+	return best
+
+
+## Ward drops a protection area at the pointer. Only one Ward is active at a
+## time, so a new cast dismisses the old one. Section 14.7.
+func _cast_ward(spell: SpellData, world_point: Vector2) -> bool:
+	if ward_scene == null:
+		push_error("Wizard has no Ward scene assigned.")
+		return false
+	if Ward.active != null and is_instance_valid(Ward.active):
+		Ward.active.dismiss()
+	var ward: Ward = ward_scene.instantiate()
+	effects.add_child(ward)
+	ward.setup(spell, world_point)
+	return true
 
 
 func _reject() -> void:
@@ -252,6 +343,12 @@ func _draw() -> void:
 	# The game shows the spell range around the cargo unit. Section 14.3.
 	_draw_dashed_circle(spell.cast_range, InkPalette.GRAY_MEDIUM)
 
+	# Ward is an area spell, so show where its protection would land at the
+	# pointer, clamped to the edge of the cast range. Section 14.7.
+	if spell.kind == SpellData.Kind.AREA:
+		var aim := _clamp_to_range(_pointer, spell.cast_range)
+		_draw_dashed_ring(to_local(aim), spell.effect_radius, InkPalette.GRAY_MEDIUM)
+
 	# A short line shows the maximum permitted target point. Section 14.4.
 	var offset := _pointer - global_position
 	if offset.length() <= spell.cast_range or offset.length_squared() < 1.0:
@@ -270,12 +367,27 @@ func _draw() -> void:
 ## grey are what makes those two arcs read as one boundary; the light line colour
 ## of the road edges disappears against the paper at this width.
 func _draw_dashed_circle(radius: float, colour: Color) -> void:
+	_draw_dashed_ring(Vector2.ZERO, radius, colour)
+
+
+## A dashed circle centred on a local point, for a range aid that is not around
+## the wizard, such as the Ward effect preview.
+func _draw_dashed_ring(centre: Vector2, radius: float, colour: Color) -> void:
 	const SEGMENTS := 48
 	var step := TAU / float(SEGMENTS)
 	for i in range(0, SEGMENTS, 2):
-		var from := Vector2.RIGHT.rotated(i * step) * radius
-		var to := Vector2.RIGHT.rotated((i + 1) * step) * radius
+		var from := centre + Vector2.RIGHT.rotated(i * step) * radius
+		var to := centre + Vector2.RIGHT.rotated((i + 1) * step) * radius
 		draw_line(from, to, colour, 2.0, true)
+
+
+## A world point pulled in to the edge of a radius around the wizard when it lies
+## beyond it, so the Ward preview never floats outside the cast range.
+func _clamp_to_range(point: Vector2, radius: float) -> Vector2:
+	var offset := point - global_position
+	if offset.length() <= radius:
+		return point
+	return global_position + offset.normalized() * radius
 
 
 func _apply_cursor() -> void:

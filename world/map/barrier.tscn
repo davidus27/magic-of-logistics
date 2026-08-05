@@ -1,9 +1,10 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://world/map/barrier.gd" id="1_barrier"]
 [ext_resource type="Script" path="res://scripts/ink_sprite.gd" id="2_ink"]
 [ext_resource type="Texture2D" path="res://assets/world/tintable/barrier_a.svg" id="3_frame_a"]
 [ext_resource type="Texture2D" path="res://assets/world/tintable/barrier_b.svg" id="4_frame_b"]
+[ext_resource type="Script" path="res://world/map/barrier_work_bar.gd" id="5_work_bar"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_body"]
 size = Vector2(420, 24)
@@ -20,3 +21,6 @@ script = ExtResource("2_ink")
 frames = Array[Texture2D]([ExtResource("3_frame_a"), ExtResource("4_frame_b")])
 supersample = 2.0
 ink_color = Color(0.101961, 0.101961, 0.101961, 1)
+
+[node name="WorkBar" type="Node2D" parent="."]
+script = ExtResource("5_work_bar")
