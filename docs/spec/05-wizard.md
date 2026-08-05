@@ -1,13 +1,13 @@
 # Wizard and spells — §14
 
 **Built.** `world/wizard/wizard.gd` implements mana and all three spells: Arc Bolt
-(§14.5) with `arc_bolt.gd`, Mend (§14.6), and Ward (§14.7) with `ward.gd`.
-`behaviour_checks` casts Mend and Ward through the wizard and asserts the heal, the
+(§14.5) with `arc_bolt.gd`, Heal (§14.6), and Shield (§14.7) with `shield.gd`.
+`behaviour_checks` casts Heal and Shield through the wizard and asserts the heal, the
 revive, the projectile-damage cut and the enemy slow, so the behaviour is verified —
 see [`../status.md`](../status.md).
 
-Balance values live in `data/spells/spell_arc_bolt.tres`, `spell_mend.tres` and
-`spell_ward.tres`; all three carry `implemented = true`.
+Balance values live in `data/spells/spell_arc_bolt.tres`, `spell_heal.tres` and
+`spell_shield.tres`; all three carry `implemented = true`.
 
 ## 14. Wizard
 
@@ -53,7 +53,7 @@ A short line shows the maximum permitted target point.
 
 ## Spell summary
 
-| | Arc Bolt | Mend | Ward |
+| | Arc Bolt | Heal | Shield |
 |---|---:|---:|---:|
 | Key | `1` | `2` | `3` |
 | Mana cost | 5 | 25 | 35 |
@@ -80,21 +80,21 @@ The projectile hits the first enemy in its path.
 
 The player can hold the left mouse button for repeated casts.
 
-### 14.6 Spell 2: Mend
+### 14.6 Spell 2: Heal
 
-Mend restores health to one target.
+Heal restores health to one target.
 
-Mend costs 25 mana.
+Heal costs 25 mana.
 
-Mend has a 5-second cooldown.
+Heal has a 5-second cooldown.
 
-Mend has a 350-pixel range.
+Heal has a 350-pixel range.
 
-Mend restores 20 defender health.
+Heal restores 20 defender health.
 
-Mend restores 15 cargo health.
+Heal restores 15 cargo health.
 
-Mend can revive a downed defender.
+Heal can revive a downed defender.
 
 A revived defender receives 20 health.
 
@@ -102,24 +102,24 @@ The player must click the cargo unit or a defender.
 
 The game selects the nearest valid target within 35 pixels of the pointer.
 
-### 14.7 Spell 3: Ward
+### 14.7 Spell 3: Shield
 
-Ward creates a temporary protection area.
+Shield creates a temporary protection area.
 
-Ward costs 35 mana.
+Shield costs 35 mana.
 
-Ward has an 8-second cooldown.
+Shield has an 8-second cooldown.
 
-Ward has a 400-pixel cast range.
+Shield has a 400-pixel cast range.
 
-Ward has a 110-pixel effect radius.
+Shield has a 110-pixel effect radius.
 
-Ward stays active for four seconds.
+Shield stays active for four seconds.
 
-Ward reduces enemy projectile damage by 80 percent.
+Shield reduces enemy projectile damage by 80 percent.
 
-Ward reduces enemy movement speed by 20 percent.
+Shield reduces enemy movement speed by 20 percent.
 
-Ward does not reduce short-range attack damage.
+Shield does not reduce short-range attack damage.
 
-Only one Ward can be active at one time.
+Only one Shield can be active at one time.

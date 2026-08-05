@@ -68,9 +68,9 @@ func _on_body_entered(body: Node2D) -> void:
 		return
 	if not CombatTarget.is_valid(body):
 		return
-	# A Ward covering the point of impact soaks most of a bolt. Melee never comes
-	# through here, so Ward leaves short-range attacks untouched. Section 14.7.
-	CombatTarget.damage(body, Ward.reduced_damage(global_position, damage))
+	# A Shield covering the point of impact soaks most of a bolt. Melee never comes
+	# through here, so Shield leaves short-range attacks untouched. Section 14.7.
+	CombatTarget.damage(body, Shield.reduced_damage(global_position, damage))
 	_show_impact()
 
 

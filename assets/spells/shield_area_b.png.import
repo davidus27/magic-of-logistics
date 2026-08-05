@@ -3,7 +3,7 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://b7170187ubapi"
-path="res://.godot/imported/shield_area_b.png-03eed1a0071386c3b40d6398eb61380a.ctex"
+path="res://.godot/imported/shield_area_b.png-f3845e6f5246242e05935e90573bbd7b.ctex"
 metadata={
 "vram_texture": false
 }
@@ -11,7 +11,7 @@ metadata={
 [deps]
 
 source_file="res://assets/spells/shield_area_b.png"
-dest_files=["res://.godot/imported/shield_area_b.png-03eed1a0071386c3b40d6398eb61380a.ctex"]
+dest_files=["res://.godot/imported/shield_area_b.png-f3845e6f5246242e05935e90573bbd7b.ctex"]
 
 [params]
 

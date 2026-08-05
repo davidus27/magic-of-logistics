@@ -3,7 +3,7 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://diyvyssevnmnj"
-path="res://.godot/imported/spell_heal.png-8cfbca062a25096996297bc2e7bfe9c7.ctex"
+path="res://.godot/imported/spell_heal.png-d3ab637f8a6770b7a386a0ed0811eb76.ctex"
 metadata={
 "vram_texture": false
 }
@@ -11,7 +11,7 @@ metadata={
 [deps]
 
 source_file="res://assets/ui/buttons/spell_heal.png"
-dest_files=["res://.godot/imported/spell_heal.png-8cfbca062a25096996297bc2e7bfe9c7.ctex"]
+dest_files=["res://.godot/imported/spell_heal.png-d3ab637f8a6770b7a386a0ed0811eb76.ctex"]
 
 [params]
 

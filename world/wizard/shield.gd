@@ -1,19 +1,19 @@
-class_name Ward
+class_name Shield
 extends Node2D
-## The Ward protection area. Specification section 14.7.
+## The Shield protection area. Specification section 14.7.
 ##
-## Ward is a temporary circle around a cast point that weakens the enemies inside
+## Shield is a temporary circle around a cast point that weakens the enemies inside
 ## it: an enemy projectile that lands in the area does far less damage, and an
 ## enemy standing in it moves slower. It never softens a short-range melee blow,
 ## which the enemy side keeps out of the two queries below by only routing bolt
 ## damage and movement through them.
 ##
-## Only one Ward can be active at one time (section 14.7), so the live instance
+## Only one Shield can be active at one time (section 14.7), so the live instance
 ## is held on a static reference that the enemy body and the enemy bolt read.
 ## A second cast dismisses the first, so this is a single value and never a list.
 
-## The Ward now on the field, or null. Section 14.7 allows only one at a time.
-static var active: Ward = null
+## The Shield now on the field, or null. Section 14.7 allows only one at a time.
+static var active: Shield = null
 
 ## Seconds of fade at the end, so the ring thins out rather than blinking away.
 const FADE_SECONDS := 0.6
@@ -30,14 +30,14 @@ var enemy_slow_factor: float = 0.20
 var _life: float = 4.0
 
 
-## Place the Ward and take over as the single active one. Section 14.7.
+## Place the Shield and take over as the single active one. Section 14.7.
 func setup(spell: SpellData, at: Vector2) -> void:
 	global_position = at
 	effect_radius = spell.effect_radius
 	projectile_damage_reduction = spell.projectile_damage_reduction
 	enemy_slow_factor = spell.enemy_slow_factor
 	_life = spell.duration
-	# The newest cast is always the active one. A Ward it replaced frees itself a
+	# The newest cast is always the active one. A Shield it replaced frees itself a
 	# frame later, and its [method _exit_tree] leaves this reference alone.
 	active = self
 
@@ -51,13 +51,13 @@ func _process(delta: float) -> void:
 
 
 func _exit_tree() -> void:
-	# Clear the shared reference only when it still points here, so a Ward that
-	# replaced this one keeps the field. See [method Wizard._cast_ward].
+	# Clear the shared reference only when it still points here, so a Shield that
+	# replaced this one keeps the field. See [method Wizard._cast_shield].
 	if active == self:
 		active = null
 
 
-## Remove this Ward now, used when a second Ward replaces it or a run ends.
+## Remove this Shield now, used when a second Shield replaces it or a run ends.
 func dismiss() -> void:
 	if active == self:
 		active = null
@@ -73,7 +73,7 @@ func contains_point(point: Vector2) -> bool:
 
 
 ## Damage an enemy bolt landing at a world point should deal after any active
-## Ward. Section 14.7 reduces enemy projectile damage; final damage is never
+## Shield. Section 14.7 reduces enemy projectile damage; final damage is never
 ## below 1, matching section 29.
 static func reduced_damage(point: Vector2, amount: int) -> int:
 	if active == null or not is_instance_valid(active) or not active.contains_point(point):
@@ -81,8 +81,8 @@ static func reduced_damage(point: Vector2, amount: int) -> int:
 	return maxi(1, roundi(float(amount) * (1.0 - active.projectile_damage_reduction)))
 
 
-## Movement speed scale for an enemy at a world point after any active Ward.
-## Section 14.7 reduces enemy movement speed. One where no Ward touches it.
+## Movement speed scale for an enemy at a world point after any active Shield.
+## Section 14.7 reduces enemy movement speed. One where no Shield touches it.
 static func speed_scale(point: Vector2) -> float:
 	if active == null or not is_instance_valid(active) or not active.contains_point(point):
 		return 1.0

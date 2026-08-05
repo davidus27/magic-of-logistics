@@ -155,7 +155,7 @@ The defender cannot move, attack, or repair.
 
 A 15-second downed timer starts.
 
-The wizard can use Mend to revive the defender.
+The wizard can use Heal to revive the defender.
 
 The defender enters the Dead state when the timer reaches zero.
 

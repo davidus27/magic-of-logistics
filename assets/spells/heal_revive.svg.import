@@ -3,7 +3,7 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://b188hc4ykrvgv"
-path="res://.godot/imported/heal_revive.svg-c5fd3ee4be4c13dcab8e4ca60aad7c31.ctex"
+path="res://.godot/imported/heal_revive.svg-85be4b67e6cb9ee15e668c35e7e0592b.ctex"
 metadata={
 "vram_texture": false
 }
@@ -11,7 +11,7 @@ metadata={
 [deps]
 
 source_file="res://assets/spells/heal_revive.svg"
-dest_files=["res://.godot/imported/heal_revive.svg-c5fd3ee4be4c13dcab8e4ca60aad7c31.ctex"]
+dest_files=["res://.godot/imported/heal_revive.svg-85be4b67e6cb9ee15e668c35e7e0592b.ctex"]
 
 [params]
 

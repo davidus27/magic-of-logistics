@@ -9,7 +9,7 @@ Godot 4.7. GDScript, statically typed.
 pixel route while six enemy groups attack it, command four defenders, cast Arc
 Bolt, and either reach the portal or watch the cargo health reach zero.
 
-**Not in this build:** the long-range enemy, Mend and Ward, and barriers. Each is
+**Not in this build:** the long-range enemy, Heal and Shield, and barriers. Each is
 disabled visibly rather than silently.
 **[`docs/status.md`](docs/status.md)** is the file to read before doing anything
 here — what is built, what is next, and the five places the specification needed a
@@ -97,7 +97,7 @@ gets a unit that stands still, so a forgotten branch stops a unit rather than
 letting it drift on last frame's velocity.
 
 **Anything not in the build is disabled, never hidden and never faked.**
-`SpellData.implemented` greys out Mend and Ward, and `EnemySpawner` logs the
+`SpellData.implemented` greys out Heal and Shield, and `EnemySpawner` logs the
 long-range enemies it could not create instead of quietly spawning a smaller
 group. A tester should always be able to see the shape of the finished game.
 

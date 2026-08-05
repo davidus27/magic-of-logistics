@@ -204,7 +204,7 @@ class Return:
 		unit.move_toward(unit.slot_position(), unit.catch_up_scale())
 
 
-## Zero health. Fifteen seconds to be revived with Mend. Section 15.10.
+## Zero health. Fifteen seconds to be revived with Heal. Section 15.10.
 class Downed:
 	extends Base
 

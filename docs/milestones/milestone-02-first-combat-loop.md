@@ -63,9 +63,9 @@ Delivered:
 
 ## Not in this build
 
-Long-range enemy (section 25.2), Mend and Ward, barriers, direct target orders
+Long-range enemy (section 25.2), Heal and Shield, barriers, direct target orders
 (P2), manual cargo steering (P3, P4), threat reinforcement spawns, the section
-30.6 world feedback. Mend and Ward appear on the spell controls as **not in this
+30.6 world feedback. Heal and Shield appear on the spell controls as **not in this
 build**, driven by a new `SpellData.implemented` flag, and cannot be selected —
 the same pattern the selection screen already uses for profiles P2 to P4.
 

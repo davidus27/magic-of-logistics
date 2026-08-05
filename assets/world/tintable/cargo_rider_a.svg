@@ -1,8 +1,12 @@
 <!-- Rider prop: small circle at the front of the cargo unit. Specification 10.4.
-     The short tick shows the movement direction of section 13.4. -->
-<svg xmlns="http://www.w3.org/2000/svg" width="30" height="24" viewBox="0 0 30 24">
+     Top-down driver: head, shoulders behind, heading chevron. Section 13.4. -->
+<svg xmlns="http://www.w3.org/2000/svg" width="40" height="28" viewBox="0 0 40 28">
   <g fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-    <circle cx="11" cy="12" r="9"/>
-    <path d="M 21,12 L 27,12"/>
+    <!-- Shoulders behind the head -->
+    <path d="M 4,9 L 4,19 L 10,19 L 10,9 Z"/>
+    <!-- Head -->
+    <circle cx="16" cy="14" r="8"/>
+    <!-- Heading chevron -->
+    <path d="M 26,9 L 34,14 L 26,19"/>
   </g>
 </svg>

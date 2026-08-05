@@ -346,7 +346,7 @@ func is_dead() -> bool:
 	return machine.current_id() == States.DEAD
 
 
-## Bring a downed defender back with Mend. Section 14.6.
+## Bring a downed defender back with Heal. Section 14.6.
 func revive(with_health: int) -> bool:
 	if not is_downed():
 		return false

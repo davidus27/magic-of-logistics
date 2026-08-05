@@ -9,7 +9,7 @@ Every asset the game loads lives here. Most of it is a pack that converts the vi
 - Road, mud, and off-road terrain tiles.
 - Two hand-drawn frames for important world objects.
 - Wizard, four defender variants, two enemy types, portal, damage, and death marks. Cargo, rider and barrier come from `world/tintable/` instead; see below.
-- Arc Bolt, Mend, and Ward effects.
+- Arc Bolt, Heal, and Shield effects.
 - Selection, target, leash, return, health, and barrier feedback.
 - HUD icons, defender portraits, order buttons, spell buttons, profile badges, and mana widgets.
 - Mockups for all major game states and all four control profiles.

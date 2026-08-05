@@ -213,8 +213,8 @@ func _zone_factor(zone: TerrainZone) -> float:
 	return zone.defender_factor
 
 
-## Movement multiplier from a temporary effect such as Ward. One on a unit that
-## no effect touches; an enemy inside a Ward reads its slow here. Section 14.7.
+## Movement multiplier from a temporary effect such as Shield. One on a unit that
+## no effect touches; an enemy inside a Shield reads its slow here. Section 14.7.
 func _status_speed_scale() -> float:
 	return 1.0
 

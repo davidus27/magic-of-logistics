@@ -275,7 +275,7 @@
     {
       "file": "world/defender_warden_a.svg",
       "category": "world",
-      "purpose": "Shielden defender hand-drawn frame A",
+      "purpose": "Warden defender hand-drawn frame A",
       "dimensions": [
         256,
         256
@@ -285,7 +285,7 @@
     {
       "file": "world/defender_warden_a.png",
       "category": "world",
-      "purpose": "Shielden defender hand-drawn frame A raster export",
+      "purpose": "Warden defender hand-drawn frame A raster export",
       "dimensions": [
         256,
         256
@@ -295,7 +295,7 @@
     {
       "file": "world/defender_warden_b.svg",
       "category": "world",
-      "purpose": "Shielden defender hand-drawn frame B",
+      "purpose": "Warden defender hand-drawn frame B",
       "dimensions": [
         256,
         256
@@ -305,7 +305,7 @@
     {
       "file": "world/defender_warden_b.png",
       "category": "world",
-      "purpose": "Shielden defender hand-drawn frame B raster export",
+      "purpose": "Warden defender hand-drawn frame B raster export",
       "dimensions": [
         256,
         256
@@ -1587,7 +1587,7 @@
     {
       "file": "ui/portraits/warden.svg",
       "category": "ui_portrait",
-      "purpose": "Shielden defender portrait",
+      "purpose": "Warden defender portrait",
       "dimensions": [
         256,
         256
@@ -1597,7 +1597,7 @@
     {
       "file": "ui/portraits/warden.png",
       "category": "ui_portrait",
-      "purpose": "Shielden defender portrait raster export",
+      "purpose": "Warden defender portrait raster export",
       "dimensions": [
         128,
         128
@@ -1607,7 +1607,7 @@
     {
       "file": "ui/portraits/warden_selected.svg",
       "category": "ui_portrait",
-      "purpose": "Shielden selected portrait",
+      "purpose": "Warden selected portrait",
       "dimensions": [
         256,
         256
@@ -1617,7 +1617,7 @@
     {
       "file": "ui/portraits/warden_selected.png",
       "category": "ui_portrait",
-      "purpose": "Shielden selected portrait raster export",
+      "purpose": "Warden selected portrait raster export",
       "dimensions": [
         128,
         128

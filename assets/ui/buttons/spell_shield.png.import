@@ -3,7 +3,7 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://dar33ebp2edbt"
-path="res://.godot/imported/spell_shield.png-46b286e23a985f90efa20dd648533fa6.ctex"
+path="res://.godot/imported/spell_shield.png-c92538eda9dbc13e27caec5f05f9914e.ctex"
 metadata={
 "vram_texture": false
 }
@@ -11,7 +11,7 @@ metadata={
 [deps]
 
 source_file="res://assets/ui/buttons/spell_shield.png"
-dest_files=["res://.godot/imported/spell_shield.png-46b286e23a985f90efa20dd648533fa6.ctex"]
+dest_files=["res://.godot/imported/spell_shield.png-c92538eda9dbc13e27caec5f05f9914e.ctex"]
 
 [params]
 

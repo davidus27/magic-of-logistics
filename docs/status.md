@@ -54,7 +54,7 @@ is left of build order once that scope is removed.
 
 | Milestone | Scope |
 |---|---|
-| **M3 — combat completion** | Barriers with the Repair state, the long-range enemy, Mend and Ward |
+| **M3 — combat completion** | Barriers with the Repair state, the long-range enemy, Heal and Shield |
 | **M4 — feedback and threat** | §30.6 world feedback, the threat reinforcements, the second barrier, final balance values |
 
 ---
@@ -76,9 +76,9 @@ or its disabled-state flag already in place, so all three are behaviour only.
    `behaviour_checks._check_long_range()` drives one to its Fire state and checks
    the bolt lands. Nothing before this session ever actually took a long-range
    hit end to end, though: see the `smoke_run` finding below.
-3. **Mend and Ward** (§14.6, §14.7). **Done.** `Wizard` now carries the `HEAL` and
-   `AREA` branches: Mend heals the cargo unit or the defender under the pointer and
-   revives a downed one, and Ward (`world/wizard/ward.gd`) drops a single protection
+3. **Heal and Shield** (§14.6, §14.7). **Done.** `Wizard` now carries the `HEAL` and
+   `AREA` branches: Heal heals the cargo unit or the defender under the pointer and
+   revives a downed one, and Shield (`world/wizard/shield.gd`) drops a single protection
    area that slows the enemies inside it and soaks most of their bolts, leaving
    short-range melee untouched. Both `.tres` now carry `implemented = true`, so the
    number keys select them, and `behaviour_checks` casts each through the wizard and
@@ -109,7 +109,7 @@ Not bugs. Do not "fix" these without checking the milestone that owns them.
 | Final combat balance — a passive `smoke_run` now fails to the long-range enemy and the barriers together | M3/M4 |
 
 `SpellData.implemented` still decides whether a spell shows live or disabled; Arc
-Bolt, Mend and Ward now all carry it true. `EnemySpawner` uses the same
+Bolt, Heal and Shield now all carry it true. `EnemySpawner` uses the same
 disable-visibly pattern for anything it cannot yet create — it logs what it deferred
 instead of quietly spawning a smaller group. Flip a flag only when the thing works
 end to end.
@@ -206,7 +206,7 @@ observed sticking.
 - [x] The cargo unit can reach the final portal — under attack, verified each run
 - [x] Both enemy types can attack the cargo unit — the long-range enemy's damage is real, per the `smoke_run` finding below
 - [x] Defenders can attack, defend, and repair — all three work; both barriers give repair a target
-- [x] The wizard can cast all three spells — Arc Bolt, Mend and Ward, each cast through the wizard in `behaviour_checks`
+- [x] The wizard can cast all three spells — Arc Bolt, Heal and Shield, each cast through the wizard in `behaviour_checks`
 - [x] The final portal can complete a run
 - [x] Cargo destruction can fail a run
 - [x] No unit stays blocked for more than two seconds — 0 fallbacks in a full run, and every enemy reached the cargo

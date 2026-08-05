@@ -5,9 +5,9 @@ extends Resource
 enum Kind {
 	## Arc Bolt: a projectile toward the pointer. Section 14.5.
 	PROJECTILE,
-	## Mend: restores health to one clicked target. Section 14.6.
+	## Heal: restores health to one clicked target. Section 14.6.
 	HEAL,
-	## Ward: a temporary protection area. Section 14.7.
+	## Shield: a temporary protection area. Section 14.7.
 	AREA,
 }
 

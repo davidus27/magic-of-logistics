@@ -27,7 +27,7 @@ than shift everything below them. Find the owning file here.
 | 11 | Battlefield layout | [`spec/03-map-and-terrain.md`](spec/03-map-and-terrain.md) |
 | 12 | Terrain: road, mud, off-road, feedback | [`spec/03-map-and-terrain.md`](spec/03-map-and-terrain.md) |
 | 13 | Cargo unit: properties, health, collision, rider | [`spec/04-cargo.md`](spec/04-cargo.md) |
-| 14 | Wizard: position, mana, spell selection, Arc Bolt, Mend, Ward | [`spec/05-wizard.md`](spec/05-wizard.md) |
+| 14 | Wizard: position, mana, spell selection, Arc Bolt, Heal, Shield | [`spec/05-wizard.md`](spec/05-wizard.md) |
 | 15 | Defenders: count, values, movement, all seven states | [`spec/06-defenders.md`](spec/06-defenders.md) |
 | 16 | Defender selection | [`spec/06-defenders.md`](spec/06-defenders.md) |
 | 17 | Defender control method A — role orders | [`spec/06-defenders.md`](spec/06-defenders.md) |

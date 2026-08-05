@@ -23,7 +23,7 @@
 [ext_resource type="PackedScene" path="res://world/wizard/arc_bolt.tscn" id="22_arc_bolt"]
 [ext_resource type="PackedScene" path="res://world/enemies/enemy_long_range.tscn" id="23_enemy_long"]
 [ext_resource type="PackedScene" path="res://world/enemies/enemy_bolt.tscn" id="24_enemy_bolt"]
-[ext_resource type="PackedScene" path="res://world/wizard/ward.tscn" id="25_ward"]
+[ext_resource type="PackedScene" path="res://world/wizard/shield.tscn" id="25_shield"]
 
 [node name="Main" type="Node2D" unique_id=319065168]
 
@@ -72,7 +72,7 @@ enemy_spawner_path = NodePath("../EnemySpawner")
 squad_path = NodePath("../Squad")
 effect_container_path = NodePath("../EffectContainer")
 arc_bolt_scene = ExtResource("22_arc_bolt")
-ward_scene = ExtResource("25_ward")
+shield_scene = ExtResource("25_shield")
 
 [node name="CameraRig" type="Camera2D" parent="World" unique_id=1018180218]
 script = ExtResource("4_camera")
