@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://diyvyssevnmnj"
-path="res://.godot/imported/spell_mend.png-8cfbca062a25096996297bc2e7bfe9c7.ctex"
+uid="uid://dar33ebp2edbt"
+path="res://.godot/imported/spell_shield.png-46b286e23a985f90efa20dd648533fa6.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/ui/buttons/spell_mend.png"
-dest_files=["res://.godot/imported/spell_mend.png-8cfbca062a25096996297bc2e7bfe9c7.ctex"]
+source_file="res://assets/ui/buttons/spell_shield.png"
+dest_files=["res://.godot/imported/spell_shield.png-46b286e23a985f90efa20dd648533fa6.ctex"]
 
 [params]
 

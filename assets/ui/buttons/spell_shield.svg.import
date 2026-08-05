@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dxkwva6r0mqpn"
-path="res://.godot/imported/ward_area_a.png-30fe05175056262e4263700df96bc766.ctex"
+uid="uid://cnrpawwlut64q"
+path="res://.godot/imported/spell_shield.svg-4830215ed2928c48aa2c0f15e9109251.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/spells/ward_area_a.png"
-dest_files=["res://.godot/imported/ward_area_a.png-30fe05175056262e4263700df96bc766.ctex"]
+source_file="res://assets/ui/buttons/spell_shield.svg"
+dest_files=["res://.godot/imported/spell_shield.svg-4830215ed2928c48aa2c0f15e9109251.ctex"]
 
 [params]
 
@@ -38,3 +38,6 @@ process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
 detect_3d/compress_to=1
+svg/scale=1.0
+editor/scale_with_editor_scale=false
+editor/convert_colors_with_editor_theme=false

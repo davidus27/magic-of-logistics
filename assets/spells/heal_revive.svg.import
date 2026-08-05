@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://hel5f5y8k743"
-path="res://.godot/imported/mend_cursor.png-2bed3675286a78ce82f423ed476c7ca6.ctex"
+uid="uid://b188hc4ykrvgv"
+path="res://.godot/imported/heal_revive.svg-c5fd3ee4be4c13dcab8e4ca60aad7c31.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/spells/mend_cursor.png"
-dest_files=["res://.godot/imported/mend_cursor.png-2bed3675286a78ce82f423ed476c7ca6.ctex"]
+source_file="res://assets/spells/heal_revive.svg"
+dest_files=["res://.godot/imported/heal_revive.svg-c5fd3ee4be4c13dcab8e4ca60aad7c31.ctex"]
 
 [params]
 
@@ -38,3 +38,6 @@ process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
 detect_3d/compress_to=1
+svg/scale=1.0
+editor/scale_with_editor_scale=false
+editor/convert_colors_with_editor_theme=false

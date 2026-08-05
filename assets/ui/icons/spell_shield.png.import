@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b7170187ubapi"
-path="res://.godot/imported/ward_area_b.png-03eed1a0071386c3b40d6398eb61380a.ctex"
+uid="uid://degwxfibkogta"
+path="res://.godot/imported/spell_shield.png-dc22ee3b806077ee34436bfd4b698b3a.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/spells/ward_area_b.png"
-dest_files=["res://.godot/imported/ward_area_b.png-03eed1a0071386c3b40d6398eb61380a.ctex"]
+source_file="res://assets/ui/icons/spell_shield.png"
+dest_files=["res://.godot/imported/spell_shield.png-dc22ee3b806077ee34436bfd4b698b3a.ctex"]
 
 [params]
 

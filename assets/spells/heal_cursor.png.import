@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bvkagciesbcf2"
-path="res://.godot/imported/ward_area_a.svg-5626fa94bd8506b6eef51b39ee882e71.ctex"
+uid="uid://hel5f5y8k743"
+path="res://.godot/imported/heal_cursor.png-2bed3675286a78ce82f423ed476c7ca6.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/spells/ward_area_a.svg"
-dest_files=["res://.godot/imported/ward_area_a.svg-5626fa94bd8506b6eef51b39ee882e71.ctex"]
+source_file="res://assets/spells/heal_cursor.png"
+dest_files=["res://.godot/imported/heal_cursor.png-2bed3675286a78ce82f423ed476c7ca6.ctex"]
 
 [params]
 
@@ -38,6 +38,3 @@ process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
 detect_3d/compress_to=1
-svg/scale=1.0
-editor/scale_with_editor_scale=false
-editor/convert_colors_with_editor_theme=false

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dar33ebp2edbt"
-path="res://.godot/imported/spell_ward.png-46b286e23a985f90efa20dd648533fa6.ctex"
+uid="uid://dgmdgq224ffik"
+path="res://.godot/imported/spell_heal.svg-9b9727051774970ada1c050f00b3440c.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/ui/buttons/spell_ward.png"
-dest_files=["res://.godot/imported/spell_ward.png-46b286e23a985f90efa20dd648533fa6.ctex"]
+source_file="res://assets/ui/icons/spell_heal.svg"
+dest_files=["res://.godot/imported/spell_heal.svg-9b9727051774970ada1c050f00b3440c.ctex"]
 
 [params]
 
@@ -23,7 +23,7 @@ compress/rdo_quality_loss=0.0
 compress/hdr_compression=1
 compress/normal_map=0
 compress/channel_pack=0
-mipmaps/generate=false
+mipmaps/generate=true
 mipmaps/limit=-1
 roughness/mode=0
 roughness/src_normal=""
@@ -38,3 +38,6 @@ process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
 detect_3d/compress_to=1
+svg/scale=2.0
+editor/scale_with_editor_scale=false
+editor/convert_colors_with_editor_theme=false

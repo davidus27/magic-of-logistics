@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cnrpawwlut64q"
-path="res://.godot/imported/spell_ward.svg-4830215ed2928c48aa2c0f15e9109251.ctex"
+uid="uid://tkc7jojx1ana"
+path="res://.godot/imported/spell_heal.svg-889220684e6a976483b1f28b88b8ee9a.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/ui/buttons/spell_ward.svg"
-dest_files=["res://.godot/imported/spell_ward.svg-4830215ed2928c48aa2c0f15e9109251.ctex"]
+source_file="res://assets/ui/buttons/spell_heal.svg"
+dest_files=["res://.godot/imported/spell_heal.svg-889220684e6a976483b1f28b88b8ee9a.ctex"]
 
 [params]
 

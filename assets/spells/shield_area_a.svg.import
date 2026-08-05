@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://d3twerky6dyp3"
-path="res://.godot/imported/mend_cursor.svg-ac7645988788b8fb85157c24102b929f.ctex"
+uid="uid://bvkagciesbcf2"
+path="res://.godot/imported/shield_area_a.svg-5626fa94bd8506b6eef51b39ee882e71.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/spells/mend_cursor.svg"
-dest_files=["res://.godot/imported/mend_cursor.svg-ac7645988788b8fb85157c24102b929f.ctex"]
+source_file="res://assets/spells/shield_area_a.svg"
+dest_files=["res://.godot/imported/shield_area_a.svg-5626fa94bd8506b6eef51b39ee882e71.ctex"]
 
 [params]
 

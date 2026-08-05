@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bf1rdkt86vh8c"
-path="res://.godot/imported/mend_effect.png-6fd6342c3f33c7681e4940909fd0040a.ctex"
+uid="uid://6ek8wq2104tt"
+path="res://.godot/imported/heal_revive.png-e84cf9edb4769194ececcb55d05a8e84.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/spells/mend_effect.png"
-dest_files=["res://.godot/imported/mend_effect.png-6fd6342c3f33c7681e4940909fd0040a.ctex"]
+source_file="res://assets/spells/heal_revive.png"
+dest_files=["res://.godot/imported/heal_revive.png-e84cf9edb4769194ececcb55d05a8e84.ctex"]
 
 [params]
 

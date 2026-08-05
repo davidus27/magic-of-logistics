@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://7bi3sqi6ikgo"
-path="res://.godot/imported/ward_area_b.svg-d885ef600538de173acf701a568326ed.ctex"
+uid="uid://b7170187ubapi"
+path="res://.godot/imported/shield_area_b.png-03eed1a0071386c3b40d6398eb61380a.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/spells/ward_area_b.svg"
-dest_files=["res://.godot/imported/ward_area_b.svg-d885ef600538de173acf701a568326ed.ctex"]
+source_file="res://assets/spells/shield_area_b.png"
+dest_files=["res://.godot/imported/shield_area_b.png-03eed1a0071386c3b40d6398eb61380a.ctex"]
 
 [params]
 
@@ -38,6 +38,3 @@ process/hdr_as_srgb=false
 process/hdr_clamp_exposure=false
 process/size_limit=0
 detect_3d/compress_to=1
-svg/scale=1.0
-editor/scale_with_editor_scale=false
-editor/convert_colors_with_editor_theme=false
