@@ -58,7 +58,7 @@ A short line shows the maximum permitted target point.
 | Key | `1` | `2` | `3` |
 | Mana cost | 5 | 25 | 35 |
 | Cooldown | 0.50 s | 5 s | 8 s |
-| Range | 500 px | 350 px | 400 px |
+| Range | 650 px | 350 px | 400 px |
 
 ### 14.5 Spell 1: Arc Bolt
 
@@ -68,7 +68,7 @@ Arc Bolt costs 5 mana.
 
 Arc Bolt has a 0.50-second cooldown.
 
-Arc Bolt has a 500-pixel range.
+Arc Bolt has a 650-pixel range.
 
 Arc Bolt causes 18 damage.
 

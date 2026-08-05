@@ -495,7 +495,7 @@
     {
       "file": "world/tintable/cargo_body_a.svg",
       "category": "world",
-      "purpose": "Cargo unit body, top-down, hand-drawn frame A",
+      "purpose": "Cargo wagon body with rear axle, bed and cabin, top-down frame A",
       "dimensions": [
         132,
         96
@@ -507,7 +507,7 @@
     {
       "file": "world/tintable/cargo_body_b.svg",
       "category": "world",
-      "purpose": "Cargo unit body, top-down, hand-drawn frame B",
+      "purpose": "Cargo wagon body with rear axle, bed and cabin, top-down frame B",
       "dimensions": [
         132,
         96
@@ -519,9 +519,9 @@
     {
       "file": "world/tintable/cargo_rider_a.svg",
       "category": "world",
-      "purpose": "Cargo rider circle with heading tick, hand-drawn frame A",
+      "purpose": "Cargo rider circle with heading chevron, hand-drawn frame A",
       "dimensions": [
-        30,
+        36,
         24
       ],
       "anchor": "center",
@@ -531,10 +531,34 @@
     {
       "file": "world/tintable/cargo_rider_b.svg",
       "category": "world",
-      "purpose": "Cargo rider circle with heading tick, hand-drawn frame B",
+      "purpose": "Cargo rider circle with heading chevron, hand-drawn frame B",
       "dimensions": [
-        30,
+        36,
         24
+      ],
+      "anchor": "center",
+      "source": "hand-authored",
+      "tint": "white source, tinted at runtime"
+    },
+    {
+      "file": "world/tintable/cargo_wizard_a.svg",
+      "category": "world",
+      "purpose": "Wizard on the cargo bed: hat triangle, body and staff, frame A",
+      "dimensions": [
+        44,
+        40
+      ],
+      "anchor": "center",
+      "source": "hand-authored",
+      "tint": "white source, tinted at runtime"
+    },
+    {
+      "file": "world/tintable/cargo_wizard_b.svg",
+      "category": "world",
+      "purpose": "Wizard on the cargo bed: hat triangle, body and staff, frame B",
+      "dimensions": [
+        44,
+        40
       ],
       "anchor": "center",
       "source": "hand-authored",

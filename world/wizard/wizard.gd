@@ -362,7 +362,7 @@ func _draw() -> void:
 ## An ink circle drawn as dashes, which reads as a guide rather than as a world
 ## object in the paper-and-ink style of section 10.
 ##
-## The Arc Bolt range of 500 pixels is taller than the 720 pixel viewport, so
+## The Arc Bolt range of 650 pixels is taller than the 720 pixel viewport, so
 ## only the left and right arcs are ever on screen. Long dashes in the medium
 ## grey are what makes those two arcs read as one boundary; the light line colour
 ## of the road edges disappears against the paper at this width.
